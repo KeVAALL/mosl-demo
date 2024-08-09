@@ -15,9 +15,11 @@ import {
   Box,
   Avatar,
   Drawer,
+  Tooltip,
+  tooltipClasses,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useTheme } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { Menu, MenuItem, Sidebar } from "react-pro-sidebar";
 import { Outlet, Link } from "react-router-dom";
@@ -32,6 +34,21 @@ import AppSettingsAltIcon from "@mui/icons-material/AppSettingsAlt";
 import DynamicFeedIcon from "@mui/icons-material/DynamicFeed";
 
 import "./mainLayout.css";
+
+// Tooltip style
+// const HtmlTooltip = styled(({ className, ...props }) => (
+//   <Tooltip {...props} classes={{ popper: className }} />
+// ))(({ theme }) => ({
+//   [`& .${tooltipClasses.tooltip}`]: {
+//     backgroundColor: "#f5f5f9",
+//     color: "#424242",
+//     // color: "rgba(0, 0, 0, 0.87)",
+//     maxWidth: 220,
+//     height: 20,
+//     fontSize: theme.typography.pxToRem(12),
+//     border: "1px solid #dadde9",
+//   },
+// }));
 
 const Header = ({ open, handleDrawerToggle }) => (
   <AppBar position="static" className="main-toolbar">
@@ -55,7 +72,33 @@ const Header = ({ open, handleDrawerToggle }) => (
         >
           <MenuIcon />
         </IconButton>
+        {/* <Tooltip
+          placement="bottom-start"
+          title={
+            <Menu iconShape="square">
+              <Link to="/sign-in">
+                <MenuItem icon={<BarChartRoundedIcon />}>
+                  <Typography variant="subtitle1">Logout</Typography>
+                </MenuItem>
+              </Link>
+            </Menu>
+          }
+          slotProps={{
+            popper: {
+              modifiers: [
+                {
+                  name: "offset",
+                  options: {
+                    offset: [0, -10],
+                  },
+                },
+              ],
+            },
+          }}
+          enterTouchDelay={20}
+        > */}
         <Avatar sx={{ bgcolor: "black" }}>N</Avatar>
+        {/* </Tooltip> */}
       </Box>
     </Toolbar>
   </AppBar>
