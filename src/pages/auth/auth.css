@@ -1,0 +1,17 @@
+.common-textfield .MuiFormControl-root {
+  width: 100% !important;
+}
+.common-textfield .MuiFormLabel-root {
+  line-height: 1.5em !important;
+  font-size: 0.75rem !important;
+}
+.common-textfield .MuiOutlinedInput-root {
+  border-radius: 5px;
+}
+.common-textfield .Mui-disabled {
+  -webkit-text-fill-color: #768087 !important;
+}
+.common-textfield .Mui-disabled input {
+  background-color: #76808729;
+  border-radius: 4px;
+}
