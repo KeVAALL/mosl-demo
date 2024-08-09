@@ -208,7 +208,7 @@ export default function SignIn() {
                         >
                           No account?
                           <Link
-                            href="/sign-up"
+                            to="/sign-up"
                             className="custom-link"
                             sx={{ ml: 1 }}
                           >

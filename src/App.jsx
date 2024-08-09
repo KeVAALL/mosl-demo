@@ -51,7 +51,6 @@ const appLayout = createBrowserRouter([
       {
         path: "sign-in",
         element: <SignIn />,
-        // element: <></>,
       },
       {
         path: "login-with-email",
