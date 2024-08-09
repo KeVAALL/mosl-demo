@@ -42,7 +42,7 @@ const appLayout = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Navigate to="/sign-in" replace />,
+        element: <Navigate to="/sign-in" />,
       },
       {
         path: "sign-up",

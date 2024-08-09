@@ -207,13 +207,13 @@ export default function SignIn() {
                           sx={{ color: "text.grey" }}
                         >
                           No account?
-                          <Link
-                            to="/sign-up"
+                          <a
+                            href="/sign-up"
                             className="custom-link"
-                            sx={{ ml: 1 }}
+                            style={{ marginLeft: "8px" }}
                           >
                             Sign Up
-                          </Link>
+                          </a>
                         </Typography>
                       </Grid>
                     </Grid>
