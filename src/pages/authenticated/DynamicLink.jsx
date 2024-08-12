@@ -157,7 +157,7 @@ function DynamicLink() {
         <Grid item xs={12}>
           {!openForm ? (
             <TableContainer component={Paper}>
-              <Grid container spacing={1} px={2} py={2}>
+              <Grid container spacing={1.5} px={2} py={2}>
                 <Grid item md={2} xs={6}>
                   <GlobalFilter
                     globalFilter={globalFilter}
