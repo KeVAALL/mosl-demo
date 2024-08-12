@@ -75,7 +75,7 @@ function Dashboard() {
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
+        {/* <Grid item xs={12} sm={6} md={4}>
           <Card
             onClick={() => {
               navigate("/home/application");
@@ -110,13 +110,13 @@ function Dashboard() {
               </Typography>
             </CardContent>
           </Card>
-        </Grid>
-        {/* <ProjectBox
+        </Grid> */}
+        <ProjectBox
           title="react-auth-test"
           description="react-auth-test-175bb"
-        /> */}
+        />
 
-        <Grid item xs={12} sm={6} md={4}>
+        {/* <Grid item xs={12} sm={6} md={4}>
           <Card
             onClick={() => {
               navigate("/home/dynamic-links");
@@ -151,11 +151,11 @@ function Dashboard() {
               </Typography>
             </CardContent>
           </Card>
-        </Grid>
-        {/* <ProjectBox
+        </Grid> */}
+        <ProjectBox
           title="push-notification"
           description="push-notification-6787b"
-        /> */}
+        />
       </Grid>
     </>
   );

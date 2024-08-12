@@ -44,10 +44,10 @@ const appLayout = createBrowserRouter([
         path: "/",
         element: <Navigate to="/sign-in" />,
       },
-      {
-        path: "sign-up",
-        element: <SignUp />,
-      },
+      // {
+      //   path: "sign-up",
+      //   element: <SignUp />,
+      // },
       {
         path: "sign-in",
         element: <SignIn />,

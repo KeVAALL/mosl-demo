@@ -52,15 +52,18 @@ export default function ThemeCustomization({ children }) {
             backgroundColor: "#000000", // Black background
             color: "#FFFFFF", // White text
             border: "1px solid #000000", // Black border
+            padding: "6px 16px", // Set padding
             "&:hover": {
               backgroundColor: "#333333", // Slightly lighter black on hover
             },
           },
           outlined: {
             textTransform: "capitalize",
-            backgroundColor: "#FFFFFF", // White background
-            color: "#616161", // Black text
-            border: "1px solid #e0e0e0", // Border color
+            backgroundColor: "#FFFFFF !important", // White background
+            // color: "#616161", // Black text
+            color: "#000000", // Black text
+            border: "1px solid #000000", // Border color
+            padding: "6px 16px", // Set padding
             boxShadow: "0px 1px 3px rgba(0, 0, 0, 0.12)", // Subtle box shadow
             "&:hover": {
               backgroundColor: "#f5f5f5", // Slightly off-white on hover

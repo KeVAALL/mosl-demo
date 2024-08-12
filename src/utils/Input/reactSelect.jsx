@@ -32,7 +32,7 @@ const customStyles = {
   // Style the single value (the selected value displayed)
   singleValue: (provided) => ({
     ...provided,
-    color: "#FFFFFF", // White text for selected value
+    color: "#000", // White text for selected value
     fontSize: "14px", // Match font size with BootstrapInput
   }),
   // Style the placeholder

@@ -10,6 +10,7 @@ import {
   Box,
   Button,
   Card,
+  Divider,
   FormControl,
   Grid,
   IconButton,
@@ -36,6 +37,7 @@ import AdbOutlinedIcon from "@mui/icons-material/AdbOutlined";
 import CodeOffOutlinedIcon from "@mui/icons-material/CodeOffOutlined";
 import AirplayOutlinedIcon from "@mui/icons-material/AirplayOutlined";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
+import { CustomSelect } from "../../utils/Input/reactSelect";
 // third-party
 import { useTable, usePagination, useGlobalFilter } from "react-table";
 
@@ -59,13 +61,16 @@ function Application() {
   const [openAndroid, setOpenAndroid] = React.useState(false);
   const [openIOS, setOpenIOS] = React.useState(false);
   const [openWeb, setOpenWeb] = React.useState(false);
+  const [openForm, setOpenForm] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const handleOpen = () => {
-    setOpen(true);
+    // setOpen(true);
+    setOpenForm(true);
   };
   const handleClose = () => {
-    setOpen(false);
+    // setOpen(false);
+    setOpenForm(false);
   };
   const handleAndroidOpen = () => {
     setOpenAndroid(true);
@@ -96,7 +101,6 @@ function Application() {
       fontSize: 13,
     },
   }));
-
   const modalStyle = {
     position: "absolute",
     top: "50%",
@@ -110,10 +114,36 @@ function Application() {
     px: 4,
     pb: 3,
   };
-
+  const applicationArr = [
+    {
+      label: "Android",
+      value: "Android",
+    },
+    {
+      label: "IOS",
+      value: "IOS",
+    },
+    {
+      label: "Web App",
+      value: "Web App",
+    },
+  ];
+  const projectArr = [
+    {
+      label: "push-notification-6787b",
+      value: "push-notification-6787b",
+    },
+    {
+      label: "react-auth-test-175bb",
+      value: "react-auth-test-175bb",
+    },
+  ];
+  const [selectedApp, setSelectedApp] = useState({
+    label: "Android",
+    value: "Android",
+  });
   const columns = useMemo(() => tableColumns, []);
   const data = useMemo(() => tableData, []);
-
   const {
     getTableProps,
     getTableBodyProps,
@@ -151,187 +181,9 @@ function Application() {
     }
     return item;
   });
-  // Handle column visibility toggle
-  // const toggleColumnVisibility = (accessor) => {
-  //   setVisibleColumns((prev) =>
-  //     prev.includes(accessor)
-  //       ? prev.filter((col) => col !== accessor)
-  //       : [...prev, accessor]
-  //   );
-  //   setHiddenColumns((prev) =>
-  //     prev.includes(accessor)
-  //       ? prev.filter((col) => col !== accessor)
-  //       : [...prev, accessor]
-  //   );
-  // };
 
   return (
     <>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="child-modal-title"
-        aria-describedby="child-modal-description"
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            timeout: 300,
-          },
-        }}
-      >
-        <Box
-          sx={{
-            ...modalStyle,
-            width: {
-              xs: "90%", // 90% of the viewport width for extra-small screens
-              sm: "70%", // 70% of the viewport width for small screens
-              md: "60%", // 60% of the viewport width for medium screens
-              lg: "50%", // 50% of the viewport width for large screens
-              xl: "40%", // 40% of the viewport width for extra-large screens
-            },
-            maxWidth: "600px", // Maximum width constraint
-            margin: "0 auto", // Center the modal horizontally
-          }}
-        >
-          <Grid container sx={{ width: "100%" }}>
-            <Grid item xs={12} sx={{ width: "100%" }}>
-              <Grid
-                container
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  width: "100%",
-                }}
-              >
-                <Grid item sx={{ width: "100%" }}>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Stack
-                      justifyContent="flex-start"
-                      alignItems="flex-start"
-                      gap="5px"
-                    >
-                      <Typography
-                        variant="h5"
-                        sx={{ color: "primary.main", fontWeight: 500 }}
-                      >
-                        Create an Application
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{ color: "text.greyLight" }}
-                      >
-                        Select a platform to get started
-                      </Typography>
-                    </Stack>
-                    <IconButton
-                      onClick={() => {
-                        // window.location.reload();
-                        handleClose();
-                      }}
-                    >
-                      <ClearOutlinedIcon />
-                    </IconButton>
-                  </Stack>
-                </Grid>
-                <Grid item xs={12} sx={{ width: "100%" }}>
-                  <Grid container spacing={3} mt={1}>
-                    <Grid
-                      item
-                      xs={12}
-                      sx={{
-                        padding: {
-                          md: "40px !important",
-                          xs: "40px 0px !important",
-                        },
-                      }}
-                    >
-                      <Grid
-                        container
-                        sx={{
-                          display: "flex",
-                          justifyContent: "center",
-                          margin: "auto",
-                          gap: { md: "inherit", xs: "30px" },
-                        }}
-                      >
-                        <Grid
-                          item
-                          md={4}
-                          display="flex"
-                          justifyContent="flex-end"
-                        >
-                          <AndroidModal
-                            open={openAndroid}
-                            handleClose={handleAndroidClose}
-                          />
-                          <Stack alignItems="center" sx={{ gap: "10px" }}>
-                            <Card
-                              className="button-30"
-                              // sx={{
-                              //   minHeight: 60,
-                              //   width: 60,
-                              //   borderRadius: "50%",
-                              //   display: "flex",
-                              //   justifyContent: "center",
-                              //   alignItems: "center",
-                              //   border: "1px solid #212121",
-                              //   cursor: "pointer",
-                              //   "&:hover": {
-                              //     backgroundColor: "#f8fafe",
-                              //     transition: "background-color 0.3s ease-in-out", // Add smooth transition
-                              //   },
-                              // }}
-                              onClick={handleAndroidOpen}
-                            >
-                              <AdbOutlinedIcon sx={{ fontSize: "24px" }} />
-                            </Card>
-                            <Typography variant="caption">Android</Typography>
-                          </Stack>
-                        </Grid>
-                        <Grid
-                          item
-                          md={4}
-                          display="flex"
-                          justifyContent="center"
-                        >
-                          <IOSModal
-                            open={openIOS}
-                            handleClose={handleIOSClose}
-                          />
-                          <Stack alignItems="center" sx={{ gap: "10px" }}>
-                            <Card className="button-30" onClick={handleIOSOpen}>
-                              <AirplayOutlinedIcon sx={{ fontSize: "24px" }} />
-                            </Card>
-                            <Typography variant="caption">IOS</Typography>
-                          </Stack>
-                        </Grid>
-                        <Grid item md={4}>
-                          <WebAppModal
-                            open={openWeb}
-                            handleClose={handleWebClose}
-                          />
-                          <Stack sx={{ gap: "10px" }}>
-                            <Card className="button-30" onClick={handleWebOpen}>
-                              <CodeOffOutlinedIcon sx={{ fontSize: "24px" }} />
-                            </Card>
-                            <Typography variant="caption">Web App</Typography>
-                          </Stack>
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Box>
-      </Modal>
       <Grid container spacing={4} sx={{ width: "100%" }}>
         <Grid item xs={12}>
           <Grid container display="flex" alignItems="center">
@@ -344,166 +196,344 @@ function Application() {
               </Typography>
             </Grid>
             <Grid item xs={6} display="flex" justifyContent="flex-end">
-              <Button variant="contained" onClick={handleOpen}>
-                Add Application
-              </Button>
+              {!openForm && (
+                <Button variant="contained" onClick={handleOpen}>
+                  Add Application
+                </Button>
+              )}
             </Grid>
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <TableContainer component={Paper}>
-            <Grid container spacing={2} px={2} py={2}>
-              <Grid item md={2} xs={6}>
-                <GlobalFilter
-                  globalFilter={globalFilter}
-                  setGlobalFilter={setGlobalFilter}
-                />
-              </Grid>
-              <Grid
-                item
-                md={2}
-                xs={6}
-                sx={{ paddingLeft: { md: "12px !important", xs: "inherit" } }}
-              >
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    className="date-picker"
-                    renderInput={(params) => {
-                      return (
-                        <BootstrapInput
-                          {...params}
-                          placeholder="Filter Apps by date"
-                        />
-                      );
-                    }}
-                    disableFuture
+          {!openForm ? (
+            <TableContainer component={Paper}>
+              <Grid container spacing={1} px={2} py={2}>
+                <Grid item md={2} xs={6}>
+                  <GlobalFilter
+                    globalFilter={globalFilter}
+                    setGlobalFilter={setGlobalFilter}
                   />
-                </LocalizationProvider>
-              </Grid>
-              {!isMobile && <Grid item md={5} xs={0}></Grid>}
-              <Grid item md={1} xs={2} display="flex" justifyContent="flex-end">
-                <Tooltip title="Download PDF" placement="top" arrow>
-                  <Button
-                    className="mui-icon-button"
-                    variant="outlined"
-                    startIcon={<CloudUploadOutlinedIcon />}
+                </Grid>
+                <Grid item md={3} xs={6}>
+                  <CustomSelect
+                    placeholder="Select Project"
+                    options={projectArr}
+                    id="project"
+                    isClearable
                   />
-                </Tooltip>
+                </Grid>
               </Grid>
-              <Grid item md={2} xs={10}>
-                <HidingSelect
-                  hiddenColumns={hiddenColumns}
-                  setHiddenColumns={setHiddenColumns}
-                  allColumns={allColumns}
-                />
-              </Grid>
-            </Grid>
-            <Box sx={{ width: "100%", overflowX: "auto", display: "block" }}>
-              <Table {...getTableProps()}>
-                <TableHead>
-                  {headerGroups.map((headerGroup) => (
-                    <TableRow
-                      key={headerGroup.id}
-                      {...headerGroup.getHeaderGroupProps()}
-                    >
-                      {headerGroup.headers.map((column) => (
+              <Box sx={{ width: "100%", overflowX: "auto", display: "block" }}>
+                <Table {...getTableProps()}>
+                  <TableHead>
+                    {headerGroups.map((headerGroup) => (
+                      <TableRow
+                        key={headerGroup.id}
+                        {...headerGroup.getHeaderGroupProps()}
+                      >
+                        {headerGroup.headers.map((column) => (
+                          <StyledTableCell
+                            key={column.id}
+                            {...column.getHeaderProps({
+                              style: { minWidth: column.minWidth },
+                            })}
+                            sx={{
+                              border: "1px solid #dbe0e5a6",
+                            }}
+                          >
+                            <HeaderSort column={column} />
+                          </StyledTableCell>
+                        ))}
                         <StyledTableCell
-                          key={column.id}
-                          {...column.getHeaderProps({
-                            style: { minWidth: column.minWidth },
-                          })}
                           sx={{
-                            border: "1px solid #dbe0e5a6",
+                            textAlign: "right",
                           }}
                         >
-                          <HeaderSort column={column} />
+                          Actions
                         </StyledTableCell>
-                      ))}
-                      <StyledTableCell
-                        sx={{
-                          textAlign: "right",
-                        }}
-                      >
-                        Actions
-                      </StyledTableCell>
-                    </TableRow>
-                  ))}
-                </TableHead>
-                <TableBody className="table_body_main" {...getTableBodyProps()}>
-                  {page.length > 0 ? (
-                    page.map((row) => {
-                      prepareRow(row);
-                      return (
-                        <TableRow key={row.id} {...row.getRowProps()}>
-                          {row.cells.map((cell) => (
-                            <StyledTableCell
-                              key={cell.column.id}
-                              {...cell.getCellProps({
-                                style: { minWidth: cell.column.minWidth },
-                              })}
-                              sx={{
-                                border: "1px solid #dbe0e5a6",
-                              }}
-                            >
-                              {cell.column.customCell ? (
-                                <cell.column.customCell value={cell.value} />
-                              ) : (
-                                cell.render("Cell")
-                              )}
+                      </TableRow>
+                    ))}
+                  </TableHead>
+                  <TableBody
+                    className="table_body_main"
+                    {...getTableBodyProps()}
+                  >
+                    {page.length > 0 ? (
+                      page.map((row) => {
+                        prepareRow(row);
+                        return (
+                          <TableRow key={row.id} {...row.getRowProps()}>
+                            {row.cells.map((cell) => (
+                              <StyledTableCell
+                                key={cell.column.id}
+                                {...cell.getCellProps({
+                                  style: { minWidth: cell.column.minWidth },
+                                })}
+                                sx={{
+                                  border: "1px solid #dbe0e5a6",
+                                }}
+                              >
+                                {cell.column.customCell ? (
+                                  <cell.column.customCell value={cell.value} />
+                                ) : (
+                                  cell.render("Cell")
+                                )}
+                              </StyledTableCell>
+                            ))}
+                            <StyledTableCell align="right">
+                              <Stack
+                                direction="row"
+                                justifyContent="flex-end"
+                                spacing={2}
+                              >
+                                <Tooltip title="View" placement="top" arrow>
+                                  <Button
+                                    className="mui-icon-button"
+                                    variant="outlined"
+                                    startIcon={<VisibilityOutlined />}
+                                  />
+                                </Tooltip>
+                                <Tooltip title="Edit" placement="top" arrow>
+                                  <Button
+                                    className="mui-icon-button"
+                                    variant="outlined"
+                                    startIcon={<BorderColorOutlinedIcon />}
+                                  />
+                                </Tooltip>
+                                <Tooltip title="Delete" placement="top" arrow>
+                                  <Button
+                                    className="mui-icon-button"
+                                    variant="outlined"
+                                    startIcon={<DeleteForeverOutlinedIcon />}
+                                  />
+                                </Tooltip>
+                              </Stack>
                             </StyledTableCell>
-                          ))}
-                          <StyledTableCell align="right">
-                            <Stack
-                              direction="row"
-                              justifyContent="flex-end"
-                              spacing={2}
-                            >
-                              <Tooltip title="View" placement="top" arrow>
-                                <Button
-                                  className="mui-icon-button"
-                                  variant="outlined"
-                                  startIcon={<VisibilityOutlined />}
-                                />
-                              </Tooltip>
-                              <Tooltip title="Edit" placement="top" arrow>
-                                <Button
-                                  className="mui-icon-button"
-                                  variant="outlined"
-                                  startIcon={<BorderColorOutlinedIcon />}
-                                />
-                              </Tooltip>
-                              <Tooltip title="Delete" placement="top" arrow>
-                                <Button
-                                  className="mui-icon-button"
-                                  variant="outlined"
-                                  startIcon={<DeleteForeverOutlinedIcon />}
-                                />
-                              </Tooltip>
-                            </Stack>
-                          </StyledTableCell>
-                        </TableRow>
-                      );
-                    })
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={columns.length + 1} align="center">
-                        No Data
-                      </TableCell>
-                    </TableRow>
+                          </TableRow>
+                        );
+                      })
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={columns.length + 1} align="center">
+                          No Data
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </Box>
+              <Box sx={{ p: 2, borderTop: "1px solid #dbe0e5a6" }}>
+                <TablePagination
+                  gotoPage={gotoPage}
+                  rows={data}
+                  setPageSize={setPageSize}
+                  pageIndex={pageIndex}
+                  pageSize={pageSize}
+                />
+              </Box>
+            </TableContainer>
+          ) : (
+            <Paper elevation={3}>
+              {/* <Box sx={{ borderBottom: "1px solid #9e9e9e" }}> */}
+              <Box>
+                <Grid container spacing={2.5} mt={1} className="pl-20 pr-20">
+                  <Grid item xs={4} sx={{ pb: 2.5 }}>
+                    <FormControl variant="standard" fullWidth>
+                      <Typography className="label d-flex items-center">
+                        Application
+                        <sup className="asc">*</sup>
+                      </Typography>
+                      <CustomSelect
+                        placeholder="Select Application"
+                        options={applicationArr}
+                        value={selectedApp}
+                        onChange={(e) => {
+                          setSelectedApp(e);
+                        }}
+                        id="application"
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Divider textAlign="left">
+                      {selectedApp?.value?.toUpperCase()}
+                    </Divider>
+                  </Grid>
+                  {selectedApp?.value === "Android" && (
+                    <Grid item xs={12}>
+                      <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
+                        <Grid
+                          container
+                          sx={{ pt: 2.5, pb: 5 }}
+                          // className="p-20"
+                        >
+                          <Grid item xs={4} className="pr-24">
+                            <FormControl variant="standard" fullWidth>
+                              <Typography className="label d-flex items-center">
+                                Android Package Name
+                                <sup className="asc">*</sup>
+                              </Typography>
+                              <BootstrapInput
+                                fullWidth
+                                id="name"
+                                size="small"
+                                label="Name"
+                                name="name"
+                                placeholder="Name"
+                              />
+                            </FormControl>
+                          </Grid>
+                          <Grid item xs={4} className="pr-24">
+                            <FormControl variant="standard" fullWidth>
+                              <Typography className="label d-flex items-center">
+                                App Nickname
+                                <sup className="asc">*</sup>
+                              </Typography>
+                              <BootstrapInput
+                                fullWidth
+                                id="nickname"
+                                size="small"
+                                name="nickname"
+                                placeholder="My Android App"
+                              />
+                            </FormControl>
+                          </Grid>
+
+                          <Grid item xs={4}>
+                            <FormControl variant="standard" fullWidth>
+                              <Typography className="label d-flex items-center">
+                                Debug signing certificate SHA-1
+                                <sup className="asc">*</sup>
+                              </Typography>
+                              <BootstrapInput
+                                fullWidth
+                                id="certificate"
+                                size="small"
+                                name="certificate"
+                                placeholder="00:00:00:00:00:00"
+                              />
+                            </FormControl>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Grid>
                   )}
-                </TableBody>
-              </Table>
-            </Box>
-            <Box sx={{ p: 2, borderTop: "1px solid #dbe0e5a6" }}>
-              <TablePagination
-                gotoPage={gotoPage}
-                rows={data}
-                setPageSize={setPageSize}
-                pageIndex={pageIndex}
-                pageSize={pageSize}
-              />
-            </Box>
-          </TableContainer>
+                  {selectedApp?.value === "IOS" && (
+                    <Grid item xs={12}>
+                      <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
+                        <Grid
+                          container
+                          sx={{ pt: 2.5, pb: 5 }}
+                          // className="p-20"
+                        >
+                          <Grid item xs={4} className="pr-24">
+                            <FormControl variant="standard" fullWidth>
+                              <Typography className="label d-flex items-center">
+                                Apple bundle ID
+                                <sup className="asc">*</sup>
+                              </Typography>
+                              <BootstrapInput
+                                fullWidth
+                                id="name"
+                                size="small"
+                                label="Name"
+                                name="name"
+                                placeholder="com.app"
+                              />
+                            </FormControl>
+                          </Grid>
+                          <Grid item xs={4} className="pr-24">
+                            <FormControl variant="standard" fullWidth>
+                              <Typography className="label d-flex items-center">
+                                App Nickname
+                                <sup className="asc">*</sup>
+                              </Typography>
+                              <BootstrapInput
+                                fullWidth
+                                id="nickname"
+                                size="small"
+                                name="nickname"
+                                placeholder="My Apple App"
+                              />
+                            </FormControl>
+                          </Grid>
+
+                          <Grid item xs={4}>
+                            <FormControl variant="standard" fullWidth>
+                              <Typography className="label d-flex items-center">
+                                App Store ID
+                                <sup className="asc">*</sup>
+                              </Typography>
+                              <BootstrapInput
+                                fullWidth
+                                id="certificate"
+                                size="small"
+                                name="certificate"
+                                placeholder="999999999"
+                              />
+                            </FormControl>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Grid>
+                  )}
+                  {selectedApp?.value === "Web App" && (
+                    <Grid item xs={12}>
+                      <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
+                        <Grid
+                          container
+                          sx={{ pt: 2.5, pb: 5 }}
+                          // className="p-20"
+                        >
+                          <Grid item xs={4}>
+                            <FormControl variant="standard" fullWidth>
+                              <Typography className="label d-flex items-center">
+                                App Nickname
+                                <sup className="asc">*</sup>
+                              </Typography>
+                              <BootstrapInput
+                                fullWidth
+                                id="nickname"
+                                size="small"
+                                name="nickname"
+                                placeholder="My Android App"
+                              />
+                            </FormControl>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Grid>
+                  )}
+                </Grid>
+              </Box>
+              <Box className="p-20">
+                <Grid container spacing={3}>
+                  <Grid item xs={9}></Grid>
+                  <Grid item xs={1}>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      sx={{ backgroundColor: "primary.main" }}
+                      onClick={handleClose}
+                    >
+                      Cancel
+                    </Button>
+                  </Grid>
+                  <Grid item xs={2}>
+                    <Button
+                      type="submit"
+                      fullWidth
+                      variant="contained"
+                      sx={{ backgroundColor: "primary.main" }}
+                      onClick={handleClose}
+                    >
+                      Save
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Box>
+            </Paper>
+          )}
         </Grid>
       </Grid>
     </>

@@ -193,7 +193,7 @@ export default function SignIn() {
                       Sign In
                     </Button>
                   </Grid>
-                  <Grid item xs={12}>
+                  {/* <Grid item xs={12}>
                     <Grid container>
                       <Grid item xs={12} display="flex" justifyContent="center">
                         <Typography
@@ -211,7 +211,7 @@ export default function SignIn() {
                         </Typography>
                       </Grid>
                     </Grid>
-                  </Grid>
+                  </Grid> */}
                 </Grid>
               </Box>
             </Container>
