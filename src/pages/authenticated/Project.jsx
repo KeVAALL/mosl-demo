@@ -192,7 +192,7 @@ function Project() {
                     >
                       <FormControl variant="standard" fullWidth>
                         <Typography className="label d-flex items-center">
-                          Enter your project name
+                          Enter project name
                           <sup className="asc">*</sup>
                         </Typography>
                         <BootstrapInput
@@ -252,7 +252,7 @@ function Project() {
           <Grid container display="flex" alignItems="center">
             <Grid item xs={6}>
               <Typography variant="h5" fontWeight={500}>
-                Your projects
+                Projects
               </Typography>
               <Typography variant="caption" sx={{ color: "text.grey", mt: 2 }}>
                 Manage Projects

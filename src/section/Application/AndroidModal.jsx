@@ -71,7 +71,7 @@ export default function AndroidModal({ open, handleClose }) {
                     variant="h5"
                     sx={{ color: "primary.main", fontWeight: 500 }}
                   >
-                    Add your Android App
+                    Add Android App
                   </Typography>
                   <IconButton
                     onClick={() => {

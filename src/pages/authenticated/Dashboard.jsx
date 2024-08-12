@@ -69,21 +69,93 @@ function Dashboard() {
             >
               <AddOutlinedIcon sx={{ fontSize: "3rem" }} />
               <Typography variant="h5" fontWeight={500} component="div">
-                Create a Project
+                Project
               </Typography>
             </CardContent>
           </Card>
         </Grid>
 
-        <ProjectBox
+        <Grid item xs={12} sm={6} md={4}>
+          <Card
+            onClick={() => {
+              navigate("/home/application");
+            }}
+            sx={{
+              minHeight: 200,
+              boxShadow:
+                "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px !important",
+              cursor: "pointer",
+              "&:hover": {
+                backgroundColor: "#f8fafe",
+                transition: "background-color 0.3s ease-in-out", // Add smooth transition
+              },
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CardContent
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: "10px",
+                // minHeight: 200,
+              }}
+            >
+              <AddOutlinedIcon sx={{ fontSize: "3rem" }} />
+              <Typography variant="h5" fontWeight={500} component="div">
+                Applications
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        {/* <ProjectBox
           title="react-auth-test"
           description="react-auth-test-175bb"
-        />
+        /> */}
 
-        <ProjectBox
+        <Grid item xs={12} sm={6} md={4}>
+          <Card
+            onClick={() => {
+              navigate("/home/dynamic-links");
+            }}
+            sx={{
+              minHeight: 200,
+              boxShadow:
+                "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px !important",
+              cursor: "pointer",
+              "&:hover": {
+                backgroundColor: "#f8fafe",
+                transition: "background-color 0.3s ease-in-out", // Add smooth transition
+              },
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CardContent
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: "10px",
+                // minHeight: 200,
+              }}
+            >
+              <AddOutlinedIcon sx={{ fontSize: "3rem" }} />
+              <Typography variant="h5" fontWeight={500} component="div">
+                Dynamic Links
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        {/* <ProjectBox
           title="push-notification"
           description="push-notification-6787b"
-        />
+        /> */}
       </Grid>
     </>
   );

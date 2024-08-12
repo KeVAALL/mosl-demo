@@ -170,7 +170,7 @@ function DynamicLink() {
                   variant="h5"
                   sx={{ color: "primary.main", fontWeight: 500 }}
                 >
-                  Create your Dynamic Link
+                  Create Dynamic Links
                 </Typography>
                 <IconButton
                   onClick={() => {
@@ -385,7 +385,7 @@ function DynamicLink() {
           <Grid container display="flex" alignItems="center">
             <Grid item xs={6}>
               <Typography variant="h5" fontWeight={500}>
-                Your Dynamic Links
+                Dynamic Links
               </Typography>
               <Typography variant="caption" sx={{ color: "text.grey", mt: 2 }}>
                 Manage Links

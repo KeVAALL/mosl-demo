@@ -71,7 +71,7 @@ export default function IOSModal({ open, handleClose }) {
                     variant="h5"
                     sx={{ color: "primary.main", fontWeight: 500 }}
                   >
-                    Add your IOS App
+                    Add IOS App
                   </Typography>
                   <IconButton
                     onClick={() => {

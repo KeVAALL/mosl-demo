@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Button from "@mui/material/Button";
-import Link from "@mui/material/Link";
+// import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -15,7 +15,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { BootstrapInput } from "../../utils/Input/textfield";
 import "./auth.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function SignIn() {
   const handleSubmit = (event) => {
@@ -91,13 +91,10 @@ export default function SignIn() {
                 >
                   <Grid item xs={12}>
                     <FormControl variant="standard" fullWidth>
-                      <InputLabel
-                        shrink
-                        htmlFor="email"
-                        className="input-label"
-                      >
-                        <Typography variant="body1">Email</Typography>
-                      </InputLabel>
+                      <Typography className="label d-flex items-center">
+                        Email
+                        <sup className="asc">*</sup>
+                      </Typography>
                       <BootstrapInput
                         fullWidth
                         id="email"
@@ -133,13 +130,10 @@ export default function SignIn() {
                   </Grid>
                   <Grid item xs={12}>
                     <FormControl variant="standard" fullWidth>
-                      <InputLabel
-                        shrink
-                        htmlFor="password"
-                        className="input-label"
-                      >
-                        <Typography variant="body1">Password</Typography>
-                      </InputLabel>
+                      <Typography className="label d-flex items-center">
+                        Password
+                        <sup className="asc">*</sup>
+                      </Typography>
                       <BootstrapInput
                         id="password"
                         type={showPassword ? "text" : "password"}
@@ -207,13 +201,13 @@ export default function SignIn() {
                           sx={{ color: "text.grey" }}
                         >
                           No account?
-                          <a
-                            href="/sign-up"
+                          <Link
+                            to="/sign-up"
                             className="custom-link"
                             style={{ marginLeft: "8px" }}
                           >
                             Sign Up
-                          </a>
+                          </Link>
                         </Typography>
                       </Grid>
                     </Grid>

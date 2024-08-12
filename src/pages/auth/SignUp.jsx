@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Button from "@mui/material/Button";
-import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -15,7 +14,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { BootstrapInput } from "../../utils/Input/textfield";
 import "./auth.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -75,13 +74,10 @@ function SignUp() {
                 >
                   <Grid item xs={12}>
                     <FormControl variant="standard" fullWidth>
-                      <InputLabel
-                        shrink
-                        htmlFor="email"
-                        className="input-label"
-                      >
-                        <Typography variant="body1">Email</Typography>
-                      </InputLabel>
+                      <Typography className="label d-flex items-center">
+                        Email
+                        <sup className="asc">*</sup>
+                      </Typography>
                       <BootstrapInput
                         fullWidth
                         id="email"
@@ -97,9 +93,10 @@ function SignUp() {
                   </Grid>
                   <Grid item xs={12}>
                     <FormControl variant="standard" fullWidth>
-                      <InputLabel shrink htmlFor="name" className="input-label">
-                        <Typography variant="body1">Name</Typography>
-                      </InputLabel>
+                      <Typography className="label d-flex items-center">
+                        Name
+                        <sup className="asc">*</sup>
+                      </Typography>
                       <BootstrapInput
                         fullWidth
                         id="name"
@@ -115,13 +112,10 @@ function SignUp() {
                   </Grid>
                   <Grid item xs={12}>
                     <FormControl variant="standard" fullWidth>
-                      <InputLabel
-                        shrink
-                        htmlFor="password"
-                        className="input-label"
-                      >
-                        <Typography variant="body1">Password</Typography>
-                      </InputLabel>
+                      <Typography className="label d-flex items-center">
+                        Password
+                        <sup className="asc">*</sup>
+                      </Typography>
                       <BootstrapInput
                         id="password"
                         fullWidth
@@ -176,9 +170,9 @@ function SignUp() {
                         >
                           Have an account?
                           <Link
-                            href="/sign-in"
+                            to="/sign-in"
                             className="custom-link"
-                            sx={{ ml: 1 }}
+                            style={{ marginLeft: "8px" }}
                           >
                             Sign In
                           </Link>

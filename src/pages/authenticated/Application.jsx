@@ -337,7 +337,7 @@ function Application() {
           <Grid container display="flex" alignItems="center">
             <Grid item xs={6}>
               <Typography variant="h5" fontWeight={500}>
-                Your Applications
+                Applications
               </Typography>
               <Typography variant="caption" sx={{ color: "text.grey", mt: 2 }}>
                 Manage Applications

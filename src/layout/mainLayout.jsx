@@ -144,34 +144,7 @@ const MobileDrawer = ({ open, handleDrawerToggle }) => {
               <Typography variant="subtitle1">Dashboard</Typography>
             </MenuItem>
           </Link>
-          <Link
-            to="/home/user"
-            onClick={handleDrawerToggle}
-            className="menu-item"
-          >
-            <MenuItem
-              icon={<AccountCircleRoundedIcon />}
-              className={`${
-                location.pathname === "/home/user" ? "active-menu-item" : ""
-              }`}
-            >
-              User
-            </MenuItem>
-          </Link>
-          <Link
-            to="/home/role"
-            oonClick={handleDrawerToggle}
-            className="menu-item"
-          >
-            <MenuItem
-              icon={<SettingsApplicationsRoundedIcon />}
-              className={`${
-                location.pathname === "/home/role" ? "active-menu-item" : ""
-              }`}
-            >
-              Role
-            </MenuItem>
-          </Link>
+
           <Link
             to="/home/projects"
             onClick={handleDrawerToggle}
@@ -218,6 +191,34 @@ const MobileDrawer = ({ open, handleDrawerToggle }) => {
               Dynamic Links
             </MenuItem>
           </Link>
+          <Link
+            to="/home/user"
+            onClick={handleDrawerToggle}
+            className="menu-item"
+          >
+            <MenuItem
+              icon={<AccountCircleRoundedIcon />}
+              className={`${
+                location.pathname === "/home/user" ? "active-menu-item" : ""
+              }`}
+            >
+              User
+            </MenuItem>
+          </Link>
+          <Link
+            to="/home/role"
+            oonClick={handleDrawerToggle}
+            className="menu-item"
+          >
+            <MenuItem
+              icon={<SettingsApplicationsRoundedIcon />}
+              className={`${
+                location.pathname === "/home/role" ? "active-menu-item" : ""
+              }`}
+            >
+              Role
+            </MenuItem>
+          </Link>
         </Menu>
       </Box>
     </Drawer>
@@ -256,26 +257,7 @@ const ReactSidebar = ({ open, activeTab }) => {
               <Typography variant="subtitle1">Dashboard</Typography>
             </MenuItem>
           </Link>
-          <Link to="/home/user" className="menu-item">
-            <MenuItem
-              icon={<AccountCircleRoundedIcon />}
-              className={`${
-                location.pathname === "/home/user" ? "active-menu-item" : ""
-              }`}
-            >
-              User
-            </MenuItem>
-          </Link>
-          <Link to="/home/role" className="menu-item">
-            <MenuItem
-              icon={<SettingsApplicationsRoundedIcon />}
-              className={`${
-                location.pathname === "/home/role" ? "active-menu-item" : ""
-              }`}
-            >
-              Role
-            </MenuItem>
-          </Link>
+
           <Link to="/home/projects" className="menu-item">
             <MenuItem
               icon={<HomeIcon />}
@@ -308,6 +290,26 @@ const ReactSidebar = ({ open, activeTab }) => {
               }`}
             >
               Dynamic Links
+            </MenuItem>
+          </Link>
+          <Link to="/home/user" className="menu-item">
+            <MenuItem
+              icon={<AccountCircleRoundedIcon />}
+              className={`${
+                location.pathname === "/home/user" ? "active-menu-item" : ""
+              }`}
+            >
+              User
+            </MenuItem>
+          </Link>
+          <Link to="/home/role" className="menu-item">
+            <MenuItem
+              icon={<SettingsApplicationsRoundedIcon />}
+              className={`${
+                location.pathname === "/home/role" ? "active-menu-item" : ""
+              }`}
+            >
+              Role
             </MenuItem>
           </Link>
           {/* <Link to="/home/role" className="menu-item">

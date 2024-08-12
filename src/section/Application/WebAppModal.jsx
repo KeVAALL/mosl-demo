@@ -71,7 +71,7 @@ export default function WebAppModal({ open, handleClose }) {
                     variant="h5"
                     sx={{ color: "primary.main", fontWeight: 500 }}
                   >
-                    Add your Web App
+                    Add Web App
                   </Typography>
                   <IconButton
                     onClick={() => {
