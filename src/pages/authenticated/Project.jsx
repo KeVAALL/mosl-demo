@@ -42,6 +42,7 @@ import { tableColumns, tableData, VisibleColumn } from "../../data/Project";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
+import { CustomSelect } from "../../utils/Input/reactSelect";
 
 function Project() {
   const [open, setOpen] = React.useState(false);
@@ -82,7 +83,11 @@ function Project() {
 
   const columns = useMemo(() => tableColumns, []);
   const data = useMemo(() => tableData, []);
-
+  const options = [
+    { value: "Admin", label: "Admin" },
+    { value: "Customer", label: "Customer" },
+    { value: "Admin 2", label: "Admin 2" },
+  ];
   const {
     getTableProps,
     getTableBodyProps,
@@ -292,10 +297,10 @@ function Project() {
                     </FormControl>
                   </Grid>
 
-                  <Grid item xs={4}>
+                  <Grid item xs={8}>
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
-                        Project ID
+                        Description
                         <sup className="asc">*</sup>
                       </Typography>
                       <BootstrapInput
@@ -304,10 +309,24 @@ function Project() {
                         size="small"
                         //   label="Project Name"
                         name="project-id"
-                        placeholder="my-unique-project-id"
+                        placeholder="Project Description"
                         InputLabelProps={{
                           shrink: true,
                         }}
+                      />
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={4}>
+                    <FormControl variant="standard" fullWidth>
+                      <Typography className="label d-flex items-center">
+                        Owner
+                        <sup className="asc">*</sup>
+                      </Typography>
+                      <CustomSelect
+                        options={options}
+                        placeholder="Select Owner"
+                        id="user"
                       />
                     </FormControl>
                   </Grid>

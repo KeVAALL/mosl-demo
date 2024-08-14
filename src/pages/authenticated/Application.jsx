@@ -334,13 +334,12 @@ function Application() {
             </TableContainer>
           ) : (
             <Paper elevation={3}>
-              {/* <Box sx={{ borderBottom: "1px solid #9e9e9e" }}> */}
               <Box>
                 <Grid container spacing={2.5} mt={1} className="pl-20 pr-20">
                   <Grid item xs={4} sx={{ pb: 2.5 }}>
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
-                        Application
+                        Platform
                         <sup className="asc">*</sup>
                       </Typography>
                       <CustomSelect
@@ -354,71 +353,112 @@ function Application() {
                       />
                     </FormControl>
                   </Grid>
+                  <Grid item xs={4} sx={{ pb: 2.5 }}>
+                    <FormControl variant="standard" fullWidth>
+                      <Typography className="label d-flex items-center">
+                        Project
+                        <sup className="asc">*</sup>
+                      </Typography>
+                      <CustomSelect
+                        placeholder="Select Project"
+                        options={projectArr}
+                        id="project"
+                      />
+                    </FormControl>
+                  </Grid>
                   <Grid item xs={12}>
                     <Divider textAlign="left">
                       {selectedApp?.value?.toUpperCase()}
                     </Divider>
                   </Grid>
-                  {selectedApp?.value === "Android" && (
-                    <Grid item xs={12}>
-                      <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
-                        <Grid
-                          container
-                          sx={{ pt: 2.5, pb: 5 }}
-                          // className="p-20"
-                        >
-                          <Grid item xs={4} className="pr-24">
-                            <FormControl variant="standard" fullWidth>
-                              <Typography className="label d-flex items-center">
-                                Android Package Name
-                                <sup className="asc">*</sup>
-                              </Typography>
-                              <BootstrapInput
-                                fullWidth
-                                id="name"
-                                size="small"
-                                label="Name"
-                                name="name"
-                                placeholder="Name"
-                              />
-                            </FormControl>
-                          </Grid>
-                          <Grid item xs={4} className="pr-24">
-                            <FormControl variant="standard" fullWidth>
-                              <Typography className="label d-flex items-center">
-                                App Nickname
-                                <sup className="asc">*</sup>
-                              </Typography>
-                              <BootstrapInput
-                                fullWidth
-                                id="nickname"
-                                size="small"
-                                name="nickname"
-                                placeholder="My Android App"
-                              />
-                            </FormControl>
-                          </Grid>
-
-                          <Grid item xs={4}>
-                            <FormControl variant="standard" fullWidth>
-                              <Typography className="label d-flex items-center">
-                                Debug signing certificate SHA-1
-                                <sup className="asc">*</sup>
-                              </Typography>
-                              <BootstrapInput
-                                fullWidth
-                                id="certificate"
-                                size="small"
-                                name="certificate"
-                                placeholder="00:00:00:00:00:00"
-                              />
-                            </FormControl>
-                          </Grid>
+                  {/* {selectedApp?.value === "Android" && ( */}
+                  <Grid item xs={12}>
+                    <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
+                      <Grid container sx={{ pt: 2.5, pb: 5 }}>
+                        <Grid item xs={4} className="pr-24">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Package Name
+                              <sup className="asc">*</sup>
+                            </Typography>
+                            <BootstrapInput
+                              fullWidth
+                              id="name"
+                              size="small"
+                              label="Name"
+                              name="name"
+                              placeholder="Name"
+                            />
+                          </FormControl>
                         </Grid>
-                      </Box>
-                    </Grid>
-                  )}
-                  {selectedApp?.value === "IOS" && (
+                        <Grid item xs={4} className="pr-24">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Description
+                              <sup className="asc">*</sup>
+                            </Typography>
+                            <BootstrapInput
+                              fullWidth
+                              id="description"
+                              size="small"
+                              name="description"
+                              placeholder="Description"
+                            />
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item xs={4}>
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Bundle ID
+                              <sup className="asc">*</sup>
+                            </Typography>
+                            <BootstrapInput
+                              fullWidth
+                              id="bundle-id"
+                              size="small"
+                              name="bundle-id"
+                              placeholder="Bundle ID"
+                            />
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item xs={4} className="pt-24 pr-24">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Store URL
+                              <sup className="asc">*</sup>
+                            </Typography>
+                            <BootstrapInput
+                              fullWidth
+                              id="store-url"
+                              size="small"
+                              name="store-url"
+                              placeholder="Store URL"
+                            />
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item xs={4} className="pt-24 pr-24">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Dynamic URL
+                              <sup className="asc">*</sup>
+                            </Typography>
+                            <BootstrapInput
+                              fullWidth
+                              id="dynamic-url"
+                              size="small"
+                              name="dynamic-url"
+                              placeholder="Dynamic URL"
+                            />
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  </Grid>
+                  {/* )} */}
+                  {/* {selectedApp?.value === "IOS" && (
                     <Grid item xs={12}>
                       <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
                         <Grid
@@ -445,15 +485,15 @@ function Application() {
                           <Grid item xs={4} className="pr-24">
                             <FormControl variant="standard" fullWidth>
                               <Typography className="label d-flex items-center">
-                                App Nickname
+                                App Description
                                 <sup className="asc">*</sup>
                               </Typography>
                               <BootstrapInput
                                 fullWidth
-                                id="nickname"
+                                id="description"
                                 size="small"
-                                name="nickname"
-                                placeholder="My Apple App"
+                                name="description"
+                                placeholder="Description"
                               />
                             </FormControl>
                           </Grid>
@@ -503,7 +543,7 @@ function Application() {
                         </Grid>
                       </Box>
                     </Grid>
-                  )}
+                  )} */}
                 </Grid>
               </Box>
               <Box className="p-20">

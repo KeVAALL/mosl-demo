@@ -148,9 +148,11 @@ function DynamicLink() {
               </Typography>
             </Grid>
             <Grid item xs={6} display="flex" justifyContent="flex-end">
-              <Button variant="contained" onClick={handleOpen}>
-                Add Link
-              </Button>
+              {!openForm && (
+                <Button variant="contained" onClick={handleOpen}>
+                  Add Link
+                </Button>
+              )}
             </Grid>
           </Grid>
         </Grid>
@@ -291,7 +293,21 @@ function DynamicLink() {
                   mt={1}
                   className="pl-20 pr-20 pb-20"
                 >
-                  <Grid item xs={6} sx={{ width: "100%" }}>
+                  <Grid item xs={6}>
+                    <FormControl variant="standard" fullWidth>
+                      <Typography className="label d-flex items-center">
+                        Application
+                        <sup className="asc">*</sup>
+                      </Typography>
+                      <CustomSelect
+                        placeholder="Select Application"
+                        options={applicationArr}
+                        id="application"
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={6}></Grid>
+                  <Grid item xs={6}>
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         URL Prefix
@@ -385,6 +401,48 @@ function DynamicLink() {
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Link behavior for Apple
+                        <sup className="asc">*</sup>
+                      </Typography>
+                      <RadioGroup
+                        aria-labelledby="link-behavior"
+                        defaultValue="Browser"
+                        // name="radio-buttons-group"
+                      >
+                        <FormControlLabel
+                          value="App"
+                          control={<Radio className="label" />}
+                          label={
+                            <Typography variant="body1" className="label">
+                              Open the deep link URL in a browser
+                            </Typography>
+                          }
+                        />
+                        <FormControlLabel
+                          value="App"
+                          control={<Radio className="label" />}
+                          label={
+                            <Typography variant="body1" className="label">
+                              Open the deep link URL in the app
+                            </Typography>
+                          }
+                        />
+                      </RadioGroup>
+                      <CustomComponentSelect
+                        options={[
+                          { value: "Admin", label: "Admin" },
+                          { value: "Customer", label: "Customer" },
+                          { value: "Admin 2", label: "Admin 2" },
+                        ]}
+                        menuPlacement="auto"
+                        //   menuPosition="fixed"
+                      />
+                    </FormControl>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <FormControl variant="standard" fullWidth>
+                      <Typography className="label d-flex items-center">
+                        Link behavior for Android
                         <sup className="asc">*</sup>
                       </Typography>
                       <RadioGroup

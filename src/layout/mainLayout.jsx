@@ -32,6 +32,8 @@ import SettingsApplicationsRoundedIcon from "@mui/icons-material/SettingsApplica
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import AppSettingsAltIcon from "@mui/icons-material/AppSettingsAlt";
 import DynamicFeedIcon from "@mui/icons-material/DynamicFeed";
+import mainLogo from "../assets/img/mosl-main-logo.png";
+import secondaryLogo from "../assets/img/mosl-small-transparent.png";
 
 import "./mainLayout.css";
 
@@ -134,7 +136,7 @@ const MobileDrawer = ({ open, handleDrawerToggle }) => {
             className="menu-item"
           >
             <MenuItem
-              icon={<BarChartRoundedIcon />}
+              icon={<HomeIcon />}
               className={`${
                 location.pathname === "/home/dashboard"
                   ? "active-menu-item"
@@ -151,7 +153,7 @@ const MobileDrawer = ({ open, handleDrawerToggle }) => {
             className="menu-item"
           >
             <MenuItem
-              icon={<HomeIcon />}
+              icon={<BarChartRoundedIcon />}
               className={`${
                 location.pathname === "/home/projects" ? "active-menu-item" : ""
               }`}
@@ -237,17 +239,29 @@ const ReactSidebar = ({ open, activeTab }) => {
       >
         <Menu iconShape="square">
           {open ? (
-            <Box sx={{ p: 3 }}>
-              <h3>DEMO</h3>
+            <Box sx={{ px: 2 }}>
+              <img
+                src={mainLogo}
+                style={{
+                  height: "90px",
+                  width: "100%",
+                }}
+              />
             </Box>
           ) : (
-            <Box sx={{ p: 3 }}>
-              <ReceiptRoundedIcon />
-            </Box>
+            // <Box sx={{ p: 3 }}>
+            <img
+              src={secondaryLogo}
+              style={{
+                height: "75px",
+                width: "100%",
+              }}
+            />
+            // </Box>
           )}
           <Link to="/home/dashboard" className="menu-item">
             <MenuItem
-              icon={<BarChartRoundedIcon />}
+              icon={<HomeIcon />}
               className={`${
                 location.pathname === "/home/dashboard"
                   ? "active-menu-item"
@@ -260,7 +274,7 @@ const ReactSidebar = ({ open, activeTab }) => {
 
           <Link to="/home/projects" className="menu-item">
             <MenuItem
-              icon={<HomeIcon />}
+              icon={<BarChartRoundedIcon />}
               className={`${
                 location.pathname === "/home/projects" ? "active-menu-item" : ""
               }`}
