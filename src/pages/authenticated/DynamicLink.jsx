@@ -70,6 +70,16 @@ function DynamicLink() {
       value: "react-auth-test-175bb",
     },
   ];
+  const projectArr = [
+    {
+      label: "push-notification-6787b",
+      value: "push-notification-6787b",
+    },
+    {
+      label: "react-auth-test-175bb",
+      value: "react-auth-test-175bb",
+    },
+  ];
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -166,11 +176,19 @@ function DynamicLink() {
                     setGlobalFilter={setGlobalFilter}
                   />
                 </Grid>
-                <Grid item md={3} xs={6}>
+                <Grid item md={2} xs={6}>
                   <CustomSelect
                     placeholder="Select Application"
                     options={applicationArr}
                     id="application"
+                    isClearable
+                  />
+                </Grid>
+                <Grid item md={2} xs={6}>
+                  <CustomSelect
+                    placeholder="Select Project"
+                    options={projectArr}
+                    id="project"
                     isClearable
                   />
                 </Grid>
@@ -306,7 +324,19 @@ function DynamicLink() {
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={6}></Grid>
+                  <Grid item xs={6}>
+                    <FormControl variant="standard" fullWidth>
+                      <Typography className="label d-flex items-center">
+                        Project
+                        <sup className="asc">*</sup>
+                      </Typography>
+                      <CustomSelect
+                        placeholder="Select Project"
+                        options={projectArr}
+                        id="project"
+                      />
+                    </FormControl>
+                  </Grid>
                   <Grid item xs={6}>
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">

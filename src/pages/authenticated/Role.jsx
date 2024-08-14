@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
-import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import { styled } from "@mui/material/styles";
 import {
   Box,
@@ -25,6 +24,8 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { RichTreeView } from "@mui/x-tree-view/RichTreeView";
+import { useTreeViewApiRef } from "@mui/x-tree-view/hooks";
 import { BootstrapInput } from "../../utils/Input/textfield";
 // third-party
 import { useTable, usePagination, useGlobalFilter } from "react-table";
@@ -74,6 +75,80 @@ function Role() {
   //   },
   // }));
 
+  const menus = [
+    {
+      id: "Admin",
+      label: "Admin",
+      children: [
+        { id: "Role", label: "Role" },
+        { id: "User", label: "User" },
+      ],
+    },
+    {
+      id: "Project",
+      label: "Project",
+      // children: [
+      //   { id: "pickers-community", label: "@mui/x-date-pickers" },
+      //   { id: "pickers-pro", label: "@mui/x-date-pickers-pro" },
+      // ],
+    },
+    {
+      id: "Application",
+      label: "Application",
+      // children: [{ id: "charts-community", label: "@mui/x-charts" }],
+    },
+    {
+      id: "Dynamic Links",
+      label: "Dynamic Links",
+      // children: [{ id: "tree-view-community", label: "@mui/x-tree-view" }],
+    },
+  ];
+  function getItemDescendantsIds(item) {
+    const ids = [];
+    item.children?.forEach((child) => {
+      ids.push(child.id);
+      ids.push(...getItemDescendantsIds(child));
+    });
+
+    return ids;
+  }
+  const [selectedItems, setSelectedItems] = React.useState([]);
+  const toggledItemRef = React.useRef({});
+  const apiRef = useTreeViewApiRef();
+
+  const handleItemSelectionToggle = (event, itemId, isSelected) => {
+    toggledItemRef.current[itemId] = isSelected;
+  };
+
+  const handleSelectedItemsChange = (event, newSelectedItems) => {
+    setSelectedItems(newSelectedItems);
+
+    // Select / unselect the children of the toggled item
+    const itemsToSelect = [];
+    const itemsToUnSelect = {};
+    Object.entries(toggledItemRef.current).forEach(([itemId, isSelected]) => {
+      const item = apiRef.current.getItem(itemId);
+      if (isSelected) {
+        itemsToSelect.push(...getItemDescendantsIds(item));
+      } else {
+        getItemDescendantsIds(item).forEach((descendantId) => {
+          itemsToUnSelect[descendantId] = true;
+        });
+      }
+    });
+
+    const newSelectedItemsWithChildren = Array.from(
+      new Set(
+        [...newSelectedItems, ...itemsToSelect].filter(
+          (itemId) => !itemsToUnSelect[itemId]
+        )
+      )
+    );
+
+    setSelectedItems(newSelectedItemsWithChildren);
+
+    toggledItemRef.current = {};
+  };
   const style = {
     position: "absolute",
     top: "50%",
@@ -175,7 +250,7 @@ function Role() {
                     setGlobalFilter={setGlobalFilter}
                   />
                 </Grid>
-                <Grid
+                {/* <Grid
                   item
                   md={2}
                   xs={6}
@@ -195,7 +270,7 @@ function Role() {
                       disableFuture
                     />
                   </LocalizationProvider>
-                </Grid>
+                </Grid> */}
               </Grid>
               <Box sx={{ width: "100%", overflowX: "auto", display: "block" }}>
                 <Table {...getTableProps()}>
@@ -315,7 +390,7 @@ function Role() {
                   mt={1}
                   className="pl-20 pr-20 pb-20"
                 >
-                  <Grid item xs={4} sx={{ width: "100%" }}>
+                  <Grid item xs={4}>
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Name
@@ -335,7 +410,7 @@ function Role() {
                     </FormControl>
                   </Grid>
                   <Grid item xs={4}>
-                    <FormControl variant="standard" fullWidth>
+                    {/* <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Description
                         <sup className="asc">*</sup>
@@ -350,6 +425,24 @@ function Role() {
                         InputLabelProps={{
                           shrink: true,
                         }}
+                      />
+                    </FormControl> */}
+                  </Grid>
+                  <Grid item xs={4}></Grid>
+                  <Grid item xs={4}>
+                    <FormControl variant="standard" fullWidth>
+                      <Typography className="label d-flex items-center">
+                        Menu
+                        <sup className="asc">*</sup>
+                      </Typography>
+                      <RichTreeView
+                        multiSelect
+                        checkboxSelection
+                        apiRef={apiRef}
+                        items={menus}
+                        selectedItems={selectedItems}
+                        onSelectedItemsChange={handleSelectedItemsChange}
+                        onItemSelectionToggle={handleItemSelectionToggle}
                       />
                     </FormControl>
                   </Grid>

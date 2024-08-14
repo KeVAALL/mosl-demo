@@ -11,6 +11,7 @@ import {
   FormControl,
   Grid,
   IconButton,
+  InputAdornment,
   InputLabel,
   Modal,
   Paper,
@@ -42,6 +43,7 @@ import { tableColumns, tableData, VisibleColumn } from "../../data/Role";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 function User() {
   const [open, setOpen] = React.useState(false);
@@ -53,6 +55,13 @@ function User() {
   const handleClose = () => {
     // setOpen(false);
     setOpenForm(false);
+  };
+  const [showPassword, setShowPassword] = useState(false);
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
   };
 
   const options = [
@@ -157,7 +166,7 @@ function User() {
                     setGlobalFilter={setGlobalFilter}
                   />
                 </Grid>
-                <Grid
+                {/* <Grid
                   item
                   md={2}
                   xs={6}
@@ -177,7 +186,7 @@ function User() {
                       disableFuture
                     />
                   </LocalizationProvider>
-                </Grid>
+                </Grid> */}
                 {/* <Grid item md={5} xs={0}></Grid>
                 <Grid item md={1} display="flex" justifyContent="flex-end">
                   <Tooltip title="Download PDF" placement="top" arrow>
@@ -327,6 +336,85 @@ function User() {
                         label="Name"
                         name="name"
                         placeholder="Name"
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <FormControl variant="standard" fullWidth>
+                      <Typography className="label d-flex items-center">
+                        Email
+                        <sup className="asc">*</sup>
+                      </Typography>
+                      <BootstrapInput
+                        fullWidth
+                        id="email"
+                        size="small"
+                        label="Email"
+                        name="email"
+                        placeholder="Email"
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <FormControl variant="standard" fullWidth>
+                      <Typography className="label d-flex items-center">
+                        Password
+                        <sup className="asc">*</sup>
+                      </Typography>
+                      <BootstrapInput
+                        fullWidth
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        size="small"
+                        label="Password"
+                        name="password"
+                        placeholder="Password"
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={handleClickShowPassword}
+                              onMouseDown={handleMouseDownPassword}
+                              onMouseUp={handleMouseDownPassword}
+                              edge="end"
+                              color="text.greyLight"
+                            >
+                              {showPassword ? (
+                                <Visibility
+                                  fontSize="small"
+                                  color="text.greyLight"
+                                />
+                              ) : (
+                                <VisibilityOff fontSize="small" />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                      />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <FormControl variant="standard" fullWidth>
+                      <Typography className="label d-flex items-center">
+                        Phone Number
+                        <sup className="asc">*</sup>
+                      </Typography>
+                      <BootstrapInput
+                        fullWidth
+                        id="phone_number"
+                        size="small"
+                        label="Phone Number"
+                        name="phone_number"
+                        placeholder="Phone Number"
                         InputLabelProps={{
                           shrink: true,
                         }}

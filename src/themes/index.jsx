@@ -25,14 +25,17 @@ export default function ThemeCustomization({ children }) {
       primary: {
         // main: "#000000", // Black for primary color
         main: colors.grey[900], // Black for primary color
+        // main: "#fdaf17", // Black for primary color
         contrastText: "#FFFFFF", // White text on primary
       },
       secondary: {
         main: "#FFFFFF", // White for secondary color
+        // main: "#fdaf17", // White for secondary color
         contrastText: "#000000", // Black text on secondary
       },
       background: {
         default: "#FFFFFF", // White background
+        // default: "#fdaf17", // White background
         paper: "#FFFFFF", // White background for paper components
       },
       text: {
@@ -50,6 +53,7 @@ export default function ThemeCustomization({ children }) {
           contained: {
             textTransform: "capitalize",
             backgroundColor: "#000000", // Black background
+            // backgroundColor: "#fdaf17", // Black background
             color: "#FFFFFF", // White text
             border: "1px solid #000000", // Black border
             padding: "6px 16px", // Set padding
@@ -119,6 +123,16 @@ export default function ThemeCustomization({ children }) {
             padding: 8, // Adjust the padding around the radio button
             "& .MuiSvgIcon-root": {
               fontSize: "1.2rem !important", // Adjust the size of the radio button icon
+            },
+          },
+        },
+      },
+      MuiCheckbox: {
+        styleOverrides: {
+          root: {
+            color: "#bdbdbd", // Black for unselected state
+            "&.Mui-checked": {
+              color: "#000000", // White for selected state
             },
           },
         },
