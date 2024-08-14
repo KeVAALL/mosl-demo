@@ -243,7 +243,7 @@ const ReactSidebar = ({ open, activeTab }) => {
               <img
                 src={mainLogo}
                 style={{
-                  height: "90px",
+                  height: "100px",
                   width: "100%",
                 }}
               />
