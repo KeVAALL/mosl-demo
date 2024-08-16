@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
-import { styled } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 import {
   Box,
   Button,
@@ -23,6 +23,7 @@ import {
   TableRow,
   Tooltip,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import { RichTreeView } from "@mui/x-tree-view/RichTreeView";
 import { useTreeViewApiRef } from "@mui/x-tree-view/hooks";
@@ -46,6 +47,8 @@ import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 function Role() {
   const [open, setOpen] = React.useState(false);
   const [openForm, setOpenForm] = useState(false);
+  const theme = useTheme();
+  const matcheSM = useMediaQuery(theme.breakpoints.down("sm"));
   const handleOpen = () => {
     // setOpen(true);
     setOpenForm(true);
@@ -390,7 +393,7 @@ function Role() {
                   mt={1}
                   className="pl-20 pr-20 pb-20"
                 >
-                  <Grid item xs={4}>
+                  <Grid item md={4} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Name
@@ -409,27 +412,13 @@ function Role() {
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={4}>
-                    {/* <FormControl variant="standard" fullWidth>
-                      <Typography className="label d-flex items-center">
-                        Description
-                        <sup className="asc">*</sup>
-                      </Typography>
-                      <BootstrapInput
-                        fullWidth
-                        id="description"
-                        size="small"
-                        label="Description"
-                        name="description"
-                        placeholder="Description"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                      />
-                    </FormControl> */}
-                  </Grid>
-                  <Grid item xs={4}></Grid>
-                  <Grid item xs={4}>
+                  {!matcheSM && (
+                    <>
+                      <Grid item xs={4}></Grid>
+                      <Grid item xs={4}></Grid>
+                    </>
+                  )}
+                  <Grid item md={4} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Menu
@@ -450,8 +439,8 @@ function Role() {
               </Box>
               <Box className="p-20">
                 <Grid container spacing={3}>
-                  <Grid item xs={9}></Grid>
-                  <Grid item xs={1}>
+                  <Grid item md={9} xs={2}></Grid>
+                  <Grid item md={1} xs={5}>
                     <Button
                       fullWidth
                       variant="outlined"
@@ -461,7 +450,7 @@ function Role() {
                       Cancel
                     </Button>
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid item md={2} xs={5}>
                     <Button
                       type="submit"
                       fullWidth

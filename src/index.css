@@ -665,7 +665,9 @@ input:-webkit-autofill:active {
 .MuiDivider-root::before {
   width: 5% !important;
 }
-
+.w-full {
+  width: 100% !important;
+}
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

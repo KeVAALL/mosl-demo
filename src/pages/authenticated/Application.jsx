@@ -207,7 +207,7 @@ function Application() {
         <Grid item xs={12}>
           {!openForm ? (
             <TableContainer component={Paper}>
-              <Grid container spacing={1.5} px={2} py={2}>
+              <Grid container spacing={1} px={2} py={2}>
                 <Grid item md={2} xs={6}>
                   <GlobalFilter
                     globalFilter={globalFilter}
@@ -336,7 +336,7 @@ function Application() {
             <Paper elevation={3}>
               <Box>
                 <Grid container spacing={2.5} mt={1} className="pl-20 pr-20">
-                  <Grid item xs={4} sx={{ pb: 2.5 }}>
+                  <Grid item md={4} sx={{ pb: 2.5 }} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Platform
@@ -353,7 +353,7 @@ function Application() {
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={4} sx={{ pb: 2.5 }}>
+                  <Grid item md={4} sx={{ pb: 2.5 }} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Project
@@ -366,16 +366,16 @@ function Application() {
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid item md={12} className="w-full">
                     <Divider textAlign="left">
                       {selectedApp?.value?.toUpperCase()}
                     </Divider>
                   </Grid>
                   {/* {selectedApp?.value === "Android" && ( */}
-                  <Grid item xs={12}>
+                  <Grid item md={12} className="w-full">
                     <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
                       <Grid container sx={{ pt: 2.5, pb: 5 }}>
-                        <Grid item xs={4} className="pr-24">
+                        <Grid item md={4} className="pr-24 w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
                               Package Name
@@ -391,7 +391,7 @@ function Application() {
                             />
                           </FormControl>
                         </Grid>
-                        <Grid item xs={4} className="pr-24">
+                        <Grid item md={4} className="pr-24 w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
                               Description
@@ -407,7 +407,7 @@ function Application() {
                           </FormControl>
                         </Grid>
 
-                        <Grid item xs={4}>
+                        <Grid item md={4} className="w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
                               Bundle ID
@@ -423,7 +423,7 @@ function Application() {
                           </FormControl>
                         </Grid>
 
-                        <Grid item xs={4} className="pt-24 pr-24">
+                        <Grid item md={4} className="pt-24 pr-24 w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
                               Store URL
@@ -439,7 +439,7 @@ function Application() {
                           </FormControl>
                         </Grid>
 
-                        <Grid item xs={4} className="pt-24 pr-24">
+                        <Grid item md={4} className="pt-24 pr-24 w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
                               Dynamic URL
@@ -548,8 +548,8 @@ function Application() {
               </Box>
               <Box className="p-20">
                 <Grid container spacing={3}>
-                  <Grid item xs={9}></Grid>
-                  <Grid item xs={1}>
+                  <Grid item md={9} xs={2}></Grid>
+                  <Grid item md={1} xs={5}>
                     <Button
                       fullWidth
                       variant="outlined"
@@ -559,7 +559,7 @@ function Application() {
                       Cancel
                     </Button>
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid item md={2} xs={5}>
                     <Button
                       type="submit"
                       fullWidth

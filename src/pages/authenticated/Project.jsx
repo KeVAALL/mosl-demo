@@ -277,7 +277,7 @@ function Project() {
                   mt={1}
                   className="pl-20 pr-20 pb-20"
                 >
-                  <Grid item xs={4} sx={{ width: "100%" }}>
+                  <Grid item md={4} sx={{ width: "100%" }}>
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Enter project name
@@ -297,7 +297,7 @@ function Project() {
                     </FormControl>
                   </Grid>
 
-                  <Grid item xs={8}>
+                  <Grid item md={8} sx={{ width: "100%" }}>
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Description
@@ -317,7 +317,7 @@ function Project() {
                     </FormControl>
                   </Grid>
 
-                  <Grid item xs={4}>
+                  <Grid item md={4} sx={{ width: "100%" }}>
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Owner
@@ -334,8 +334,8 @@ function Project() {
               </Box>
               <Box className="p-20">
                 <Grid container spacing={3}>
-                  <Grid item xs={9}></Grid>
-                  <Grid item xs={1}>
+                  <Grid item md={9} xs={2}></Grid>
+                  <Grid item md={1} xs={5}>
                     <Button
                       fullWidth
                       variant="outlined"
@@ -345,7 +345,7 @@ function Project() {
                       Cancel
                     </Button>
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid item md={2} xs={5}>
                     <Button
                       type="submit"
                       fullWidth

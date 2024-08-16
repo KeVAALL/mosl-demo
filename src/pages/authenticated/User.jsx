@@ -323,7 +323,7 @@ function User() {
                   mt={1}
                   className="pl-20 pr-20 pb-20"
                 >
-                  <Grid item xs={4}>
+                  <Grid item md={4} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Name
@@ -342,7 +342,7 @@ function User() {
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid item md={4} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Email
@@ -361,7 +361,7 @@ function User() {
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid item md={4} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Password
@@ -402,7 +402,7 @@ function User() {
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid item md={4} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Phone Number
@@ -421,7 +421,7 @@ function User() {
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid item md={4} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Role
@@ -434,8 +434,8 @@ function User() {
               </Box>
               <Box className="p-20">
                 <Grid container spacing={3}>
-                  <Grid item xs={9}></Grid>
-                  <Grid item xs={1}>
+                  <Grid item md={9} xs={2}></Grid>
+                  <Grid item md={1} xs={5}>
                     <Button
                       fullWidth
                       variant="outlined"
@@ -445,7 +445,7 @@ function User() {
                       Cancel
                     </Button>
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid item md={2} xs={5}>
                     <Button
                       type="submit"
                       fullWidth

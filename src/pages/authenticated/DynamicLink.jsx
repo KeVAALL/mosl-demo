@@ -176,7 +176,7 @@ function DynamicLink() {
                     setGlobalFilter={setGlobalFilter}
                   />
                 </Grid>
-                <Grid item md={2} xs={6}>
+                <Grid item md={3} xs={6}>
                   <CustomSelect
                     placeholder="Select Application"
                     options={applicationArr}
@@ -184,7 +184,7 @@ function DynamicLink() {
                     isClearable
                   />
                 </Grid>
-                <Grid item md={2} xs={6}>
+                <Grid item md={3} xs={6}>
                   <CustomSelect
                     placeholder="Select Project"
                     options={projectArr}
@@ -311,7 +311,7 @@ function DynamicLink() {
                   mt={1}
                   className="pl-20 pr-20 pb-20"
                 >
-                  <Grid item xs={6}>
+                  <Grid item md={6} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Application
@@ -324,7 +324,7 @@ function DynamicLink() {
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item md={6} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Project
@@ -337,7 +337,7 @@ function DynamicLink() {
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item md={6} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         URL Prefix
@@ -355,7 +355,7 @@ function DynamicLink() {
                       />
                     </FormControl>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item md={6} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         URL Suffix
@@ -374,7 +374,7 @@ function DynamicLink() {
                     </FormControl>
                   </Grid>
 
-                  <Grid item xs={12}>
+                  <Grid item md={12} className="w-full">
                     <Stack spacing={0.5}>
                       <Typography variant="body1" className="label">
                         Link Preview
@@ -387,7 +387,7 @@ function DynamicLink() {
                     </Stack>
                   </Grid>
 
-                  <Grid item xs={6}>
+                  <Grid item md={6} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Deep Link URL
@@ -407,7 +407,7 @@ function DynamicLink() {
                     </FormControl>
                   </Grid>
 
-                  <Grid item xs={6}>
+                  <Grid item md={6} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Dynamic Link Name
@@ -427,7 +427,7 @@ function DynamicLink() {
                     </FormControl>
                   </Grid>
 
-                  <Grid item xs={6}>
+                  <Grid item md={6} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Link behavior for Apple
@@ -469,7 +469,7 @@ function DynamicLink() {
                     </FormControl>
                   </Grid>
 
-                  <Grid item xs={6}>
+                  <Grid item md={6} className="w-full">
                     <FormControl variant="standard" fullWidth>
                       <Typography className="label d-flex items-center">
                         Link behavior for Android
@@ -514,8 +514,8 @@ function DynamicLink() {
               </Box>
               <Box className="p-20">
                 <Grid container spacing={3}>
-                  <Grid item xs={9}></Grid>
-                  <Grid item xs={1}>
+                  <Grid item md={9} xs={2}></Grid>
+                  <Grid item md={1} xs={5}>
                     <Button
                       fullWidth
                       variant="outlined"
@@ -525,7 +525,7 @@ function DynamicLink() {
                       Cancel
                     </Button>
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid item md={2} xs={5}>
                     <Button
                       type="submit"
                       fullWidth
