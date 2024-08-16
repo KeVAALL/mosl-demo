@@ -32,25 +32,33 @@ import SettingsApplicationsRoundedIcon from "@mui/icons-material/SettingsApplica
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import AppSettingsAltIcon from "@mui/icons-material/AppSettingsAlt";
 import DynamicFeedIcon from "@mui/icons-material/DynamicFeed";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import mainLogo from "../assets/img/mosl-main-logo.png";
 import secondaryLogo from "../assets/img/mosl-small-transparent.png";
 
 import "./mainLayout.css";
 
-// Tooltip style
-// const HtmlTooltip = styled(({ className, ...props }) => (
-//   <Tooltip {...props} classes={{ popper: className }} />
-// ))(({ theme }) => ({
-//   [`& .${tooltipClasses.tooltip}`]: {
-//     backgroundColor: "#f5f5f9",
-//     color: "#424242",
-//     // color: "rgba(0, 0, 0, 0.87)",
-//     maxWidth: 220,
-//     height: 20,
-//     fontSize: theme.typography.pxToRem(12),
-//     border: "1px solid #dadde9",
-//   },
-// }));
+const HtmlTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: "#f5f5f9",
+    color: "rgba(0, 0, 0, 0.87)",
+    maxWidth: 220,
+    height: 30,
+    fontSize: theme.typography.pxToRem(12),
+    border: "1px solid #dadde9",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  [`& .${tooltipClasses.arrow}`]: {
+    color: "#f5f5f9", // Match this to the backgroundColor of the tooltip
+    "&:before": {
+      border: "1px solid #dadde9", // This will be the border color
+    },
+  },
+}));
 
 const Header = ({ open, handleDrawerToggle }) => (
   <AppBar position="static" className="main-toolbar">
@@ -74,19 +82,46 @@ const Header = ({ open, handleDrawerToggle }) => (
         >
           <MenuIcon />
         </IconButton>
-        {/* <Tooltip
+        <Tooltip
+          // open={true}
+          arrow
           placement="bottom-start"
+          sx={{ backgroundColor: "#f5f5f9" }}
           title={
-            <Menu iconShape="square">
-              <Link to="/sign-in">
-                <MenuItem icon={<BarChartRoundedIcon />}>
-                  <Typography variant="subtitle1">Logout</Typography>
-                </MenuItem>
+            <Box sx={{ backgroundColor: "#f5f5f9" }}>
+              <Link
+                to="/sign-in"
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "4px 12px",
+                  color: "rgba(0, 0, 0, 0.87)",
+                  backgroundColor: "#f5f5f9",
+                  textDecoration: "none",
+                }}
+              >
+                <LogoutOutlinedIcon sx={{ fontSize: "18px" }} />
+                <Typography sx={{ fontSize: "14px" }}>Logout</Typography>
               </Link>
-            </Menu>
+            </Box>
           }
           slotProps={{
             popper: {
+              sx: {
+                "& .MuiTooltip-tooltip": {
+                  bgcolor: "#f5f5f9", // Background color for the tooltip
+                  color: "rgba(0, 0, 0, 0.87)", // Text color for the tooltip
+                  border: "1px solid #c6c9d5",
+                },
+                "& .MuiTooltip-arrow": {
+                  color: "#f5f5f9", // Arrow background color
+                  "&:before": {
+                    border: "1px solid #c6c9d5", // This will be the border color
+                  },
+                },
+              },
               modifiers: [
                 {
                   name: "offset",
@@ -98,13 +133,14 @@ const Header = ({ open, handleDrawerToggle }) => (
             },
           }}
           enterTouchDelay={20}
-        > */}
-        <Avatar sx={{ bgcolor: "black" }}>N</Avatar>
-        {/* </Tooltip> */}
+        >
+          <Avatar sx={{ bgcolor: "black" }}>N</Avatar>
+        </Tooltip>
       </Box>
     </Toolbar>
   </AppBar>
 );
+
 const MobileDrawer = ({ open, handleDrawerToggle }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -127,8 +163,14 @@ const MobileDrawer = ({ open, handleDrawerToggle }) => {
         }}
       >
         <Menu iconShape="square">
-          <Box sx={{ p: 3 }}>
-            <h3>DEMO</h3>
+          <Box sx={{ px: 2 }}>
+            <img
+              src={mainLogo}
+              style={{
+                height: "100px",
+                width: "100%",
+              }}
+            />
           </Box>
           <Link
             to="/home/dashboard"
@@ -249,7 +291,6 @@ const ReactSidebar = ({ open, activeTab }) => {
               />
             </Box>
           ) : (
-            // <Box sx={{ p: 3 }}>
             <img
               src={secondaryLogo}
               style={{
@@ -257,75 +298,180 @@ const ReactSidebar = ({ open, activeTab }) => {
                 width: "100%",
               }}
             />
-            // </Box>
           )}
-          <Link to="/home/dashboard" className="menu-item">
-            <MenuItem
-              icon={<HomeIcon />}
-              className={`${
-                location.pathname === "/home/dashboard"
-                  ? "active-menu-item"
-                  : ""
-              }`}
-            >
-              <Typography variant="subtitle1">Dashboard</Typography>
-            </MenuItem>
-          </Link>
 
-          <Link to="/home/projects" className="menu-item">
-            <MenuItem
-              icon={<BarChartRoundedIcon />}
-              className={`${
-                location.pathname === "/home/projects" ? "active-menu-item" : ""
-              }`}
-            >
-              Project
-            </MenuItem>
-          </Link>
-          <Link to="/home/application" className="menu-item">
-            <MenuItem
-              icon={<AppSettingsAltIcon />}
-              className={`${
-                location.pathname === "/home/application"
-                  ? "active-menu-item"
-                  : ""
-              }`}
-            >
-              Application
-            </MenuItem>
-          </Link>
-          <Link to="/home/dynamic-links" className="menu-item">
-            <MenuItem
-              icon={<DynamicFeedIcon />}
-              className={`${
-                location.pathname === "/home/dynamic-links"
-                  ? "active-menu-item"
-                  : ""
-              }`}
-            >
-              Dynamic Links
-            </MenuItem>
-          </Link>
-          <Link to="/home/user" className="menu-item">
-            <MenuItem
-              icon={<AccountCircleRoundedIcon />}
-              className={`${
-                location.pathname === "/home/user" ? "active-menu-item" : ""
-              }`}
-            >
-              User
-            </MenuItem>
-          </Link>
-          <Link to="/home/role" className="menu-item">
-            <MenuItem
-              icon={<SettingsApplicationsRoundedIcon />}
-              className={`${
-                location.pathname === "/home/role" ? "active-menu-item" : ""
-              }`}
-            >
-              Role
-            </MenuItem>
-          </Link>
+          {open ? (
+            <Link to="/home/dashboard" className="menu-item">
+              <MenuItem
+                icon={<HomeIcon />}
+                className={`${
+                  location.pathname === "/home/dashboard"
+                    ? "active-menu-item"
+                    : ""
+                }`}
+              >
+                <Typography variant="subtitle1">Dashboard</Typography>
+              </MenuItem>
+            </Link>
+          ) : (
+            <HtmlTooltip arrow title="Dashboard" placement="right">
+              <Link to="/home/dashboard" className="menu-item">
+                <MenuItem
+                  icon={<HomeIcon />}
+                  className={`${
+                    location.pathname === "/home/dashboard"
+                      ? "active-menu-item"
+                      : ""
+                  }`}
+                >
+                  <Typography variant="subtitle1">Dashboard</Typography>
+                </MenuItem>
+              </Link>
+            </HtmlTooltip>
+          )}
+
+          {open ? (
+            <Link to="/home/projects" className="menu-item">
+              <MenuItem
+                icon={<BarChartRoundedIcon />}
+                className={`${
+                  location.pathname === "/home/projects"
+                    ? "active-menu-item"
+                    : ""
+                }`}
+              >
+                Project
+              </MenuItem>
+            </Link>
+          ) : (
+            <HtmlTooltip arrow title="Project" placement="right">
+              <Link to="/home/projects" className="menu-item">
+                <MenuItem
+                  icon={<BarChartRoundedIcon />}
+                  className={`${
+                    location.pathname === "/home/projects"
+                      ? "active-menu-item"
+                      : ""
+                  }`}
+                >
+                  Project
+                </MenuItem>
+              </Link>
+            </HtmlTooltip>
+          )}
+
+          {open ? (
+            <Link to="/home/application" className="menu-item">
+              <MenuItem
+                icon={<AppSettingsAltIcon />}
+                className={`${
+                  location.pathname === "/home/application"
+                    ? "active-menu-item"
+                    : ""
+                }`}
+              >
+                Application
+              </MenuItem>
+            </Link>
+          ) : (
+            <HtmlTooltip arrow title="Application" placement="right">
+              <Link to="/home/application" className="menu-item">
+                <MenuItem
+                  icon={<AppSettingsAltIcon />}
+                  className={`${
+                    location.pathname === "/home/application"
+                      ? "active-menu-item"
+                      : ""
+                  }`}
+                >
+                  Application
+                </MenuItem>
+              </Link>
+            </HtmlTooltip>
+          )}
+
+          {open ? (
+            <Link to="/home/dynamic-links" className="menu-item">
+              <MenuItem
+                icon={<DynamicFeedIcon />}
+                className={`${
+                  location.pathname === "/home/dynamic-links"
+                    ? "active-menu-item"
+                    : ""
+                }`}
+              >
+                Dynamic Links
+              </MenuItem>
+            </Link>
+          ) : (
+            <HtmlTooltip arrow title="Dynamic Links" placement="right">
+              <Link to="/home/dynamic-links" className="menu-item">
+                <MenuItem
+                  icon={<DynamicFeedIcon />}
+                  className={`${
+                    location.pathname === "/home/dynamic-links"
+                      ? "active-menu-item"
+                      : ""
+                  }`}
+                >
+                  Dynamic Links
+                </MenuItem>
+              </Link>
+            </HtmlTooltip>
+          )}
+
+          {open ? (
+            <Link to="/home/user" className="menu-item">
+              <MenuItem
+                icon={<AccountCircleRoundedIcon />}
+                className={`${
+                  location.pathname === "/home/user" ? "active-menu-item" : ""
+                }`}
+              >
+                User
+              </MenuItem>
+            </Link>
+          ) : (
+            <HtmlTooltip arrow title="User" placement="right">
+              <Link to="/home/user" className="menu-item">
+                <MenuItem
+                  icon={<AccountCircleRoundedIcon />}
+                  className={`${
+                    location.pathname === "/home/user" ? "active-menu-item" : ""
+                  }`}
+                >
+                  User
+                </MenuItem>
+              </Link>
+            </HtmlTooltip>
+          )}
+
+          {open ? (
+            <Link to="/home/role" className="menu-item">
+              <MenuItem
+                icon={<SettingsApplicationsRoundedIcon />}
+                className={`${
+                  location.pathname === "/home/role" ? "active-menu-item" : ""
+                }`}
+              >
+                Role
+              </MenuItem>
+            </Link>
+          ) : (
+            <HtmlTooltip arrow title="Role" placement="right">
+              <Link to="/home/role" className="menu-item">
+                <MenuItem
+                  icon={<SettingsApplicationsRoundedIcon />}
+                  className={`${
+                    location.pathname === "/home/role" ? "active-menu-item" : ""
+                  }`}
+                >
+                  Role
+                </MenuItem>
+              </Link>
+            </HtmlTooltip>
+          )}
+
           {/* <Link to="/home/role" className="menu-item">
             <MenuItem icon={<TimelineRoundedIcon />}>Logs</MenuItem>
           </Link> */}
@@ -400,7 +546,11 @@ export const Layout = () => {
             paddingBottom: 4,
             // paddingRight: { lg: 0, sm: 4, xs: 0 },
             flexGrow: 1,
-            width: { md: "calc(100% - 20px)", xs: "100%" },
+            width: {
+              md: "calc(100% - 20px)",
+              sm: "calc(100% - 45px)",
+              xs: "100%",
+            },
             overflowY: "auto",
             "&::-webkit-scrollbar": {
               width: "8px",
