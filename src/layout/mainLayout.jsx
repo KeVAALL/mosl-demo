@@ -55,7 +55,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
   [`& .${tooltipClasses.arrow}`]: {
     color: "#f5f5f9", // Match this to the backgroundColor of the tooltip
     "&:before": {
-      border: "1px solid #dadde9", // This will be the border color
+      border: "1px solid #dadde9",
     },
   },
 }));
