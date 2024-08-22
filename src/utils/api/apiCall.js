@@ -4,7 +4,6 @@ import AxiosInstance from "../utils/axios";
 export async function ApiService(data, endPoint) {
   try {
     const response = await AxiosInstance.post(`${endPoint}`, data);
-    console.log(response);
     return response;
   } catch (error) {
     console.log(error?.response?.data?.message);

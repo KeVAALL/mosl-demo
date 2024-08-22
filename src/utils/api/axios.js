@@ -10,8 +10,6 @@ AxiosInstance.interceptors.request.use(function (config) {
   const state = store.getState();
   const token = state.user.token;
   const we3Key = state.user.we3key;
-  // const token = localStorage.getItem("authToken");
-  // const we3Key = localStorage.getItem("we3key");
 
   if (token) {
     config.headers["Authorization"] = "Bearer " + token;
