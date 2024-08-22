@@ -16,6 +16,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { BootstrapInput } from "../../utils/Input/textfield";
 import "./auth.css";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function SignIn() {
   const handleSubmit = (event) => {
@@ -176,6 +177,7 @@ export default function SignIn() {
                   variant="contained"
                   sx={{ mt: 1, mb: 1, backgroundColor: "primary.main" }}
                   onClick={() => {
+                    toast.success("Successful!");
                     navigate("/home/dashboard");
                   }}
                 >
