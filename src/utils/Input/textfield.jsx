@@ -15,8 +15,8 @@ export const BootstrapInput = styled(InputBase)(
       borderColor: theme.palette.mode === "light" ? "#E0E3E7" : "#2D3843",
       fontSize: 14,
       padding: "8px 12px",
-      paddingRight: endAdornment ? "40px" : "12px", // Adjusted for end adornment
-      paddingLeft: startAdornment ? "40px" : "12px", // Adjusted for start adornment
+      paddingRight: endAdornment ? "40px" : "12px", // For end adornment
+      paddingLeft: startAdornment ? "40px" : "12px", // For start adornment
       transition: theme.transitions.create([
         "border-color",
         "background-color",
