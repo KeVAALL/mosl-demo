@@ -1,4 +1,4 @@
-import AxiosInstance from "../utils/axios";
+import AxiosInstance from "./axios";
 
 //API call
 export async function ApiService(data, endPoint) {

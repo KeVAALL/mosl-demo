@@ -1,6 +1,6 @@
 import axios from "axios";
-import { BASE_URL } from "../config/url";
-import { store } from "../redux/store";
+import { BASE_URL } from "../../config/url";
+import { store } from "../../redux/store";
 
 let AxiosInstance = axios.create({
   baseURL: BASE_URL || "http://localhost:3000/",
