@@ -149,7 +149,7 @@ export default function ForgotPassword() {
                           variant="contained"
                           sx={{ mt: 1, mb: 1, backgroundColor: "primary.main" }}
                         >
-                          Sign In
+                          Submit
                         </LoadingButton>
                       </Box>
                     </Grid>
