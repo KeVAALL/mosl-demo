@@ -12,14 +12,16 @@ import {
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import userReducer from "./slices/userSlice";
+import menuReducer from "./slices/menuSlice";
 import { encryptTransform } from "redux-persist-transform-encrypt";
 
 const rootReducer = combineReducers({
   user: userReducer,
+  menu: menuReducer,
 });
 
 const encryptor = encryptTransform({
-  secretKey: "@fitizen-2-0-2-4", // Replace with your secret key
+  secretKey: "@mosl-2-0-2-4", // Replace with your secret key
   onError: function (error) {
     // Handle the error
     console.error("Encryption Error:", error);

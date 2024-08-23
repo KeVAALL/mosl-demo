@@ -5,11 +5,16 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { Field, Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { FormControl, IconButton, InputAdornment, Stack } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import {
+  FormControl,
+  IconButton,
+  InputAdornment,
+  Link,
+  Stack,
+} from "@mui/material";
+import { Email, Visibility, VisibilityOff } from "@mui/icons-material";
+import KeyboardBackspaceOutlinedIcon from "@mui/icons-material/KeyboardBackspaceOutlined";
 import { BootstrapInput } from "../../utils/Input/textfield";
-import { useNavigate } from "react-router-dom";
-import Link from "@mui/material/Link";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
@@ -17,40 +22,32 @@ import { ApiService } from "../../utils/api/apiCall";
 import { setProfile } from "../../redux/slices/userSlice";
 import { setMenu } from "../../redux/slices/menuSlice";
 import "./auth.css";
+import { decryptData } from "../../utils/encryption";
+import { useNavigate } from "react-router-dom";
 
-export default function SignIn() {
+export default function ResetPassword() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const [loginAttempt, setLoginAttempt] = useState(false);
-  const [signInForm, setSignInForm] = useState({
-    email: "email@gmalil.com",
-    password: "",
-  });
+  const resetEmail = decryptData(localStorage.getItem("resetEmail"));
   const handleSubmit = async (values) => {
-    console.log(values);
+    console.log({ email: resetEmail, password: values?.newPassword });
+
+    const reqdata = { email: resetEmail, password: values?.newPassword };
 
     try {
       setLoginAttempt(true);
-      const result = await ApiService(values, "user/login");
+      const result = await ApiService(reqdata, "user/updatePassword");
       if (result) {
         console.log(result?.data?.data);
 
-        const apiResponse = {
-          userProfile: result?.data?.data,
-          token: result?.data?.data?.token?.access_token,
-        };
-        dispatch(setProfile(apiResponse));
-
-        const apiMenu = { menu: result?.data?.data?.menu };
-        dispatch(setMenu(apiMenu));
-
-        if (result?.data?.data?.is_password_reset) {
-          toast.warn("Please reset your Password!");
-          navigate("/reset-password");
-        } else {
-          toast.success("Successful!");
-          navigate("/home/dashboard");
+        if (result?.data?.result_flag) {
+          toast.success(`Password Updated for ${resetEmail}`);
+          navigate("/sign-in");
+          localStorage.removeItem("resetEmail");
         }
+
         return result;
       }
     } catch (err) {
@@ -59,18 +56,26 @@ export default function SignIn() {
       setLoginAttempt(false);
     }
   };
-  const [showPassword, setShowPassword] = useState(false);
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const handleClickShowNewPassword = () => {
+    setShowNewPassword(!showNewPassword);
+  };
+  const handleClickShowConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
   const validationSchema = Yup.object({
-    email: Yup.string()
-      .email("Invalid email format")
-      .required("Email is required"),
-    password: Yup.string().required("Password is required"),
+    newPassword: Yup.string().required("Password is required"),
+    confirmPassword: Yup.string()
+      .required("Password is required")
+      .test(
+        "confirmPassword",
+        "Both Password should match!",
+        (confirmPassword, yup) => yup.parent.newPassword === confirmPassword
+      ),
   });
 
   return (
@@ -103,13 +108,13 @@ export default function SignIn() {
                 Admin
               </Typography>
               <Typography variant="caption" sx={{ color: "text.grey" }}>
-                Sign In
+                Reset Password for {resetEmail}
               </Typography>
             </Stack>
           </Grid>
           <Grid container direction="column">
             <Formik
-              initialValues={signInForm}
+              initialValues={{ newPassword: "", confirmPassword: "" }}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
@@ -119,42 +124,16 @@ export default function SignIn() {
                     <Grid item xs={12}>
                       <FormControl variant="standard" fullWidth>
                         <Typography className="label d-flex items-center">
-                          Email
+                          New Password
                           <sup className="asc">*</sup>
                         </Typography>
-
-                        <Field name="email">
+                        <Field name="newPassword">
                           {({ field }) => (
                             <BootstrapInput
                               {...field}
-                              id="email"
-                              size="small"
-                              placeholder="Email Address"
-                              fullWidth
-                              InputLabelProps={{ shrink: true }}
-                            />
-                          )}
-                        </Field>
-                        <ErrorMessage
-                          name="email"
-                          component="div"
-                          className="text-error text-12 mt-5"
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <FormControl variant="standard" fullWidth>
-                        <Typography className="label d-flex items-center">
-                          Password
-                          <sup className="asc">*</sup>
-                        </Typography>
-                        <Field name="password">
-                          {({ field }) => (
-                            <BootstrapInput
-                              {...field}
-                              id="password"
+                              id="newPassword"
                               placeholder="Password"
-                              type={showPassword ? "text" : "password"}
+                              type={showNewPassword ? "text" : "password"}
                               fullWidth
                               size="small"
                               InputLabelProps={{ shrink: true }}
@@ -162,12 +141,12 @@ export default function SignIn() {
                                 <InputAdornment position="end">
                                   <IconButton
                                     aria-label="toggle password visibility"
-                                    onClick={handleClickShowPassword}
+                                    onClick={handleClickShowNewPassword}
                                     onMouseDown={handleMouseDownPassword}
                                     onMouseUp={handleMouseDownPassword}
                                     edge="end"
                                   >
-                                    {showPassword ? (
+                                    {showNewPassword ? (
                                       <Visibility fontSize="small" />
                                     ) : (
                                       <VisibilityOff fontSize="small" />
@@ -179,19 +158,56 @@ export default function SignIn() {
                           )}
                         </Field>
                         <ErrorMessage
-                          name="password"
+                          name="newPassword"
                           component="div"
                           className="text-error text-12 mt-5"
                         />
                       </FormControl>
                     </Grid>
-                    <Grid item xs={6} alignItems="flex-end">
-                      <Link href="/forgot-password" className="custom-link">
-                        <Typography variant="caption">
-                          Forgot password?
+                    <Grid item xs={12}>
+                      <FormControl variant="standard" fullWidth>
+                        <Typography className="label d-flex items-center">
+                          Confirm Password
+                          <sup className="asc">*</sup>
                         </Typography>
-                      </Link>
+                        <Field name="confirmPassword">
+                          {({ field }) => (
+                            <BootstrapInput
+                              {...field}
+                              id="confirmPassword"
+                              placeholder="Password"
+                              type={showConfirmPassword ? "text" : "password"}
+                              fullWidth
+                              size="small"
+                              InputLabelProps={{ shrink: true }}
+                              endAdornment={
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={handleClickShowConfirmPassword}
+                                    onMouseDown={handleMouseDownPassword}
+                                    onMouseUp={handleMouseDownPassword}
+                                    edge="end"
+                                  >
+                                    {showConfirmPassword ? (
+                                      <Visibility fontSize="small" />
+                                    ) : (
+                                      <VisibilityOff fontSize="small" />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              }
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage
+                          name="confirmPassword"
+                          component="div"
+                          className="text-error text-12 mt-5"
+                        />
+                      </FormControl>
                     </Grid>
+
                     <Grid item xs={12}>
                       <Box
                         sx={{
@@ -207,14 +223,26 @@ export default function SignIn() {
                           fullWidth
                           variant="contained"
                           sx={{ mt: 1, mb: 1, backgroundColor: "primary.main" }}
-                          // onClick={() => {
-                          //   toast.success("Successful!");
-                          //   // navigate("/home/dashboard");
-                          // }}
                         >
-                          Sign In
+                          Reset Password
                         </LoadingButton>
                       </Box>
+                    </Grid>
+                    <Grid
+                      item
+                      md={3}
+                      xs={6}
+                      component={Stack}
+                      flexDirection="row"
+                      alignItems="center"
+                      gap={0.5}
+                    >
+                      <KeyboardBackspaceOutlinedIcon
+                        style={{ fontSize: "20px", paddingTop: "4px" }}
+                      />
+                      <Link href="/sign-in" className="custom-link">
+                        <Typography variant="caption">Go back</Typography>
+                      </Link>
                     </Grid>
                   </Grid>
                 </Form>
@@ -224,37 +252,5 @@ export default function SignIn() {
         </Grid>
       </Container>
     </Box>
-    // </AuthWrapper>
   );
 }
-
-/* <TextField
-                        variant="outlined"
-                        fullWidth
-                        size="small"
-                        id="email"
-                        label="Email Address"
-                        name="email"
-                        autoComplete="email"
-                        placeholder="Email"
-                        // autoFocus
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        inputProps={{
-                          "aria-label": "weight",
-                        }}
-                      /> */
-// {
-/* <BootstrapInput
-                        fullWidth
-                        id="email"
-                        size="small"
-                        label="Email Address"
-                        name="email"
-                        placeholder="Email"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                      /> */
-// }

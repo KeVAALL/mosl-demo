@@ -24,9 +24,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { Menu, MenuItem, Sidebar } from "react-pro-sidebar";
 import { Outlet, Link } from "react-router-dom";
 
-import ReceiptRoundedIcon from "@mui/icons-material/ReceiptRounded";
 import BarChartRoundedIcon from "@mui/icons-material/BarChartRounded";
-import TimelineRoundedIcon from "@mui/icons-material/TimelineRounded";
 import HomeIcon from "@mui/icons-material/Home";
 import SettingsApplicationsRoundedIcon from "@mui/icons-material/SettingsApplicationsRounded";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
@@ -36,7 +34,10 @@ import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import mainLogo from "../assets/img/mosl-main-logo.png";
 import secondaryLogo from "../assets/img/mosl-small-transparent.png";
 
+import { useDispatch, useSelector } from "react-redux";
+
 import "./mainLayout.css";
+import { clearProfile } from "../redux/slices/userSlice";
 
 const HtmlTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -59,91 +60,107 @@ const HtmlTooltip = styled(({ className, ...props }) => (
     },
   },
 }));
+const iconMapping = {
+  Dashboard: <HomeIcon />,
+  Project: <BarChartRoundedIcon />,
+  Application: <AppSettingsAltIcon />,
+  "Dynamic Links": <DynamicFeedIcon />,
+  Users: <AccountCircleRoundedIcon />,
+  Role: <SettingsApplicationsRoundedIcon />,
+};
 
-const Header = ({ open, handleDrawerToggle }) => (
-  <AppBar position="static" className="main-toolbar">
-    <Toolbar>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          width: "100%",
-          p: 2,
-        }}
-        className={`${open ? "drawer-open" : ""}`}
-      >
-        <IconButton
-          className="toggle-drawer-btn"
-          edge="start"
-          color="black"
-          aria-label="menu"
-          onClick={handleDrawerToggle}
-        >
-          <MenuIcon />
-        </IconButton>
-        <Tooltip
-          // open={true}
-          arrow
-          placement="bottom-start"
-          sx={{ backgroundColor: "#f5f5f9" }}
-          title={
-            <Box sx={{ backgroundColor: "#f5f5f9" }}>
-              <Link
-                to="/sign-in"
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: "10px",
-                  padding: "4px 12px",
-                  color: "rgba(0, 0, 0, 0.87)",
-                  backgroundColor: "#f5f5f9",
-                  textDecoration: "none",
-                }}
-              >
-                <LogoutOutlinedIcon sx={{ fontSize: "18px" }} />
-                <Typography sx={{ fontSize: "14px" }}>Logout</Typography>
-              </Link>
-            </Box>
-          }
-          slotProps={{
-            popper: {
-              sx: {
-                "& .MuiTooltip-tooltip": {
-                  bgcolor: "#f5f5f9", // Background color for the tooltip
-                  color: "rgba(0, 0, 0, 0.87)", // Text color for the tooltip
-                  border: "1px solid #c6c9d5",
-                },
-                "& .MuiTooltip-arrow": {
-                  color: "#f5f5f9", // Arrow background color
-                  "&:before": {
-                    border: "1px solid #c6c9d5", // This will be the border color
-                  },
-                },
-              },
-              modifiers: [
-                {
-                  name: "offset",
-                  options: {
-                    offset: [0, -10],
-                  },
-                },
-              ],
-            },
-          }}
-          enterTouchDelay={20}
-        >
-          <Avatar sx={{ bgcolor: "black" }}>N</Avatar>
-        </Tooltip>
-      </Box>
-    </Toolbar>
-  </AppBar>
-);
-
-const MobileDrawer = ({ open, handleDrawerToggle }) => {
-  const location = useLocation();
+const Header = ({ open, handleDrawerToggle }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  return (
+    <AppBar position="static" className="main-toolbar">
+      <Toolbar>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "100%",
+            p: 2,
+          }}
+          className={`${open ? "drawer-open" : ""}`}
+        >
+          <IconButton
+            className="toggle-drawer-btn"
+            edge="start"
+            color="black"
+            aria-label="menu"
+            onClick={handleDrawerToggle}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Tooltip
+            // open={true}
+            arrow
+            placement="bottom-start"
+            sx={{ backgroundColor: "#f5f5f9" }}
+            title={
+              <Box sx={{ backgroundColor: "#f5f5f9" }}>
+                <Link
+                  onClick={() => {
+                    dispatch(clearProfile());
+                    navigate("/sign-in");
+                  }}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: "10px",
+                    padding: "4px 12px",
+                    color: "rgba(0, 0, 0, 0.87)",
+                    backgroundColor: "#f5f5f9",
+                    textDecoration: "none",
+                  }}
+                >
+                  <LogoutOutlinedIcon sx={{ fontSize: "18px" }} />
+                  <Typography sx={{ fontSize: "14px" }}>Logout</Typography>
+                </Link>
+              </Box>
+            }
+            slotProps={{
+              popper: {
+                sx: {
+                  "& .MuiTooltip-tooltip": {
+                    bgcolor: "#f5f5f9", // Background color for the tooltip
+                    color: "rgba(0, 0, 0, 0.87)", // Text color for the tooltip
+                    border: "1px solid #c6c9d5",
+                  },
+                  "& .MuiTooltip-arrow": {
+                    color: "#f5f5f9", // Arrow background color
+                    "&:before": {
+                      border: "1px solid #c6c9d5", // This will be the border color
+                    },
+                  },
+                },
+                modifiers: [
+                  {
+                    name: "offset",
+                    options: {
+                      offset: [0, -10],
+                    },
+                  },
+                ],
+              },
+            }}
+            enterTouchDelay={20}
+          >
+            <Avatar sx={{ bgcolor: "black" }}>N</Avatar>
+          </Tooltip>
+        </Box>
+      </Toolbar>
+    </AppBar>
+  );
+};
+
+const MobileDrawer = ({ open, handleDrawerToggle, menu }) => {
+  const location = useLocation();
+  console.log(menu);
 
   return (
     <Drawer
@@ -172,106 +189,34 @@ const MobileDrawer = ({ open, handleDrawerToggle }) => {
               }}
             />
           </Box>
-          <Link
-            to="/home/dashboard"
-            onClick={handleDrawerToggle}
-            className="menu-item"
-          >
-            <MenuItem
-              icon={<HomeIcon />}
-              className={`${
-                location.pathname === "/home/dashboard"
-                  ? "active-menu-item"
-                  : ""
-              }`}
-            >
-              <Typography variant="subtitle1">Dashboard</Typography>
-            </MenuItem>
-          </Link>
 
-          <Link
-            to="/home/projects"
-            onClick={handleDrawerToggle}
-            className="menu-item"
-          >
-            <MenuItem
-              icon={<BarChartRoundedIcon />}
-              className={`${
-                location.pathname === "/home/projects" ? "active-menu-item" : ""
-              }`}
+          {menu.map((item) => (
+            <Link
+              to={`/home/${item.menu_url}`}
+              key={item.menu_id}
+              onClick={handleDrawerToggle}
+              className="menu-item"
             >
-              Project
-            </MenuItem>
-          </Link>
-          <Link
-            to="/home/application"
-            onClick={handleDrawerToggle}
-            className="menu-item"
-          >
-            <MenuItem
-              icon={<AppSettingsAltIcon />}
-              className={`${
-                location.pathname === "/home/application"
-                  ? "active-menu-item"
-                  : ""
-              }`}
-            >
-              Application
-            </MenuItem>
-          </Link>
-          <Link
-            to="/home/dynamic-links"
-            onClick={handleDrawerToggle}
-            className="menu-item"
-          >
-            <MenuItem
-              icon={<DynamicFeedIcon />}
-              className={`${
-                location.pathname === "/home/dynamic-links"
-                  ? "active-menu-item"
-                  : ""
-              }`}
-            >
-              Dynamic Links
-            </MenuItem>
-          </Link>
-          <Link
-            to="/home/user"
-            onClick={handleDrawerToggle}
-            className="menu-item"
-          >
-            <MenuItem
-              icon={<AccountCircleRoundedIcon />}
-              className={`${
-                location.pathname === "/home/user" ? "active-menu-item" : ""
-              }`}
-            >
-              User
-            </MenuItem>
-          </Link>
-          <Link
-            to="/home/role"
-            oonClick={handleDrawerToggle}
-            className="menu-item"
-          >
-            <MenuItem
-              icon={<SettingsApplicationsRoundedIcon />}
-              className={`${
-                location.pathname === "/home/role" ? "active-menu-item" : ""
-              }`}
-            >
-              Role
-            </MenuItem>
-          </Link>
+              <MenuItem
+                icon={iconMapping[item.menu_name]}
+                className={
+                  location.pathname.includes(item.menu_url)
+                    ? "active-menu-item"
+                    : ""
+                }
+              >
+                <Typography variant="subtitle1">{item.menu_name}</Typography>
+              </MenuItem>
+            </Link>
+          ))}
         </Menu>
       </Box>
     </Drawer>
   );
 };
-const ReactSidebar = ({ open, activeTab }) => {
+const ReactSidebar = ({ open, menu }) => {
   const location = useLocation();
-  console.log(location.pathname);
-  console.log(activeTab);
+  console.log(menu);
 
   return (
     <>
@@ -300,177 +245,41 @@ const ReactSidebar = ({ open, activeTab }) => {
             />
           )}
 
-          {open ? (
-            <Link to="/home/dashboard" className="menu-item">
-              <MenuItem
-                icon={<HomeIcon />}
-                className={`${
-                  location.pathname === "/home/dashboard"
-                    ? "active-menu-item"
-                    : ""
-                }`}
-              >
-                <Typography variant="subtitle1">Dashboard</Typography>
-              </MenuItem>
-            </Link>
-          ) : (
-            <HtmlTooltip arrow title="Dashboard" placement="right">
-              <Link to="/home/dashboard" className="menu-item">
+          {menu.map((item) => (
+            <Link
+              to={`/home/${item.menu_url}`}
+              key={item.menu_id}
+              className="menu-item"
+            >
+              {open ? (
                 <MenuItem
-                  icon={<HomeIcon />}
-                  className={`${
-                    location.pathname === "/home/dashboard"
+                  icon={iconMapping[item.menu_name]}
+                  className={
+                    location.pathname.includes(item.menu_url)
                       ? "active-menu-item"
                       : ""
-                  }`}
+                  }
                 >
-                  <Typography variant="subtitle1">Dashboard</Typography>
+                  <Typography variant="subtitle1">{item.menu_name}</Typography>
                 </MenuItem>
-              </Link>
-            </HtmlTooltip>
-          )}
-
-          {open ? (
-            <Link to="/home/projects" className="menu-item">
-              <MenuItem
-                icon={<BarChartRoundedIcon />}
-                className={`${
-                  location.pathname === "/home/projects"
-                    ? "active-menu-item"
-                    : ""
-                }`}
-              >
-                Project
-              </MenuItem>
+              ) : (
+                <HtmlTooltip arrow title={item.menu_name} placement="right">
+                  <MenuItem
+                    icon={iconMapping[item.menu_name]}
+                    className={
+                      location.pathname.includes(item.menu_url)
+                        ? "active-menu-item"
+                        : ""
+                    }
+                  >
+                    <Typography variant="subtitle1">
+                      {item.menu_name}
+                    </Typography>
+                  </MenuItem>
+                </HtmlTooltip>
+              )}
             </Link>
-          ) : (
-            <HtmlTooltip arrow title="Project" placement="right">
-              <Link to="/home/projects" className="menu-item">
-                <MenuItem
-                  icon={<BarChartRoundedIcon />}
-                  className={`${
-                    location.pathname === "/home/projects"
-                      ? "active-menu-item"
-                      : ""
-                  }`}
-                >
-                  Project
-                </MenuItem>
-              </Link>
-            </HtmlTooltip>
-          )}
-
-          {open ? (
-            <Link to="/home/application" className="menu-item">
-              <MenuItem
-                icon={<AppSettingsAltIcon />}
-                className={`${
-                  location.pathname === "/home/application"
-                    ? "active-menu-item"
-                    : ""
-                }`}
-              >
-                Application
-              </MenuItem>
-            </Link>
-          ) : (
-            <HtmlTooltip arrow title="Application" placement="right">
-              <Link to="/home/application" className="menu-item">
-                <MenuItem
-                  icon={<AppSettingsAltIcon />}
-                  className={`${
-                    location.pathname === "/home/application"
-                      ? "active-menu-item"
-                      : ""
-                  }`}
-                >
-                  Application
-                </MenuItem>
-              </Link>
-            </HtmlTooltip>
-          )}
-
-          {open ? (
-            <Link to="/home/dynamic-links" className="menu-item">
-              <MenuItem
-                icon={<DynamicFeedIcon />}
-                className={`${
-                  location.pathname === "/home/dynamic-links"
-                    ? "active-menu-item"
-                    : ""
-                }`}
-              >
-                Dynamic Links
-              </MenuItem>
-            </Link>
-          ) : (
-            <HtmlTooltip arrow title="Dynamic Links" placement="right">
-              <Link to="/home/dynamic-links" className="menu-item">
-                <MenuItem
-                  icon={<DynamicFeedIcon />}
-                  className={`${
-                    location.pathname === "/home/dynamic-links"
-                      ? "active-menu-item"
-                      : ""
-                  }`}
-                >
-                  Dynamic Links
-                </MenuItem>
-              </Link>
-            </HtmlTooltip>
-          )}
-
-          {open ? (
-            <Link to="/home/user" className="menu-item">
-              <MenuItem
-                icon={<AccountCircleRoundedIcon />}
-                className={`${
-                  location.pathname === "/home/user" ? "active-menu-item" : ""
-                }`}
-              >
-                User
-              </MenuItem>
-            </Link>
-          ) : (
-            <HtmlTooltip arrow title="User" placement="right">
-              <Link to="/home/user" className="menu-item">
-                <MenuItem
-                  icon={<AccountCircleRoundedIcon />}
-                  className={`${
-                    location.pathname === "/home/user" ? "active-menu-item" : ""
-                  }`}
-                >
-                  User
-                </MenuItem>
-              </Link>
-            </HtmlTooltip>
-          )}
-
-          {open ? (
-            <Link to="/home/role" className="menu-item">
-              <MenuItem
-                icon={<SettingsApplicationsRoundedIcon />}
-                className={`${
-                  location.pathname === "/home/role" ? "active-menu-item" : ""
-                }`}
-              >
-                Role
-              </MenuItem>
-            </Link>
-          ) : (
-            <HtmlTooltip arrow title="Role" placement="right">
-              <Link to="/home/role" className="menu-item">
-                <MenuItem
-                  icon={<SettingsApplicationsRoundedIcon />}
-                  className={`${
-                    location.pathname === "/home/role" ? "active-menu-item" : ""
-                  }`}
-                >
-                  Role
-                </MenuItem>
-              </Link>
-            </HtmlTooltip>
-          )}
+          ))}
 
           {/* <Link to="/home/role" className="menu-item">
             <MenuItem icon={<TimelineRoundedIcon />}>Logs</MenuItem>
@@ -485,6 +294,8 @@ export const Layout = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const theme = useTheme();
+  const { menu } = useSelector((state) => state.menu);
+  console.log(menu);
   const isDesktop = useMediaQuery(theme.breakpoints.up("sm"));
 
   const handleDesktopDrawerToggle = () => {
@@ -504,11 +315,12 @@ export const Layout = () => {
       }}
     >
       {isDesktop ? (
-        <ReactSidebar open={drawerOpen} />
+        <ReactSidebar open={drawerOpen} menu={menu} />
       ) : (
         <MobileDrawer
           open={mobileDrawerOpen}
           handleDrawerToggle={handleMobileDrawerToggle}
+          menu={menu}
         />
       )}
       <Box

@@ -4,7 +4,6 @@ const initialState = {
   userProfile: null,
   isLoggedIn: false,
   token: null,
-  we3key: null,
 };
 const userSlice = createSlice({
   name: "user",
@@ -15,7 +14,6 @@ const userSlice = createSlice({
       state.userProfile = action.payload.userProfile;
       state.isLoggedIn = true;
       state.token = action.payload.token;
-      state.we3key = action.payload.we3_key;
     },
     clearProfile: (state) => {
       state.userProfile = null;
@@ -23,7 +21,7 @@ const userSlice = createSlice({
       state.token = null;
       state.we3key = null;
     },
-    setGoogleLogin: (state, action) => {
+    setLoginAttempt: (state, action) => {
       state.userProfile = action.payload.userProfile;
       state.token = action.payload.token;
       state.we3key = action.payload.we3_key;

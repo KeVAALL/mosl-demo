@@ -8,7 +8,7 @@ const menuSlice = createSlice({
   initialState,
   reducers: {
     setMenu: (state, action) => {
-      state.menu = action.menu;
+      state.menu = action.payload.menu;
     },
   },
 });

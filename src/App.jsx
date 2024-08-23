@@ -18,6 +18,9 @@ import Dashboard from "./pages/authenticated/Dashboard";
 import Project from "./pages/authenticated/Project";
 import Application from "./pages/authenticated/Application";
 import DynamicLink from "./pages/authenticated/DynamicLink";
+import ResetPassword from "./pages/auth/ResetPassword";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import { useSelector } from "react-redux";
 
 const theme = createTheme({
   breakpoints: {
@@ -30,77 +33,89 @@ const theme = createTheme({
     },
   },
 });
-const appLayout = createBrowserRouter([
-  {
-    path: `/`,
-    // element: (
-    //   // <AuthGuard>
-    //   // </AuthGuard>
-    //   // <CommonLayout />
-    //   <>Heyyy</>
-    // ),
-    children: [
-      {
-        path: "/",
-        element: <Navigate to="/sign-in" />,
-      },
-      // {
-      //   path: "sign-up",
-      //   element: <SignUp />,
-      // },
-      {
-        path: "sign-in",
-        element: <SignIn />,
-      },
-      {
-        path: "login-with-email",
-        element: <></>,
-      },
-      {
-        path: "forgot-password",
-        element: <></>,
-      },
-    ],
-  },
-  {
-    path: "/",
-    children: [
-      {
-        path: "home",
-        element: <Layout />,
-        children: [
-          {
-            path: "dashboard",
-            element: <Dashboard />,
-          },
-          {
-            path: "user",
-            element: <User />,
-          },
-          {
-            path: "role",
-            element: <Role />,
-          },
-          {
-            path: "projects",
-            element: <Project />,
-          },
-          {
-            path: "application",
-            element: <Application />,
-          },
-          { path: "dynamic-links", element: <DynamicLink /> },
-        ],
-      },
-    ],
-  },
-  {
-    path: "*",
-    element: <>No page found</>,
-  },
-]);
 
 function App() {
+  const { menu } = useSelector((state) => state.menu);
+
+  const componentMapping = {
+    dashboard: <Dashboard />,
+    project: <Project />,
+    application: <Application />,
+    "dynamic-links": <DynamicLink />,
+    user: <User />,
+    role: <Role />,
+  };
+
+  const appLayout = createBrowserRouter([
+    {
+      path: `/`,
+      // element: (
+      //   // <AuthGuard>
+      //   // </AuthGuard>
+      //   // <CommonLayout />
+      // ),
+      children: [
+        {
+          path: "/",
+          element: <Navigate to="/sign-in" />,
+        },
+
+        {
+          path: "sign-in",
+          element: <SignIn />,
+        },
+        {
+          path: "forgot-password",
+          element: <ForgotPassword />,
+        },
+        {
+          path: "reset-password",
+          element: <ResetPassword />,
+        },
+      ],
+    },
+    {
+      path: "/",
+      children: [
+        {
+          path: "home",
+          element: <Layout />,
+          // children: [
+          //   {
+          //     path: "dashboard",
+          //     element: <Dashboard />,
+          //   },
+          //   {
+          //     path: "user",
+          //     element: <User />,
+          //   },
+          //   {
+          //     path: "role",
+          //     element: <Role />,
+          //   },
+          //   {
+          //     path: "project",
+          //     element: <Project />,
+          //   },
+          //   {
+          //     path: "application",
+          //     element: <Application />,
+          //   },
+          //   { path: "dynamic-links", element: <DynamicLink /> },
+          // ],
+          children: menu.map((item) => ({
+            path: item.menu_url,
+            element: componentMapping[item.menu_url] || <>No Component Found</>,
+          })),
+        },
+      ],
+    },
+    {
+      path: "*",
+      element: <>No page found</>,
+    },
+  ]);
+
   return (
     <>
       <ThemeCustomization>
