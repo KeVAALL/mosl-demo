@@ -27,15 +27,16 @@ export default function SignIn() {
   const handleSubmit = async (values) => {
     console.log(values);
     const reqdata = {
-      email: "email@gmalil33333.com",
-      password: "ank9@13294479995577",
+      email: "email@gmalil.com",
+      password: "3zrqxx",
     };
     try {
       setLoginAttempt(true);
       const result = await ApiService(reqdata, "user/login");
       if (result) {
-        //   toast.success("Successful!");
-        // navigate("/home/dashboard");
+        console.log(result);
+        toast.success("Successful!");
+        navigate("/home/dashboard");
         return result;
       }
     } catch (err) {
@@ -151,6 +152,7 @@ export default function SignIn() {
                                     aria-label="toggle password visibility"
                                     onClick={handleClickShowPassword}
                                     onMouseDown={handleMouseDownPassword}
+                                    onMouseUp={handleMouseDownPassword}
                                     edge="end"
                                   >
                                     {showPassword ? (
