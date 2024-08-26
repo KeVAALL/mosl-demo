@@ -527,6 +527,9 @@ h1 {
 .text-error {
   color: red;
 }
+.text-success {
+  color: #22bb33;
+}
 .text-12 {
   font-size: 12px;
 }
@@ -679,6 +682,14 @@ input:-webkit-autofill:active {
 }
 .MuiDivider-root::before {
   width: 5% !important;
+}
+.MuiCircularProgress-root {
+  height: 16px !important;
+  width: 16px !important;
+}
+.table_loader {
+  height: 24px !important;
+  width: 24px !important;
 }
 .MuiLoadingButton-loadingIndicator {
   color: #757575 !important;

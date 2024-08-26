@@ -12,21 +12,18 @@ import {
   Link,
   Stack,
 } from "@mui/material";
-import { Email, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import KeyboardBackspaceOutlinedIcon from "@mui/icons-material/KeyboardBackspaceOutlined";
 import { BootstrapInput } from "../../utils/Input/textfield";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { ApiService } from "../../utils/api/apiCall";
-import { setProfile } from "../../redux/slices/userSlice";
-import { setMenu } from "../../redux/slices/menuSlice";
 import "./auth.css";
 import { decryptData } from "../../utils/encryption";
 import { useNavigate } from "react-router-dom";
 
 export default function ResetPassword() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [loginAttempt, setLoginAttempt] = useState(false);

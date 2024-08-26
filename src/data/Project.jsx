@@ -8,8 +8,8 @@ const tableColumns = [
     accessor: "project_id",
   },
   {
-    Header: "Security key",
-    accessor: "api_key",
+    Header: "Description",
+    accessor: "project_description",
   },
   {
     Header: "Owner",

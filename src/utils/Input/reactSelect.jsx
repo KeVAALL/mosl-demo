@@ -44,7 +44,7 @@ const customStyles = {
 };
 
 export function CustomSelect({ options, ...props }) {
-  console.log(props);
+  // console.log(props);
   return (
     <Select
       options={options}

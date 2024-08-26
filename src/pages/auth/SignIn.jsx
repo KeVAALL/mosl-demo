@@ -26,6 +26,12 @@ export default function SignIn() {
     email: "email@gmalil.com",
     password: "",
   });
+  const validationSchema = Yup.object({
+    email: Yup.string()
+      .email("Invalid email format")
+      .required("Email is required"),
+    password: Yup.string().required("Password is required"),
+  });
   const handleSubmit = async (values) => {
     console.log(values);
 
@@ -72,12 +78,6 @@ export default function SignIn() {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-  const validationSchema = Yup.object({
-    email: Yup.string()
-      .email("Invalid email format")
-      .required("Email is required"),
-    password: Yup.string().required("Password is required"),
-  });
 
   return (
     <Box

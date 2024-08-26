@@ -9,9 +9,11 @@ import {
   Backdrop,
   Box,
   Button,
+  CircularProgress,
   FormControl,
   Grid,
   IconButton,
+  InputAdornment,
   InputLabel,
   Modal,
   Paper,
@@ -28,6 +30,7 @@ import {
 } from "@mui/material";
 import { BootstrapInput } from "../../utils/Input/textfield";
 // third-party
+import * as Yup from "yup";
 import { useTable, usePagination, useGlobalFilter } from "react-table";
 
 // project-imports
@@ -38,22 +41,107 @@ import {
   HidingSelect,
 } from "../../utils/ReactTable/index";
 import { useSortBy } from "react-table";
-import { tableColumns, tableData, VisibleColumn } from "../../data/Project";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
+import { tableColumns, VisibleColumn } from "../../data/Project";
 import { CustomSelect } from "../../utils/Input/reactSelect";
+import { ErrorMessage, Field, Form, Formik } from "formik";
+import { toast } from "react-toastify";
+import { ApiService } from "../../utils/api/apiCall";
+import { useSelector } from "react-redux";
+import { LoadingButton } from "@mui/lab";
+import { original } from "@reduxjs/toolkit";
 
 function Project() {
-  const [open, setOpen] = React.useState(false);
   const [openForm, setOpenForm] = useState(false);
+  const [checkUniqueID, setCheckUniqueID] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [submitForm, setSubmitForm] = useState(false);
+  const [initialValues, setInitialValues] = useState({
+    project_name: "",
+    project_id: "",
+    project_owner: null, // Assuming user is selected from CustomSelect
+    project_description: "",
+  });
+  const [tableData, setTableData] = useState([]);
+  const [ownerDropdown, setOwnerDropdown] = useState([]);
+  const [loadingData, setLoadingData] = useState([]);
+  const { userProfile } = useSelector((state) => state.user);
+  // Step 2: Define validationSchema using Yup
+  const validationSchema = Yup.object().shape({
+    project_name: Yup.string().required("Project Name is required"),
+    project_id: Yup.string()
+      .min(15, "Minimum length should be 15")
+      .required("Project ID is required"),
+    project_description: Yup.string().required(
+      "Project Description is required"
+    ),
+    project_owner: Yup.object().required("Owner is required"),
+  });
+
+  const onSubmit = async (values) => {
+    console.log(values);
+    console.log(userProfile);
+    const reqdata = {
+      ...values,
+      project_owner: 1,
+      created_by: userProfile?.user_role_id,
+      created_by_name: userProfile?.user_name,
+    };
+    // Handle form submission
+    try {
+      setSubmitForm(true);
+
+      const result = await ApiService(reqdata, "project/create");
+
+      console.log(result);
+
+      if (result?.status === 201) {
+        toast.success("Project Added");
+        setOpenForm(false);
+        setInitialValues({
+          project_name: "",
+          project_id: "",
+          project_owner: null,
+          project_description: "",
+        });
+      }
+
+      // return result;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setSubmitForm(false);
+    }
+  };
+  const checkProjectUnique = async (value) => {
+    try {
+      setCheckUniqueID(true);
+
+      const result = await ApiService(
+        { project_id: value },
+        "project/validate-id"
+      );
+
+      console.log(result);
+      return result;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setCheckUniqueID(false);
+    }
+  };
   const handleOpen = () => {
-    // setOpen(true);
+    setSuccessMessage("");
     setOpenForm(true);
   };
   const handleClose = () => {
-    // setOpen(false);
+    setSuccessMessage("");
     setOpenForm(false);
+    setInitialValues({
+      project_name: "",
+      project_id: "",
+      project_owner: null,
+      project_description: "",
+    });
   };
 
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -66,23 +154,8 @@ function Project() {
       fontSize: 13,
     },
   }));
-
-  const modalStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 400,
-    bgcolor: "background.paper",
-    border: "1px solid #000",
-    boxShadow: 24,
-    pt: 2,
-    px: 4,
-    pb: 3,
-  };
-
   const columns = useMemo(() => tableColumns, []);
-  const data = useMemo(() => tableData, []);
+  const data = useMemo(() => tableData, [tableData]);
   const options = [
     { value: "Admin", label: "Admin" },
     { value: "Customer", label: "Customer" },
@@ -125,6 +198,38 @@ function Project() {
     }
     return item;
   });
+
+  useEffect(() => {
+    async function getOwnerDropdown() {
+      try {
+        const result = await ApiService({ method: "getusers" }, "masters/get");
+
+        console.log(result);
+
+        setOwnerDropdown(result?.data);
+      } catch (error) {
+        toast.error(error?.response?.data?.message);
+      }
+    }
+    getOwnerDropdown();
+  }, []);
+  useEffect(() => {
+    async function getProjects() {
+      try {
+        setLoadingData(true);
+        const result = await ApiService({}, "project/getall-project");
+
+        console.log(result);
+
+        setTableData(result?.data);
+      } catch (error) {
+        toast.error(error?.response?.data?.message);
+      } finally {
+        setLoadingData(false);
+      }
+    }
+    getProjects();
+  }, []);
 
   return (
     <>
@@ -190,72 +295,99 @@ function Project() {
                       </TableRow>
                     ))}
                   </TableHead>
-                  <TableBody
-                    className="table_body_main"
-                    {...getTableBodyProps()}
-                  >
-                    {page.length > 0 ? (
-                      page.map((row) => {
-                        prepareRow(row);
-                        return (
-                          <TableRow key={row.id} {...row.getRowProps()}>
-                            {row.cells.map((cell) => (
-                              <StyledTableCell
-                                key={cell.column.id}
-                                {...cell.getCellProps({
-                                  style: { minWidth: cell.column.minWidth },
-                                })}
-                                sx={{
-                                  border: "1px solid #dbe0e5a6",
-                                }}
-                              >
-                                {cell.column.customCell ? (
-                                  <cell.column.customCell value={cell.value} />
-                                ) : (
-                                  cell.render("Cell")
-                                )}
-                              </StyledTableCell>
-                            ))}
-                            <StyledTableCell align="right">
-                              <Stack
-                                direction="row"
-                                justifyContent="flex-end"
-                                spacing={2}
-                              >
-                                <Tooltip title="View" placement="top" arrow>
-                                  <Button
-                                    className="mui-icon-button"
-                                    variant="outlined"
-                                    startIcon={<VisibilityOutlined />}
-                                  />
-                                </Tooltip>
-                                <Tooltip title="Edit" placement="top" arrow>
-                                  <Button
-                                    className="mui-icon-button"
-                                    variant="outlined"
-                                    startIcon={<BorderColorOutlinedIcon />}
-                                  />
-                                </Tooltip>
-                                <Tooltip title="Delete" placement="top" arrow>
-                                  <Button
-                                    className="mui-icon-button"
-                                    variant="outlined"
-                                    startIcon={<DeleteForeverOutlinedIcon />}
-                                  />
-                                </Tooltip>
-                              </Stack>
-                            </StyledTableCell>
-                          </TableRow>
-                        );
-                      })
-                    ) : (
+                  {loadingData ? (
+                    <TableBody>
                       <TableRow>
                         <TableCell colSpan={columns.length + 1} align="center">
-                          No Data
+                          <Box p={5} display="flex" justifyContent="center">
+                            <CircularProgress
+                              className="table_loader"
+                              sx={{
+                                color: "#757575",
+                              }}
+                            />
+                          </Box>
                         </TableCell>
                       </TableRow>
-                    )}
-                  </TableBody>
+                    </TableBody>
+                  ) : (
+                    <TableBody
+                      className="table_body_main"
+                      {...getTableBodyProps()}
+                    >
+                      {page.length > 0 ? (
+                        page.map((row) => {
+                          prepareRow(row);
+                          return (
+                            <TableRow key={row.id} {...row.getRowProps()}>
+                              {row.cells.map((cell) => (
+                                <StyledTableCell
+                                  key={cell.column.id}
+                                  {...cell.getCellProps({
+                                    style: { minWidth: cell.column.minWidth },
+                                  })}
+                                  sx={{
+                                    border: "1px solid #dbe0e5a6",
+                                  }}
+                                >
+                                  {cell.column.customCell ? (
+                                    <cell.column.customCell
+                                      value={cell.value}
+                                    />
+                                  ) : (
+                                    cell.render("Cell")
+                                  )}
+                                </StyledTableCell>
+                              ))}
+                              <StyledTableCell align="right">
+                                <Stack
+                                  direction="row"
+                                  justifyContent="flex-end"
+                                  spacing={2}
+                                >
+                                  <Tooltip title="View" placement="top" arrow>
+                                    <Button
+                                      className="mui-icon-button"
+                                      variant="outlined"
+                                      startIcon={<VisibilityOutlined />}
+                                    />
+                                  </Tooltip>
+                                  <Tooltip title="Edit" placement="top" arrow>
+                                    <Button
+                                      className="mui-icon-button"
+                                      variant="outlined"
+                                      startIcon={<BorderColorOutlinedIcon />}
+                                      onClick={() => {
+                                        console.log(row);
+                                        setOpenForm(true);
+                                        setInitialValues(row?.original);
+                                      }}
+                                    />
+                                  </Tooltip>
+                                  <Tooltip title="Delete" placement="top" arrow>
+                                    <Button
+                                      className="mui-icon-button"
+                                      variant="outlined"
+                                      startIcon={<DeleteForeverOutlinedIcon />}
+                                    />
+                                  </Tooltip>
+                                </Stack>
+                              </StyledTableCell>
+                            </TableRow>
+                          );
+                        })
+                      ) : (
+                        <TableRow>
+                          <TableCell
+                            colSpan={columns.length + 1}
+                            align="center"
+                          >
+                            No Data
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  )}
                 </Table>
               </Box>
               <Box sx={{ p: 2, borderTop: "1px solid #dbe0e5a6" }}>
@@ -269,96 +401,215 @@ function Project() {
               </Box>
             </TableContainer>
           ) : (
-            <Paper elevation={3}>
-              <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
-                <Grid
-                  container
-                  spacing={2.5}
-                  mt={1}
-                  className="pl-20 pr-20 pb-20"
-                >
-                  <Grid item md={4} sx={{ width: "100%" }}>
-                    <FormControl variant="standard" fullWidth>
-                      <Typography className="label d-flex items-center">
-                        Enter project name
-                        <sup className="asc">*</sup>
-                      </Typography>
-                      <BootstrapInput
-                        fullWidth
-                        id="name"
-                        size="small"
-                        label="Project Name"
-                        name="name"
-                        placeholder="Project Name"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                      />
-                    </FormControl>
-                  </Grid>
+            <Formik
+              enableReinitialize
+              initialValues={initialValues}
+              validationSchema={validationSchema}
+              onSubmit={onSubmit}
+            >
+              {({
+                setFieldValue,
+                setFieldTouched,
+                setFieldError,
+                handleSubmit,
+              }) => (
+                <Form onSubmit={handleSubmit}>
+                  <Paper elevation={3}>
+                    <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
+                      <Grid
+                        container
+                        spacing={2.5}
+                        mt={1}
+                        className="pl-20 pr-20 pb-20"
+                      >
+                        {/* Project Name Field */}
+                        <Grid item md={4} sx={{ width: "100%" }}>
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Project name
+                              <sup className="asc">*</sup>
+                            </Typography>
+                            <Field name="project_name">
+                              {({ field }) => (
+                                <BootstrapInput
+                                  {...field}
+                                  fullWidth
+                                  id="project_name"
+                                  size="small"
+                                  placeholder="Project Name"
+                                  InputLabelProps={{ shrink: true }}
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="project_name"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                          </FormControl>
+                        </Grid>
 
-                  <Grid item md={8} sx={{ width: "100%" }}>
-                    <FormControl variant="standard" fullWidth>
-                      <Typography className="label d-flex items-center">
-                        Description
-                        <sup className="asc">*</sup>
-                      </Typography>
-                      <BootstrapInput
-                        fullWidth
-                        id="project-id"
-                        size="small"
-                        //   label="Project Name"
-                        name="project-id"
-                        placeholder="Project Description"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                      />
-                    </FormControl>
-                  </Grid>
+                        {/* Project ID Field */}
+                        <Grid item md={4} sx={{ width: "100%" }}>
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Project ID
+                              <sup className="asc">*</sup>
+                            </Typography>
+                            <Field name="project_id">
+                              {({ field }) => (
+                                <BootstrapInput
+                                  {...field}
+                                  fullWidth
+                                  id="project_id"
+                                  size="small"
+                                  placeholder="Project ID"
+                                  InputLabelProps={{ shrink: true }}
+                                  onChange={async (e) => {
+                                    const value = e.target.value;
+                                    setFieldValue("project_id", value);
+                                    setSuccessMessage("");
+                                    if (value?.length > 15) {
+                                      const response = await checkProjectUnique(
+                                        value
+                                      );
+                                      if (!response?.data?.result_flag) {
+                                        setSuccessMessage(
+                                          "Project ID is valid"
+                                        );
+                                        setFieldTouched(
+                                          "project_id",
+                                          true,
+                                          false
+                                        );
+                                      } else {
+                                        setFieldError(
+                                          "project_id",
+                                          "Invalid Project ID"
+                                        );
+                                      }
+                                    }
+                                  }}
+                                  endAdornment={
+                                    <InputAdornment position="end">
+                                      {checkUniqueID ? (
+                                        <CircularProgress
+                                          sx={{
+                                            color: "#757575",
+                                          }}
+                                        />
+                                      ) : (
+                                        <></>
+                                      )}
+                                    </InputAdornment>
+                                  }
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="project_id"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                            {successMessage && (
+                              <div className="text-success text-12 mt-5">
+                                {successMessage}
+                              </div>
+                            )}
+                          </FormControl>
+                        </Grid>
 
-                  <Grid item md={4} sx={{ width: "100%" }}>
-                    <FormControl variant="standard" fullWidth>
-                      <Typography className="label d-flex items-center">
-                        Owner
-                        <sup className="asc">*</sup>
-                      </Typography>
-                      <CustomSelect
-                        options={options}
-                        placeholder="Select Owner"
-                        id="user"
-                      />
-                    </FormControl>
-                  </Grid>
-                </Grid>
-              </Box>
-              <Box className="p-20">
-                <Grid container spacing={3}>
-                  <Grid item md={9} xs={2}></Grid>
-                  <Grid item md={1} xs={5}>
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      sx={{ backgroundColor: "primary.main" }}
-                      onClick={handleClose}
-                    >
-                      Cancel
-                    </Button>
-                  </Grid>
-                  <Grid item md={2} xs={5}>
-                    <Button
-                      type="submit"
-                      fullWidth
-                      variant="contained"
-                      sx={{ backgroundColor: "primary.main" }}
-                      onClick={handleClose}
-                    >
-                      Save
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Paper>
+                        {/* Owner Select Field */}
+                        <Grid item md={4} sx={{ width: "100%" }}>
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Owner
+                              <sup className="asc">*</sup>
+                            </Typography>
+                            <Field name="project_owner">
+                              {({ field }) => (
+                                <CustomSelect
+                                  {...field}
+                                  options={options}
+                                  placeholder="Select Owner"
+                                  id="project_owner"
+                                  onChange={(selectedOption) =>
+                                    setFieldValue(
+                                      "project_owner",
+                                      selectedOption
+                                    )
+                                  }
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="project_owner"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                          </FormControl>
+                        </Grid>
+
+                        {/* Project Description Field */}
+                        <Grid item md={8} sx={{ width: "100%" }}>
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Description
+                              <sup className="asc">*</sup>
+                            </Typography>
+                            <Field name="project_description">
+                              {({ field }) => (
+                                <BootstrapInput
+                                  {...field}
+                                  fullWidth
+                                  id="project_description"
+                                  size="small"
+                                  placeholder="Project Description"
+                                  InputLabelProps={{ shrink: true }}
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="project_description"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+                    </Box>
+
+                    <Box className="p-20">
+                      <Grid container spacing={3}>
+                        <Grid item md={9} xs={2}></Grid>
+                        <Grid item md={1} xs={5}>
+                          <Button
+                            fullWidth
+                            variant="outlined"
+                            sx={{ backgroundColor: "primary.main" }}
+                            onClick={handleClose}
+                          >
+                            Cancel
+                          </Button>
+                        </Grid>
+                        <Grid item md={2} xs={5}>
+                          <LoadingButton
+                            loading={submitForm}
+                            disabled={submitForm}
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            sx={{ backgroundColor: "primary.main" }}
+                          >
+                            Save
+                          </LoadingButton>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  </Paper>
+                </Form>
+              )}
+            </Formik>
           )}
         </Grid>
       </Grid>
@@ -368,6 +619,19 @@ function Project() {
 
 export default Project;
 
+// const modalStyle = {
+//   position: "absolute",
+//   top: "50%",
+//   left: "50%",
+//   transform: "translate(-50%, -50%)",
+//   width: 400,
+//   bgcolor: "background.paper",
+//   border: "1px solid #000",
+//   boxShadow: 24,
+//   pt: 2,
+//   px: 4,
+//   pb: 3,
+// };
 /* <Grid
                 item
                 md={2}
