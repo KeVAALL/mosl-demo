@@ -144,6 +144,7 @@ export default function ForgotPassword() {
                       >
                         <LoadingButton
                           loading={loginAttempt}
+                          disabled={loginAttempt}
                           type="submit"
                           fullWidth
                           variant="contained"

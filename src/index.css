@@ -680,6 +680,9 @@ input:-webkit-autofill:active {
 .MuiDivider-root::before {
   width: 5% !important;
 }
+.MuiLoadingButton-loadingIndicator {
+  color: #757575 !important;
+}
 .w-full {
   width: 100% !important;
 }

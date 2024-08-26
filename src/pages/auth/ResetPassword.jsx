@@ -219,6 +219,7 @@ export default function ResetPassword() {
                       >
                         <LoadingButton
                           loading={loginAttempt}
+                          disabled={loginAttempt}
                           type="submit"
                           fullWidth
                           variant="contained"

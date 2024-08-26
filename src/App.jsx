@@ -103,7 +103,7 @@ function App() {
           //   },
           //   { path: "dynamic-links", element: <DynamicLink /> },
           // ],
-          children: menu.map((item) => ({
+          children: menu?.map((item) => ({
             path: item.menu_url,
             element: componentMapping[item.menu_url] || <>No Component Found</>,
           })),

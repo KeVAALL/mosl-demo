@@ -33,7 +33,20 @@ export default function SignIn() {
       setLoginAttempt(true);
       const result = await ApiService(values, "user/login");
       if (result) {
-        console.log(result?.data?.data);
+        console.log(result);
+
+        if (result?.data?.result_flag === 0) {
+          toast.error("Invalid Credentials");
+          return;
+        }
+
+        if (result?.data?.data?.is_password_reset) {
+          toast.warn("Please reset your Password!");
+          navigate("/reset-password");
+        } else {
+          toast.success("Successful!");
+          navigate("/home/dashboard");
+        }
 
         const apiResponse = {
           userProfile: result?.data?.data,
@@ -44,13 +57,6 @@ export default function SignIn() {
         const apiMenu = { menu: result?.data?.data?.menu };
         dispatch(setMenu(apiMenu));
 
-        if (result?.data?.data?.is_password_reset) {
-          toast.warn("Please reset your Password!");
-          navigate("/reset-password");
-        } else {
-          toast.success("Successful!");
-          navigate("/home/dashboard");
-        }
         return result;
       }
     } catch (err) {
@@ -203,14 +209,11 @@ export default function SignIn() {
                       >
                         <LoadingButton
                           loading={loginAttempt}
+                          disabled={loginAttempt}
                           type="submit"
                           fullWidth
                           variant="contained"
                           sx={{ mt: 1, mb: 1, backgroundColor: "primary.main" }}
-                          // onClick={() => {
-                          //   toast.success("Successful!");
-                          //   // navigate("/home/dashboard");
-                          // }}
                         >
                           Sign In
                         </LoadingButton>
