@@ -55,6 +55,7 @@ function Project() {
   const [checkUniqueID, setCheckUniqueID] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [submitForm, setSubmitForm] = useState(false);
+  // const [isEditing, setIsEditing] = useState(false);
   const [initialValues, setInitialValues] = useState({
     project_name: "",
     project_id: "",
@@ -77,12 +78,43 @@ function Project() {
     project_owner: Yup.object().required("Owner is required"),
   });
 
+  async function getProjects() {
+    try {
+      setLoadingData(true);
+      const result = await ApiService({}, "project/getall-project");
+
+      console.log(result);
+      const newMap = result?.data?.map((table) => {
+        return { ...table, isEditing: false };
+      });
+
+      setTableData(newMap);
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setLoadingData(false);
+    }
+  }
+  async function getOwnerDropdown() {
+    try {
+      const result = await ApiService({ method: "getusers" }, "masters/get");
+
+      console.log(result);
+      const newMap = result?.data?.map((user) => {
+        return { label: user?.name, value: user?.user_id };
+      });
+
+      setOwnerDropdown(newMap);
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    }
+  }
   const onSubmit = async (values) => {
     console.log(values);
     console.log(userProfile);
     const reqdata = {
       ...values,
-      project_owner: 1,
+      project_owner: values?.project_owner?.value,
       created_by: userProfile?.user_role_id,
       created_by_name: userProfile?.user_name,
     };
@@ -103,6 +135,7 @@ function Project() {
           project_owner: null,
           project_description: "",
         });
+        getProjects();
       }
 
       // return result;
@@ -156,11 +189,6 @@ function Project() {
   }));
   const columns = useMemo(() => tableColumns, []);
   const data = useMemo(() => tableData, [tableData]);
-  const options = [
-    { value: "Admin", label: "Admin" },
-    { value: "Customer", label: "Customer" },
-    { value: "Admin 2", label: "Admin 2" },
-  ];
   const {
     getTableProps,
     getTableBodyProps,
@@ -200,34 +228,9 @@ function Project() {
   });
 
   useEffect(() => {
-    async function getOwnerDropdown() {
-      try {
-        const result = await ApiService({ method: "getusers" }, "masters/get");
-
-        console.log(result);
-
-        setOwnerDropdown(result?.data);
-      } catch (error) {
-        toast.error(error?.response?.data?.message);
-      }
-    }
     getOwnerDropdown();
   }, []);
   useEffect(() => {
-    async function getProjects() {
-      try {
-        setLoadingData(true);
-        const result = await ApiService({}, "project/getall-project");
-
-        console.log(result);
-
-        setTableData(result?.data);
-      } catch (error) {
-        toast.error(error?.response?.data?.message);
-      } finally {
-        setLoadingData(false);
-      }
-    }
     getProjects();
   }, []);
 
@@ -353,14 +356,64 @@ function Project() {
                                     />
                                   </Tooltip>
                                   <Tooltip title="Edit" placement="top" arrow>
-                                    <Button
+                                    <LoadingButton
+                                      loading={row?.original?.isEditing}
+                                      disabled={row?.original?.isEditing}
                                       className="mui-icon-button"
                                       variant="outlined"
                                       startIcon={<BorderColorOutlinedIcon />}
-                                      onClick={() => {
+                                      onClick={async () => {
                                         console.log(row);
-                                        setOpenForm(true);
-                                        setInitialValues(row?.original);
+                                        console.log(tableData);
+                                        try {
+                                          // Find the index of the matched element in the tableData array
+                                          const updatedTableData =
+                                            tableData.map((item) =>
+                                              item.id === row.original.id
+                                                ? { ...item, isEditing: true }
+                                                : item
+                                            );
+
+                                          // Set the updated tableData state
+                                          setTableData(updatedTableData);
+
+                                          const result = await ApiService(
+                                            { id: row?.original?.id },
+                                            "project/getone-project"
+                                          );
+
+                                          console.log(result);
+                                          const resp = result?.data[0];
+
+                                          const newMap = {
+                                            ...resp,
+                                            project_owner:
+                                              ownerDropdown?.filter(
+                                                (user) =>
+                                                  user?.value ===
+                                                  resp?.project_owner
+                                              )[0],
+                                          };
+
+                                          setInitialValues(newMap);
+                                          setOpenForm(true);
+                                        } catch (error) {
+                                          toast.error(
+                                            error?.response?.data?.message
+                                          );
+                                        } finally {
+                                          // setIsEditing(false);
+                                          // Reset the isEditing state for the matched element
+                                          const finalTableData = tableData.map(
+                                            (item) =>
+                                              item.id === row.original.id
+                                                ? { ...item, isEditing: false }
+                                                : item
+                                          );
+
+                                          // Set the final updated tableData state
+                                          setTableData(finalTableData);
+                                        }
                                       }}
                                     />
                                   </Tooltip>
@@ -530,7 +583,7 @@ function Project() {
                               {({ field }) => (
                                 <CustomSelect
                                   {...field}
-                                  options={options}
+                                  options={ownerDropdown}
                                   placeholder="Select Owner"
                                   id="project_owner"
                                   onChange={(selectedOption) =>
