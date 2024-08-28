@@ -28,9 +28,17 @@ export default function SignIn() {
   });
   const validationSchema = Yup.object({
     email: Yup.string()
-      .email("Invalid email format")
+      .trim()
+      .email("Invalid email")
       .required("Email is required"),
-    password: Yup.string().required("Password is required"),
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters long")
+      .matches(/[0-9]/, "Password must contain at least 1 numeric character")
+      .matches(
+        /[!@#$%^&*(),.?":{}|<>]/,
+        "Password must contain at least 1 special character"
+      )
+      .required("Password is required"),
   });
   const handleSubmit = async (values) => {
     console.log(values);

@@ -79,29 +79,6 @@ function App() {
         {
           path: "home",
           element: <Layout />,
-          // children: [
-          //   {
-          //     path: "dashboard",
-          //     element: <Dashboard />,
-          //   },
-          //   {
-          //     path: "user",
-          //     element: <User />,
-          //   },
-          //   {
-          //     path: "role",
-          //     element: <Role />,
-          //   },
-          //   {
-          //     path: "project",
-          //     element: <Project />,
-          //   },
-          //   {
-          //     path: "application",
-          //     element: <Application />,
-          //   },
-          //   { path: "dynamic-links", element: <DynamicLink /> },
-          // ],
           children: menu?.map((item) => ({
             path: item.menu_url,
             element: componentMapping[item.menu_url] || <>No Component Found</>,
@@ -118,14 +95,36 @@ function App() {
   return (
     <>
       <ThemeCustomization>
-        {/* <ThemeProvider theme={theme}> */}
         <ToasterProvider>
           <RouterProvider router={appLayout} />
         </ToasterProvider>
-        {/* </ThemeProvider> */}
       </ThemeCustomization>
     </>
   );
 }
 
 export default App;
+
+// children: [
+//   {
+//     path: "dashboard",
+//     element: <Dashboard />,
+//   },
+//   {
+//     path: "user",
+//     element: <User />,
+//   },
+//   {
+//     path: "role",
+//     element: <Role />,
+//   },
+//   {
+//     path: "project",
+//     element: <Project />,
+//   },
+//   {
+//     path: "application",
+//     element: <Application />,
+//   },
+//   { path: "dynamic-links", element: <DynamicLink /> },
+// ],

@@ -5,7 +5,6 @@ import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import { styled } from "@mui/material/styles";
 import {
-  Backdrop,
   Box,
   Button,
   CircularProgress,
@@ -16,10 +15,7 @@ import {
   DialogTitle,
   FormControl,
   Grid,
-  IconButton,
   InputAdornment,
-  InputLabel,
-  Modal,
   Paper,
   Stack,
   Table,
@@ -56,6 +52,7 @@ import { useSelector } from "react-redux";
 import { LoadingButton } from "@mui/lab";
 
 function Project() {
+  const { userProfile } = useSelector((state) => state.user);
   const [openForm, setOpenForm] = useState(false);
   const [checkUniqueID, setCheckUniqueID] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -69,16 +66,13 @@ function Project() {
   const [tableData, setTableData] = useState([]);
   const [ownerDropdown, setOwnerDropdown] = useState([]);
   const [loadingData, setLoadingData] = useState([]);
-  const { userProfile } = useSelector((state) => state.user);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteItem, setDeleteItem] = useState({});
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
 
+  // Delete Modal
   const handleDeleteConfirmation = () => {
     setOpenDeleteModal(!openDeleteModal);
   };
-
   // Validation
   const validationSchema = Yup.object().shape({
     project_name: Yup.string().required("Project Name is required"),
@@ -521,7 +515,6 @@ function Project() {
                                           <DeleteForeverOutlinedIcon />
                                         }
                                         onClick={() => {
-                                          console.log(row?.original);
                                           setDeleteItem(row?.original);
                                           handleDeleteConfirmation();
                                         }}

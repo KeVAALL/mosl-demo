@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import React from "react";
 import Select from "react-select";
 
 const customStyles = {
@@ -9,13 +8,13 @@ const customStyles = {
     width: "100%",
   }),
   // Style the control (the main wrapper)
-  control: (provided) => ({
+  control: (provided, state) => ({
     ...provided,
-    border: "1px solid #9e9e9e", // Set border color
-    boxShadow: "none", // Remove box shadow
+    border: state.isFocused ? "1px solid #212121" : "1px solid #E0E3E7",
+    boxShadow: state.isFocused ? "0 0 0 2px rgba(33, 33, 33, 0.25)" : "none",
     fontSize: "14px", // Match font size with BootstrapInput
     "&:hover": {
-      border: "1px solid #9e9e9e", // Border color on hover
+      border: "1px solid #212121", // Border color on hover
     },
   }),
   // Style the option (when not selected)
