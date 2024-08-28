@@ -59,7 +59,6 @@ function App() {
           path: "/",
           element: <Navigate to="/sign-in" />,
         },
-
         {
           path: "sign-in",
           element: <SignIn />,

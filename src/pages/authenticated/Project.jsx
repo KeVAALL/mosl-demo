@@ -3,13 +3,17 @@ import React, { useEffect, useMemo, useState } from "react";
 import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
-import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
 import { styled } from "@mui/material/styles";
 import {
   Backdrop,
   Box,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   Grid,
   IconButton,
@@ -27,6 +31,8 @@ import {
   TableRow,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { BootstrapInput } from "../../utils/Input/textfield";
 // third-party
@@ -48,14 +54,12 @@ import { toast } from "react-toastify";
 import { ApiService } from "../../utils/api/apiCall";
 import { useSelector } from "react-redux";
 import { LoadingButton } from "@mui/lab";
-import { original } from "@reduxjs/toolkit";
 
 function Project() {
   const [openForm, setOpenForm] = useState(false);
   const [checkUniqueID, setCheckUniqueID] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [submitForm, setSubmitForm] = useState(false);
-  // const [isEditing, setIsEditing] = useState(false);
   const [initialValues, setInitialValues] = useState({
     project_name: "",
     project_id: "",
@@ -66,7 +70,16 @@ function Project() {
   const [ownerDropdown, setOwnerDropdown] = useState([]);
   const [loadingData, setLoadingData] = useState([]);
   const { userProfile } = useSelector((state) => state.user);
-  // Step 2: Define validationSchema using Yup
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deleteItem, setDeleteItem] = useState({});
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+
+  const handleDeleteConfirmation = () => {
+    setOpenDeleteModal(!openDeleteModal);
+  };
+
+  // Validation
   const validationSchema = Yup.object().shape({
     project_name: Yup.string().required("Project Name is required"),
     project_id: Yup.string()
@@ -85,7 +98,7 @@ function Project() {
 
       console.log(result);
       const newMap = result?.data?.map((table) => {
-        return { ...table, isEditing: false };
+        return { ...table, isDeleting: false, isEditing: false };
       });
 
       setTableData(newMap);
@@ -109,9 +122,25 @@ function Project() {
       toast.error(error?.response?.data?.message);
     }
   }
+  const checkProjectUnique = async (value) => {
+    try {
+      setCheckUniqueID(true);
+
+      const result = await ApiService(
+        { project_id: value },
+        "project/validate-id"
+      );
+
+      console.log(result);
+      return result;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setCheckUniqueID(false);
+    }
+  };
   const onSubmit = async (values) => {
     console.log(values);
-    console.log(userProfile);
     const reqdata = {
       ...values,
       project_owner: values?.project_owner?.value,
@@ -145,23 +174,7 @@ function Project() {
       setSubmitForm(false);
     }
   };
-  const checkProjectUnique = async (value) => {
-    try {
-      setCheckUniqueID(true);
-
-      const result = await ApiService(
-        { project_id: value },
-        "project/validate-id"
-      );
-
-      console.log(result);
-      return result;
-    } catch (error) {
-      toast.error(error?.response?.data?.message);
-    } finally {
-      setCheckUniqueID(false);
-    }
-  };
+  // Form
   const handleOpen = () => {
     setSuccessMessage("");
     setOpenForm(true);
@@ -176,7 +189,7 @@ function Project() {
       project_description: "",
     });
   };
-
+  // Table
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: theme.palette.common.black,
@@ -258,201 +271,292 @@ function Project() {
         </Grid>
         <Grid item xs={12}>
           {!openForm ? (
-            <TableContainer component={Paper}>
-              <Grid container spacing={2} px={2} py={2}>
-                <Grid item md={3} xs={6}>
-                  <GlobalFilter
-                    globalFilter={globalFilter}
-                    setGlobalFilter={setGlobalFilter}
-                  />
+            <>
+              <Dialog
+                open={openDeleteModal}
+                aria-labelledby="responsive-dialog-title"
+                PaperProps={{
+                  style: {
+                    width: "500px",
+                  },
+                }}
+              >
+                <DialogTitle id="responsive-dialog-title">
+                  {"Are you sure?"}
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText color="black">
+                    Delete {deleteItem?.project_name}?
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ display: "flex", gap: "10px" }}>
+                  <Button autoFocus onClick={handleDeleteConfirmation}>
+                    Cancel
+                  </Button>
+                  <LoadingButton
+                    loading={deleteItem?.isDeleting}
+                    disabled={deleteItem?.isDeleting}
+                    autoFocus
+                    variant="outlined"
+                    onClick={async () => {
+                      console.log(deleteItem);
+                      const reqdata = {
+                        ...deleteItem,
+                        is_deleted: 1,
+                        is_active: 0,
+                      };
+                      console.log(reqdata);
+                      // Handle form submission
+                      try {
+                        // Set the updated tableData state
+                        setDeleteItem({
+                          ...deleteItem,
+                          isDeleting: true,
+                        });
+
+                        const result = await ApiService(
+                          reqdata,
+                          "project/create"
+                        );
+
+                        if (result?.status === 201) {
+                          toast.error("Project Deleted");
+                          handleDeleteConfirmation();
+                          getProjects();
+                        }
+
+                        return result;
+                      } catch (error) {
+                        toast.error(error?.response?.data?.message);
+                      } finally {
+                        setDeleteItem({
+                          ...deleteItem,
+                          isDeleting: false,
+                        });
+                      }
+                    }}
+                  >
+                    Delete
+                  </LoadingButton>
+                </DialogActions>
+              </Dialog>
+              <TableContainer component={Paper}>
+                <Grid container spacing={2} px={2} py={2}>
+                  <Grid item md={3} xs={6}>
+                    <GlobalFilter
+                      globalFilter={globalFilter}
+                      setGlobalFilter={setGlobalFilter}
+                    />
+                  </Grid>
                 </Grid>
-              </Grid>
-              <Box sx={{ width: "100%", overflowX: "auto", display: "block" }}>
-                <Table {...getTableProps()}>
-                  <TableHead>
-                    {headerGroups.map((headerGroup) => (
-                      <TableRow
-                        key={headerGroup.id}
-                        {...headerGroup.getHeaderGroupProps()}
-                      >
-                        {headerGroup.headers.map((column) => (
+                <Box
+                  sx={{ width: "100%", overflowX: "auto", display: "block" }}
+                >
+                  <Table {...getTableProps()}>
+                    <TableHead>
+                      {headerGroups.map((headerGroup) => (
+                        <TableRow
+                          key={headerGroup.id}
+                          {...headerGroup.getHeaderGroupProps()}
+                        >
+                          {headerGroup.headers.map((column) => (
+                            <StyledTableCell
+                              key={column.id}
+                              {...column.getHeaderProps({
+                                style: { minWidth: column.minWidth },
+                              })}
+                              sx={{
+                                border: "1px solid #dbe0e5a6",
+                              }}
+                            >
+                              <HeaderSort column={column} />
+                            </StyledTableCell>
+                          ))}
                           <StyledTableCell
-                            key={column.id}
-                            {...column.getHeaderProps({
-                              style: { minWidth: column.minWidth },
-                            })}
                             sx={{
-                              border: "1px solid #dbe0e5a6",
+                              textAlign: "right",
                             }}
                           >
-                            <HeaderSort column={column} />
+                            Actions
                           </StyledTableCell>
-                        ))}
-                        <StyledTableCell
-                          sx={{
-                            textAlign: "right",
-                          }}
-                        >
-                          Actions
-                        </StyledTableCell>
-                      </TableRow>
-                    ))}
-                  </TableHead>
-                  {loadingData ? (
-                    <TableBody>
-                      <TableRow>
-                        <TableCell colSpan={columns.length + 1} align="center">
-                          <Box p={5} display="flex" justifyContent="center">
-                            <CircularProgress
-                              className="table_loader"
-                              sx={{
-                                color: "#757575",
-                              }}
-                            />
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  ) : (
-                    <TableBody
-                      className="table_body_main"
-                      {...getTableBodyProps()}
-                    >
-                      {page.length > 0 ? (
-                        page.map((row) => {
-                          prepareRow(row);
-                          return (
-                            <TableRow key={row.id} {...row.getRowProps()}>
-                              {row.cells.map((cell) => (
-                                <StyledTableCell
-                                  key={cell.column.id}
-                                  {...cell.getCellProps({
-                                    style: { minWidth: cell.column.minWidth },
-                                  })}
-                                  sx={{
-                                    border: "1px solid #dbe0e5a6",
-                                  }}
-                                >
-                                  {cell.column.customCell ? (
-                                    <cell.column.customCell
-                                      value={cell.value}
-                                    />
-                                  ) : (
-                                    cell.render("Cell")
-                                  )}
-                                </StyledTableCell>
-                              ))}
-                              <StyledTableCell align="right">
-                                <Stack
-                                  direction="row"
-                                  justifyContent="flex-end"
-                                  spacing={2}
-                                >
-                                  <Tooltip title="View" placement="top" arrow>
-                                    <Button
-                                      className="mui-icon-button"
-                                      variant="outlined"
-                                      startIcon={<VisibilityOutlined />}
-                                    />
-                                  </Tooltip>
-                                  <Tooltip title="Edit" placement="top" arrow>
-                                    <LoadingButton
-                                      loading={row?.original?.isEditing}
-                                      disabled={row?.original?.isEditing}
-                                      className="mui-icon-button"
-                                      variant="outlined"
-                                      startIcon={<BorderColorOutlinedIcon />}
-                                      onClick={async () => {
-                                        console.log(row);
-                                        console.log(tableData);
-                                        try {
-                                          // Find the index of the matched element in the tableData array
-                                          const updatedTableData =
-                                            tableData.map((item) =>
-                                              item.id === row.original.id
-                                                ? { ...item, isEditing: true }
-                                                : item
-                                            );
-
-                                          // Set the updated tableData state
-                                          setTableData(updatedTableData);
-
-                                          const result = await ApiService(
-                                            { id: row?.original?.id },
-                                            "project/getone-project"
-                                          );
-
-                                          console.log(result);
-                                          const resp = result?.data[0];
-
-                                          const newMap = {
-                                            ...resp,
-                                            project_owner:
-                                              ownerDropdown?.filter(
-                                                (user) =>
-                                                  user?.value ===
-                                                  resp?.project_owner
-                                              )[0],
-                                          };
-
-                                          setInitialValues(newMap);
-                                          setOpenForm(true);
-                                        } catch (error) {
-                                          toast.error(
-                                            error?.response?.data?.message
-                                          );
-                                        } finally {
-                                          // setIsEditing(false);
-                                          // Reset the isEditing state for the matched element
-                                          const finalTableData = tableData.map(
-                                            (item) =>
-                                              item.id === row.original.id
-                                                ? { ...item, isEditing: false }
-                                                : item
-                                          );
-
-                                          // Set the final updated tableData state
-                                          setTableData(finalTableData);
-                                        }
-                                      }}
-                                    />
-                                  </Tooltip>
-                                  <Tooltip title="Delete" placement="top" arrow>
-                                    <Button
-                                      className="mui-icon-button"
-                                      variant="outlined"
-                                      startIcon={<DeleteForeverOutlinedIcon />}
-                                    />
-                                  </Tooltip>
-                                </Stack>
-                              </StyledTableCell>
-                            </TableRow>
-                          );
-                        })
-                      ) : (
+                        </TableRow>
+                      ))}
+                    </TableHead>
+                    {loadingData ? (
+                      <TableBody>
                         <TableRow>
                           <TableCell
                             colSpan={columns.length + 1}
                             align="center"
                           >
-                            No Data
+                            <Box p={5} display="flex" justifyContent="center">
+                              <CircularProgress
+                                className="table_loader"
+                                sx={{
+                                  color: "#757575",
+                                }}
+                              />
+                            </Box>
                           </TableCell>
                         </TableRow>
-                      )}
-                    </TableBody>
-                  )}
-                </Table>
-              </Box>
-              <Box sx={{ p: 2, borderTop: "1px solid #dbe0e5a6" }}>
-                <TablePagination
-                  gotoPage={gotoPage}
-                  rows={data}
-                  setPageSize={setPageSize}
-                  pageIndex={pageIndex}
-                  pageSize={pageSize}
-                />
-              </Box>
-            </TableContainer>
+                      </TableBody>
+                    ) : (
+                      <TableBody
+                        className="table_body_main"
+                        {...getTableBodyProps()}
+                      >
+                        {page.length > 0 ? (
+                          page.map((row) => {
+                            prepareRow(row);
+                            return (
+                              <TableRow key={row.id} {...row.getRowProps()}>
+                                {row.cells.map((cell) => (
+                                  <StyledTableCell
+                                    key={cell.column.id}
+                                    {...cell.getCellProps({
+                                      style: { minWidth: cell.column.minWidth },
+                                    })}
+                                    sx={{
+                                      border: "1px solid #dbe0e5a6",
+                                    }}
+                                  >
+                                    {cell.column.customCell ? (
+                                      <cell.column.customCell
+                                        value={cell.value}
+                                      />
+                                    ) : (
+                                      cell.render("Cell")
+                                    )}
+                                  </StyledTableCell>
+                                ))}
+
+                                <StyledTableCell align="right">
+                                  <Stack
+                                    direction="row"
+                                    justifyContent="flex-end"
+                                    spacing={2}
+                                  >
+                                    <Tooltip title="View" placement="top" arrow>
+                                      <Button
+                                        className="mui-icon-button"
+                                        variant="outlined"
+                                        startIcon={<VisibilityOutlined />}
+                                      />
+                                    </Tooltip>
+                                    <Tooltip title="Edit" placement="top" arrow>
+                                      <LoadingButton
+                                        loading={row?.original?.isEditing}
+                                        disabled={row?.original?.isEditing}
+                                        className="mui-icon-button"
+                                        variant="outlined"
+                                        startIcon={<BorderColorOutlinedIcon />}
+                                        onClick={async () => {
+                                          console.log(row);
+                                          console.log(tableData);
+                                          try {
+                                            // Find the index of the matched element in the tableData array
+                                            const updatedTableData =
+                                              tableData.map((item) =>
+                                                item.id === row.original.id
+                                                  ? { ...item, isEditing: true }
+                                                  : item
+                                              );
+
+                                            // Set the updated tableData state
+                                            setTableData(updatedTableData);
+
+                                            const result = await ApiService(
+                                              { id: row?.original?.id },
+                                              "project/getone-project"
+                                            );
+
+                                            console.log(result);
+                                            const resp = result?.data[0];
+
+                                            const newMap = {
+                                              ...resp,
+                                              project_owner:
+                                                ownerDropdown?.filter(
+                                                  (user) =>
+                                                    user?.value ===
+                                                    resp?.project_owner
+                                                )[0],
+                                            };
+
+                                            setInitialValues(newMap);
+                                            setOpenForm(true);
+                                          } catch (error) {
+                                            toast.error(
+                                              error?.response?.data?.message
+                                            );
+                                          } finally {
+                                            // setIsEditing(false);
+                                            // Reset the isEditing state for the matched element
+                                            const finalTableData =
+                                              tableData.map((item) =>
+                                                item.id === row.original.id
+                                                  ? {
+                                                      ...item,
+                                                      isEditing: false,
+                                                    }
+                                                  : item
+                                              );
+
+                                            // Set the final updated tableData state
+                                            setTableData(finalTableData);
+                                          }
+                                        }}
+                                      />
+                                    </Tooltip>
+
+                                    <Tooltip
+                                      title="Delete"
+                                      placement="top"
+                                      arrow
+                                    >
+                                      <Button
+                                        className="mui-icon-button"
+                                        variant="outlined"
+                                        startIcon={
+                                          <DeleteForeverOutlinedIcon />
+                                        }
+                                        onClick={() => {
+                                          console.log(row?.original);
+                                          setDeleteItem(row?.original);
+                                          handleDeleteConfirmation();
+                                        }}
+                                      />
+                                    </Tooltip>
+                                  </Stack>
+                                </StyledTableCell>
+                              </TableRow>
+                            );
+                          })
+                        ) : (
+                          <TableRow>
+                            <TableCell
+                              colSpan={columns.length + 1}
+                              align="center"
+                            >
+                              No Data
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    )}
+                  </Table>
+                </Box>
+                <Box sx={{ p: 2, borderTop: "1px solid #dbe0e5a6" }}>
+                  <TablePagination
+                    gotoPage={gotoPage}
+                    rows={data}
+                    setPageSize={setPageSize}
+                    pageIndex={pageIndex}
+                    pageSize={pageSize}
+                  />
+                </Box>
+              </TableContainer>
+            </>
           ) : (
             <Formik
               enableReinitialize
