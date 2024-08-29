@@ -21,6 +21,8 @@ import {
   Pagination as MuiPagination,
   InputAdornment,
   IconButton,
+  TableCell,
+  tableCellClasses,
 } from "@mui/material";
 import NorthOutlinedIcon from "@mui/icons-material/NorthOutlined";
 import SouthOutlinedIcon from "@mui/icons-material/SouthOutlined";
@@ -337,3 +339,14 @@ CSVExport.propTypes = {
   headers: PropTypes.any,
   filename: PropTypes.string,
 };
+
+export const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+    fontSize: 14,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 13,
+  },
+}));

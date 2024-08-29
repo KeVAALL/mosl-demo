@@ -391,7 +391,7 @@ function Application() {
                             />
                           </FormControl>
                         </Grid>
-                        <Grid item md={4} className="pr-24 w-full">
+                        <Grid item md={8} className="w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
                               Description
@@ -407,7 +407,7 @@ function Application() {
                           </FormControl>
                         </Grid>
 
-                        <Grid item md={4} className="w-full">
+                        <Grid item md={4} className="pt-24 pr-24 w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
                               Bundle ID
@@ -439,7 +439,7 @@ function Application() {
                           </FormControl>
                         </Grid>
 
-                        <Grid item md={4} className="pt-24 pr-24 w-full">
+                        <Grid item md={4} className="pt-24 w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
                               Dynamic URL

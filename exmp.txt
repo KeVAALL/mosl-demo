@@ -1,0 +1,14 @@
+  // useEffect(() => {
+  //   const handleBeforeUnload = (e) => {
+  //     const customMessage =
+  //       "You have unsaved changes. Are you sure you want to leave this page?";
+  //     e.preventDefault();
+  //     e.returnValue = customMessage;
+  //     return customMessage;
+  //   };
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
+  //   return () => {
+  //     console.log("Start Again");
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //   };
+  // }, []);

@@ -41,6 +41,7 @@ import {
   HeaderSort,
   GlobalFilter,
   HidingSelect,
+  StyledTableCell,
 } from "../../utils/ReactTable/index";
 import { useSortBy } from "react-table";
 import { tableColumns, VisibleColumn } from "../../data/Project";
@@ -68,6 +69,7 @@ function Project() {
   const [loadingData, setLoadingData] = useState([]);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteItem, setDeleteItem] = useState({});
+  const [formEditing, setFormEditing] = useState(false);
 
   // Delete Modal
   const handleDeleteConfirmation = () => {
@@ -84,7 +86,7 @@ function Project() {
     ),
     project_owner: Yup.object().required("Owner is required"),
   });
-
+  // CRUD
   async function getProjects() {
     try {
       setLoadingData(true);
@@ -150,8 +152,9 @@ function Project() {
       console.log(result);
 
       if (result?.status === 201) {
-        toast.success("Project Added");
+        toast.success(`Project${formEditing ? " Edited" : " Added"}`);
         setOpenForm(false);
+        setFormEditing(false);
         setInitialValues({
           project_name: "",
           project_id: "",
@@ -168,6 +171,40 @@ function Project() {
       setSubmitForm(false);
     }
   };
+  const deleteProject = async () => {
+    console.log(deleteItem);
+    const reqdata = {
+      ...deleteItem,
+      is_deleted: 1,
+      is_active: 0,
+    };
+    console.log(reqdata);
+    // Handle form submission
+    try {
+      // Set the updated tableData state
+      setDeleteItem({
+        ...deleteItem,
+        isDeleting: true,
+      });
+
+      const result = await ApiService(reqdata, "project/create");
+
+      if (result?.status === 201) {
+        toast.error("Project Deleted");
+        handleDeleteConfirmation();
+        getProjects();
+      }
+
+      return result;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setDeleteItem({
+        ...deleteItem,
+        isDeleting: false,
+      });
+    }
+  };
   // Form
   const handleOpen = () => {
     setSuccessMessage("");
@@ -176,6 +213,7 @@ function Project() {
   const handleClose = () => {
     setSuccessMessage("");
     setOpenForm(false);
+    setFormEditing(false);
     setInitialValues({
       project_name: "",
       project_id: "",
@@ -184,17 +222,84 @@ function Project() {
     });
   };
   // Table
-  const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: theme.palette.common.black,
-      color: theme.palette.common.white,
-      fontSize: 14,
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 13,
-    },
-  }));
-  const columns = useMemo(() => tableColumns, []);
+  const dataColumns = useMemo(
+    () => [
+      ...tableColumns,
+      {
+        Header: "Actions",
+        accessor: "id",
+        right: true,
+        Cell: ({ value, row }) => {
+          const [isEditing, setIsEditing] = useState(false);
+
+          return (
+            <Stack direction="row" justifyContent="flex-end" spacing={2}>
+              <Tooltip title="View" placement="top" arrow>
+                <Button
+                  className="mui-icon-button"
+                  variant="outlined"
+                  startIcon={<VisibilityOutlined />}
+                />
+              </Tooltip>
+              <Tooltip title="Edit" placement="top" arrow>
+                <LoadingButton
+                  loading={isEditing}
+                  disabled={isEditing}
+                  className="mui-icon-button"
+                  variant="outlined"
+                  startIcon={<BorderColorOutlinedIcon />}
+                  onClick={async () => {
+                    console.log(row);
+                    console.log(tableData);
+                    try {
+                      // Find the index of the matched element in the tableData array
+                      setIsEditing(true);
+
+                      const result = await ApiService(
+                        { id: row?.original?.id },
+                        "project/getone-project"
+                      );
+
+                      const resp = result?.data[0];
+
+                      const newMap = {
+                        ...resp,
+                        project_owner: ownerDropdown?.filter(
+                          (user) => user?.value === resp?.project_owner
+                        )[0],
+                      };
+
+                      setInitialValues(newMap);
+                      setFormEditing(true);
+                      setOpenForm(true);
+                    } catch (error) {
+                      toast.error(error?.response?.data?.message);
+                    } finally {
+                      setIsEditing(false);
+                    }
+                  }}
+                />
+              </Tooltip>
+
+              <Tooltip title="Delete" placement="top" arrow>
+                <Button
+                  className="mui-icon-button"
+                  variant="outlined"
+                  startIcon={<DeleteForeverOutlinedIcon />}
+                  onClick={() => {
+                    setDeleteItem(row?.original);
+                    handleDeleteConfirmation();
+                  }}
+                />
+              </Tooltip>
+            </Stack>
+          );
+        },
+      },
+    ],
+    [ownerDropdown, tableData]
+  );
+  const columns = useMemo(() => dataColumns, [dataColumns]);
   const data = useMemo(() => tableData, [tableData]);
   const {
     getTableProps,
@@ -290,45 +395,9 @@ function Project() {
                   <LoadingButton
                     loading={deleteItem?.isDeleting}
                     disabled={deleteItem?.isDeleting}
-                    autoFocus
                     variant="outlined"
-                    onClick={async () => {
-                      console.log(deleteItem);
-                      const reqdata = {
-                        ...deleteItem,
-                        is_deleted: 1,
-                        is_active: 0,
-                      };
-                      console.log(reqdata);
-                      // Handle form submission
-                      try {
-                        // Set the updated tableData state
-                        setDeleteItem({
-                          ...deleteItem,
-                          isDeleting: true,
-                        });
-
-                        const result = await ApiService(
-                          reqdata,
-                          "project/create"
-                        );
-
-                        if (result?.status === 201) {
-                          toast.error("Project Deleted");
-                          handleDeleteConfirmation();
-                          getProjects();
-                        }
-
-                        return result;
-                      } catch (error) {
-                        toast.error(error?.response?.data?.message);
-                      } finally {
-                        setDeleteItem({
-                          ...deleteItem,
-                          isDeleting: false,
-                        });
-                      }
-                    }}
+                    onClick={deleteProject}
+                    autoFocus
                   >
                     Delete
                   </LoadingButton>
@@ -350,6 +419,7 @@ function Project() {
                     <TableHead>
                       {headerGroups.map((headerGroup) => (
                         <TableRow
+                          className="last-header-right"
                           key={headerGroup.id}
                           {...headerGroup.getHeaderGroupProps()}
                         >
@@ -366,13 +436,6 @@ function Project() {
                               <HeaderSort column={column} />
                             </StyledTableCell>
                           ))}
-                          <StyledTableCell
-                            sx={{
-                              textAlign: "right",
-                            }}
-                          >
-                            Actions
-                          </StyledTableCell>
                         </TableRow>
                       ))}
                     </TableHead>
@@ -423,105 +486,6 @@ function Project() {
                                     )}
                                   </StyledTableCell>
                                 ))}
-
-                                <StyledTableCell align="right">
-                                  <Stack
-                                    direction="row"
-                                    justifyContent="flex-end"
-                                    spacing={2}
-                                  >
-                                    <Tooltip title="View" placement="top" arrow>
-                                      <Button
-                                        className="mui-icon-button"
-                                        variant="outlined"
-                                        startIcon={<VisibilityOutlined />}
-                                      />
-                                    </Tooltip>
-                                    <Tooltip title="Edit" placement="top" arrow>
-                                      <LoadingButton
-                                        loading={row?.original?.isEditing}
-                                        disabled={row?.original?.isEditing}
-                                        className="mui-icon-button"
-                                        variant="outlined"
-                                        startIcon={<BorderColorOutlinedIcon />}
-                                        onClick={async () => {
-                                          console.log(row);
-                                          console.log(tableData);
-                                          try {
-                                            // Find the index of the matched element in the tableData array
-                                            const updatedTableData =
-                                              tableData.map((item) =>
-                                                item.id === row.original.id
-                                                  ? { ...item, isEditing: true }
-                                                  : item
-                                              );
-
-                                            // Set the updated tableData state
-                                            setTableData(updatedTableData);
-
-                                            const result = await ApiService(
-                                              { id: row?.original?.id },
-                                              "project/getone-project"
-                                            );
-
-                                            console.log(result);
-                                            const resp = result?.data[0];
-
-                                            const newMap = {
-                                              ...resp,
-                                              project_owner:
-                                                ownerDropdown?.filter(
-                                                  (user) =>
-                                                    user?.value ===
-                                                    resp?.project_owner
-                                                )[0],
-                                            };
-
-                                            setInitialValues(newMap);
-                                            setOpenForm(true);
-                                          } catch (error) {
-                                            toast.error(
-                                              error?.response?.data?.message
-                                            );
-                                          } finally {
-                                            // setIsEditing(false);
-                                            // Reset the isEditing state for the matched element
-                                            const finalTableData =
-                                              tableData.map((item) =>
-                                                item.id === row.original.id
-                                                  ? {
-                                                      ...item,
-                                                      isEditing: false,
-                                                    }
-                                                  : item
-                                              );
-
-                                            // Set the final updated tableData state
-                                            setTableData(finalTableData);
-                                          }
-                                        }}
-                                      />
-                                    </Tooltip>
-
-                                    <Tooltip
-                                      title="Delete"
-                                      placement="top"
-                                      arrow
-                                    >
-                                      <Button
-                                        className="mui-icon-button"
-                                        variant="outlined"
-                                        startIcon={
-                                          <DeleteForeverOutlinedIcon />
-                                        }
-                                        onClick={() => {
-                                          setDeleteItem(row?.original);
-                                          handleDeleteConfirmation();
-                                        }}
-                                      />
-                                    </Tooltip>
-                                  </Stack>
-                                </StyledTableCell>
                               </TableRow>
                             );
                           })

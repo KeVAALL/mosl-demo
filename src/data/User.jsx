@@ -1,7 +1,19 @@
 const tableColumns = [
   {
+    Header: "Username",
+    accessor: "user_name",
+  },
+  {
     Header: "Role",
     accessor: "role_name",
+  },
+  {
+    Header: "Phone Number",
+    accessor: "user_phone_number",
+  },
+  {
+    Header: "Email",
+    accessor: "user_email",
   },
 ];
 

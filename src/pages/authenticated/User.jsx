@@ -1,26 +1,26 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
-import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
-import { styled } from "@mui/material/styles";
 import {
   Box,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   Grid,
   IconButton,
   InputAdornment,
-  InputLabel,
-  Modal,
   Paper,
   Stack,
   Table,
   TableBody,
   TableCell,
-  tableCellClasses,
   TableContainer,
   TableHead,
   TableRow,
@@ -37,10 +37,11 @@ import {
   TablePagination,
   HidingSelect,
   HeaderSort,
+  StyledTableCell,
 } from "../../utils/ReactTable/index";
 import { useTable, usePagination, useGlobalFilter } from "react-table";
 import { useSortBy } from "react-table";
-import { tableColumns, VisibleColumn } from "../../data/Role";
+import { tableColumns, VisibleColumn } from "../../data/User";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
@@ -62,6 +63,9 @@ function User() {
   const [tableData, setTableData] = useState([]);
   const [roleDropdown, setRoleDropdown] = useState([]);
   const [loadingData, setLoadingData] = useState([]);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deleteItem, setDeleteItem] = useState({});
+  const [formEditing, setFormEditing] = useState(false);
   // Validation
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
@@ -85,6 +89,14 @@ function User() {
   };
   const handleClose = () => {
     setOpenForm(false);
+    setFormEditing(false);
+    setInitialValues({
+      name: "",
+      email: "",
+      password: "",
+      phone_number: "",
+      role_id: null,
+    });
   };
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => {
@@ -93,11 +105,18 @@ function User() {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-
+  // Delete Modal
+  const handleDeleteConfirmation = () => {
+    setOpenDeleteModal(!openDeleteModal);
+  };
+  // CRUD
   async function getUsers() {
     try {
       setLoadingData(true);
-      const result = await ApiService({ id: 0, name: "" }, "user/getall-users");
+      const result = await ApiService(
+        { user_id: 0, name: "" },
+        "user/getall-users"
+      );
 
       console.log(result);
       const newMap = result?.data?.map((table) => {
@@ -116,8 +135,8 @@ function User() {
       const result = await ApiService({}, "role/get-roles");
 
       console.log(result);
-      const newMap = result?.data?.map((user) => {
-        return { label: user?.name, value: user?.user_id };
+      const newMap = result?.data?.map((role) => {
+        return { label: role?.role_name, value: role?.role_id };
       });
 
       setRoleDropdown(newMap);
@@ -129,7 +148,7 @@ function User() {
     console.log(values);
     const reqdata = {
       ...values,
-      project_owner: values?.project_owner?.value,
+      role_id: values?.role_id?.value,
       created_by: userProfile?.user_role_id,
       created_by_name: userProfile?.user_name,
     };
@@ -142,8 +161,9 @@ function User() {
       console.log(result);
 
       if (result?.status === 201) {
-        toast.success("User Added");
+        toast.success(`User${formEditing ? " Edited" : " Added"}`);
         setOpenForm(false);
+        setFormEditing(false);
         setInitialValues({
           name: "",
           email: "",
@@ -161,17 +181,125 @@ function User() {
       setSubmitForm(false);
     }
   };
-  const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: theme.palette.common.black,
-      color: theme.palette.common.white,
-      fontSize: 14,
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 13,
-    },
-  }));
-  const columns = useMemo(() => tableColumns, []);
+  const deleteUser = async () => {
+    console.log(deleteItem);
+    const reqdata = {
+      ...deleteItem,
+      is_deleted: 1,
+      is_active: 0,
+    };
+    console.log(reqdata);
+    // Handle form submission
+    try {
+      // Set the updated tableData state
+      setDeleteItem({
+        ...deleteItem,
+        isDeleting: true,
+      });
+
+      const result = await ApiService(reqdata, "user/createuser");
+
+      if (result?.status === 201) {
+        toast.error("User Deleted");
+        handleDeleteConfirmation();
+        getUsers();
+      }
+
+      return result;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setDeleteItem({
+        ...deleteItem,
+        isDeleting: false,
+      });
+    }
+  };
+
+  const dataColumns = useMemo(
+    () => [
+      ...tableColumns,
+      {
+        Header: "Actions",
+        accessor: "user_id",
+        right: true,
+        Cell: ({ value, row }) => {
+          const [isEditing, setIsEditing] = useState(false);
+
+          return (
+            <Stack direction="row" justifyContent="flex-end" spacing={2}>
+              <Tooltip title="View" placement="top" arrow>
+                <Button
+                  className="mui-icon-button"
+                  variant="outlined"
+                  startIcon={<VisibilityOutlined />}
+                />
+              </Tooltip>
+              <Tooltip title="Edit" placement="top" arrow>
+                <LoadingButton
+                  loading={isEditing}
+                  disabled={isEditing}
+                  className="mui-icon-button"
+                  variant="outlined"
+                  startIcon={<BorderColorOutlinedIcon />}
+                  onClick={async () => {
+                    console.log(row);
+                    console.log(tableData);
+                    try {
+                      setIsEditing(true);
+
+                      const result = await ApiService(
+                        {
+                          user_id: row?.original?.user_id,
+                          name: row?.original?.user_name,
+                        },
+                        "user/getall-users"
+                      );
+                      console.log(result);
+                      const resp = result?.data[0];
+
+                      const newMap = {
+                        user_id: resp?.user_id,
+                        name: resp?.user_name,
+                        email: resp?.user_email,
+                        password: resp?.user_password,
+                        phone_number: resp?.user_phone_number,
+                        role_id: roleDropdown?.find(
+                          (user) => user?.value === resp?.user_role_id
+                        ),
+                      };
+
+                      setInitialValues(newMap);
+                      setFormEditing(true);
+                      setOpenForm(true);
+                    } catch (error) {
+                      toast.error(error?.response?.data?.message);
+                    } finally {
+                      setIsEditing(false);
+                    }
+                  }}
+                />
+              </Tooltip>
+
+              <Tooltip title="Delete" placement="top" arrow>
+                <Button
+                  className="mui-icon-button"
+                  variant="outlined"
+                  startIcon={<DeleteForeverOutlinedIcon />}
+                  onClick={() => {
+                    setDeleteItem(row?.original);
+                    handleDeleteConfirmation();
+                  }}
+                />
+              </Tooltip>
+            </Stack>
+          );
+        },
+      },
+    ],
+    [tableData, roleDropdown]
+  );
+  const columns = useMemo(() => dataColumns, [dataColumns]);
   const data = useMemo(() => tableData, [tableData]);
 
   const {
@@ -242,155 +370,150 @@ function User() {
         </Grid>
         <Grid item xs={12}>
           {!openForm ? (
-            <TableContainer component={Paper}>
-              <Grid container spacing={2} px={2} py={2}>
-                <Grid item md={2} xs={6}>
-                  <GlobalFilter
-                    globalFilter={globalFilter}
-                    setGlobalFilter={setGlobalFilter}
-                  />
+            <>
+              <Dialog
+                open={openDeleteModal}
+                aria-labelledby="responsive-dialog-title"
+                PaperProps={{
+                  style: {
+                    width: "500px",
+                  },
+                }}
+              >
+                <DialogTitle id="responsive-dialog-title">
+                  {"Are you sure?"}
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText color="black">
+                    Delete {deleteItem?.user_name}?
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ display: "flex", gap: "10px" }}>
+                  <Button autoFocus onClick={handleDeleteConfirmation}>
+                    Cancel
+                  </Button>
+                  <LoadingButton
+                    loading={deleteItem?.isDeleting}
+                    disabled={deleteItem?.isDeleting}
+                    variant="outlined"
+                    onClick={deleteUser}
+                    autoFocus
+                  >
+                    Delete
+                  </LoadingButton>
+                </DialogActions>
+              </Dialog>
+              <TableContainer component={Paper}>
+                <Grid container spacing={2} px={2} py={2}>
+                  <Grid item md={2} xs={6}>
+                    <GlobalFilter
+                      globalFilter={globalFilter}
+                      setGlobalFilter={setGlobalFilter}
+                    />
+                  </Grid>
                 </Grid>
-              </Grid>
-              <Box sx={{ width: "100%", overflowX: "auto", display: "block" }}>
-                <Table {...getTableProps()}>
-                  <TableHead>
-                    {headerGroups.map((headerGroup) => (
-                      <TableRow
-                        key={headerGroup.id}
-                        {...headerGroup.getHeaderGroupProps()}
-                      >
-                        {headerGroup.headers.map((column) => (
-                          <StyledTableCell
-                            key={column.id}
-                            {...column.getHeaderProps({
-                              style: { minWidth: column.minWidth },
-                            })}
-                            sx={{
-                              border: "1px solid #dbe0e5a6",
-                            }}
-                          >
-                            <HeaderSort column={column} />
-                          </StyledTableCell>
-                        ))}
-                        <StyledTableCell
-                          sx={{
-                            textAlign: "right",
-                          }}
+                <Box
+                  sx={{ width: "100%", overflowX: "auto", display: "block" }}
+                >
+                  <Table {...getTableProps()}>
+                    <TableHead>
+                      {headerGroups.map((headerGroup) => (
+                        <TableRow
+                          className="last-header-right"
+                          key={headerGroup.id}
+                          {...headerGroup.getHeaderGroupProps()}
                         >
-                          Actions
-                        </StyledTableCell>
-                      </TableRow>
-                    ))}
-                  </TableHead>
-                  {loadingData ? (
-                    <TableBody>
-                      <TableRow>
-                        <TableCell colSpan={columns.length + 1} align="center">
-                          <Box p={5} display="flex" justifyContent="center">
-                            <CircularProgress
-                              className="table_loader"
+                          {headerGroup.headers.map((column) => (
+                            <StyledTableCell
+                              key={column.id}
+                              {...column.getHeaderProps({
+                                style: { minWidth: column.minWidth },
+                              })}
                               sx={{
-                                color: "#757575",
+                                border: "1px solid #dbe0e5a6",
                               }}
-                            />
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  ) : (
-                    <TableBody
-                      className="table_body_main"
-                      {...getTableBodyProps()}
-                    >
-                      {page.length > 0 ? (
-                        page.map((row) => {
-                          prepareRow(row);
-                          return (
-                            <TableRow key={row.id} {...row.getRowProps()}>
-                              {row.cells.map((cell) => (
-                                <StyledTableCell
-                                  key={cell.column.id}
-                                  {...cell.getCellProps({
-                                    style: { minWidth: cell.column.minWidth },
-                                  })}
-                                  sx={{
-                                    border: "1px solid #dbe0e5a6",
-                                  }}
-                                >
-                                  {cell.column.customCell ? (
-                                    <cell.column.customCell
-                                      value={cell.value}
-                                    />
-                                  ) : (
-                                    cell.render("Cell")
-                                  )}
-                                </StyledTableCell>
-                              ))}
-
-                              <StyledTableCell align="right">
-                                <Stack
-                                  direction="row"
-                                  justifyContent="flex-end"
-                                  spacing={2}
-                                >
-                                  <Tooltip title="View" placement="top" arrow>
-                                    <Button
-                                      className="mui-icon-button"
-                                      variant="outlined"
-                                      startIcon={<VisibilityOutlined />}
-                                    />
-                                  </Tooltip>
-                                  <Tooltip title="Edit" placement="top" arrow>
-                                    <LoadingButton
-                                      // loading={row?.original?.isEditing}
-                                      // disabled={row?.original?.isEditing}
-                                      className="mui-icon-button"
-                                      variant="outlined"
-                                      startIcon={<BorderColorOutlinedIcon />}
-                                      onClick={async () => {
-                                        console.log(row);
-                                        console.log(tableData);
-                                      }}
-                                    />
-                                  </Tooltip>
-
-                                  <Tooltip title="Delete" placement="top" arrow>
-                                    <Button
-                                      className="mui-icon-button"
-                                      variant="outlined"
-                                      startIcon={<DeleteForeverOutlinedIcon />}
-                                      onClick={() => {}}
-                                    />
-                                  </Tooltip>
-                                </Stack>
-                              </StyledTableCell>
-                            </TableRow>
-                          );
-                        })
-                      ) : (
+                            >
+                              <HeaderSort column={column} />
+                            </StyledTableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableHead>
+                    {loadingData ? (
+                      <TableBody>
                         <TableRow>
                           <TableCell
                             colSpan={columns.length + 1}
                             align="center"
                           >
-                            No Data
+                            <Box p={5} display="flex" justifyContent="center">
+                              <CircularProgress
+                                className="table_loader"
+                                sx={{
+                                  color: "#757575",
+                                }}
+                              />
+                            </Box>
                           </TableCell>
                         </TableRow>
-                      )}
-                    </TableBody>
-                  )}
-                </Table>
-              </Box>
-              <Box sx={{ p: 2, borderTop: "1px solid #dbe0e5a6" }}>
-                <TablePagination
-                  gotoPage={gotoPage}
-                  rows={data}
-                  setPageSize={setPageSize}
-                  pageIndex={pageIndex}
-                  pageSize={pageSize}
-                />
-              </Box>
-            </TableContainer>
+                      </TableBody>
+                    ) : (
+                      <TableBody
+                        className="table_body_main"
+                        {...getTableBodyProps()}
+                      >
+                        {page.length > 0 ? (
+                          page.map((row) => {
+                            prepareRow(row);
+                            return (
+                              <TableRow key={row.id} {...row.getRowProps()}>
+                                {row.cells.map((cell) => (
+                                  <StyledTableCell
+                                    key={cell.column.id}
+                                    {...cell.getCellProps({
+                                      style: { minWidth: cell.column.minWidth },
+                                    })}
+                                    sx={{
+                                      border: "1px solid #dbe0e5a6",
+                                    }}
+                                  >
+                                    {cell.column.customCell ? (
+                                      <cell.column.customCell
+                                        value={cell.value}
+                                      />
+                                    ) : (
+                                      cell.render("Cell")
+                                    )}
+                                  </StyledTableCell>
+                                ))}
+                              </TableRow>
+                            );
+                          })
+                        ) : (
+                          <TableRow>
+                            <TableCell
+                              colSpan={columns.length + 1}
+                              align="center"
+                            >
+                              No Data
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    )}
+                  </Table>
+                </Box>
+                <Box sx={{ p: 2, borderTop: "1px solid #dbe0e5a6" }}>
+                  <TablePagination
+                    gotoPage={gotoPage}
+                    rows={data}
+                    setPageSize={setPageSize}
+                    pageIndex={pageIndex}
+                    pageSize={pageSize}
+                  />
+                </Box>
+              </TableContainer>
+            </>
           ) : (
             <Formik
               enableReinitialize
@@ -429,6 +552,21 @@ function User() {
                                   placeholder="Name"
                                   InputLabelProps={{
                                     shrink: true,
+                                  }}
+                                  onChange={(e) => {
+                                    e.preventDefault();
+                                    const { value } = e.target;
+
+                                    const regex = /^[a-zA-Z][a-zA-Z\s]*$/;
+
+                                    if (
+                                      !value ||
+                                      regex.test(value.toString())
+                                    ) {
+                                      setFieldValue("name", value);
+                                    } else {
+                                      return;
+                                    }
                                   }}
                                 />
                               )}
@@ -532,6 +670,23 @@ function User() {
                                   placeholder="Phone Number"
                                   InputLabelProps={{
                                     shrink: true,
+                                  }}
+                                  onChange={(e) => {
+                                    e.preventDefault();
+                                    const { value } = e.target;
+
+                                    // Regular expression to allow only numbers
+                                    const regex = /^[0-9\b]+$/;
+
+                                    if (
+                                      !value ||
+                                      (regex.test(value.toString()) &&
+                                        value.length <= 10)
+                                    ) {
+                                      setFieldValue("phone_number", value);
+                                    } else {
+                                      return;
+                                    }
                                   }}
                                 />
                               )}

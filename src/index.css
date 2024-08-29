@@ -713,3 +713,7 @@ input:-webkit-autofill:active {
   margin-top: 10px !important;
   margin-right: 10px !important;
 }
+.last-header-right th:last-of-type {
+  display: flex;
+  justify-content: flex-end;
+}
