@@ -66,7 +66,7 @@ function Project() {
   });
   const [tableData, setTableData] = useState([]);
   const [ownerDropdown, setOwnerDropdown] = useState([]);
-  const [loadingData, setLoadingData] = useState([]);
+  const [loadingData, setLoadingData] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteItem, setDeleteItem] = useState({});
   const [formEditing, setFormEditing] = useState(false);
@@ -140,7 +140,7 @@ function Project() {
     const reqdata = {
       ...values,
       project_owner: values?.project_owner?.value,
-      created_by: userProfile?.user_role_id,
+      created_by: userProfile?.user_id,
       created_by_name: userProfile?.user_name,
     };
     // Handle form submission

@@ -10,6 +10,7 @@ import {
   Box,
   Button,
   Card,
+  CircularProgress,
   Divider,
   FormControl,
   Grid,
@@ -47,6 +48,7 @@ import {
   HeaderSort,
   GlobalFilter,
   HidingSelect,
+  StyledTableCell,
 } from "../../utils/ReactTable/index";
 import { useSortBy } from "react-table";
 import { tableColumns, tableData, VisibleColumn } from "../../data/Application";
@@ -55,13 +57,30 @@ import AndroidModal from "../../section/Application/AndroidModal";
 import IOSModal from "../../section/Application/IOSModal";
 import WebAppModal from "../../section/Application/WebAppModal";
 import { BootstrapInput } from "../../utils/Input/textfield";
+import { ApiService } from "../../utils/api/apiCall";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { LoadingButton } from "@mui/lab";
 
 function Application() {
-  const [open, setOpen] = React.useState(false);
-  const [openAndroid, setOpenAndroid] = React.useState(false);
-  const [openIOS, setOpenIOS] = React.useState(false);
-  const [openWeb, setOpenWeb] = React.useState(false);
+  const { userProfile } = useSelector((state) => state.user);
   const [openForm, setOpenForm] = useState(false);
+  const [checkUniqueID, setCheckUniqueID] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [submitForm, setSubmitForm] = useState(false);
+  const [initialValues, setInitialValues] = useState({
+    project_name: "",
+    project_id: "",
+    project_owner: null, // Assuming user is selected from CustomSelect
+    project_description: "",
+  });
+  const [tableData, setTableData] = useState([]);
+  const [projectDropdown, setProjectDropdown] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [loadingData, setLoadingData] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deleteItem, setDeleteItem] = useState({});
+  const [formEditing, setFormEditing] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const handleOpen = () => {
@@ -72,48 +91,48 @@ function Application() {
     // setOpen(false);
     setOpenForm(false);
   };
-  const handleAndroidOpen = () => {
-    setOpenAndroid(true);
+  // Delete Modal
+  const handleDeleteConfirmation = () => {
+    setOpenDeleteModal(!openDeleteModal);
   };
-  const handleAndroidClose = () => {
-    setOpenAndroid(false);
-  };
-  const handleIOSOpen = () => {
-    setOpenIOS(true);
-  };
-  const handleIOSClose = () => {
-    setOpenIOS(false);
-  };
-  const handleWebOpen = () => {
-    setOpenWeb(true);
-  };
-  const handleWebClose = () => {
-    setOpenWeb(false);
-  };
+  async function getApplication(project) {
+    try {
+      setLoadingData(true);
+      const result = await ApiService(
+        {
+          id: userProfile?.user_id,
+          name: userProfile?.user_name,
+          p_id: project.value,
+        },
+        "application/getall-application"
+      );
 
-  const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: theme.palette.common.black,
-      color: theme.palette.common.white,
-      fontSize: 14,
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 13,
-    },
-  }));
-  const modalStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 400,
-    bgcolor: "background.paper",
-    border: "1px solid #000",
-    boxShadow: 24,
-    pt: 2,
-    px: 4,
-    pb: 3,
-  };
+      const newMap = result?.data?.map((table) => {
+        return { ...table, isDeleting: false, isEditing: false };
+      });
+
+      setTableData(newMap);
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setLoadingData(false);
+    }
+  }
+  async function getProjectDropdown() {
+    try {
+      const result = await ApiService({}, "project/getall-project");
+
+      console.log(result);
+      const newMap = result?.data?.map((project) => {
+        return { label: project?.project_name, value: project?.id };
+      });
+
+      setProjectDropdown(newMap);
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    }
+  }
+
   const applicationArr = [
     {
       label: "Android",
@@ -128,22 +147,63 @@ function Application() {
       value: "Web App",
     },
   ];
-  const projectArr = [
-    {
-      label: "push-notification-6787b",
-      value: "push-notification-6787b",
-    },
-    {
-      label: "react-auth-test-175bb",
-      value: "react-auth-test-175bb",
-    },
-  ];
+
   const [selectedApp, setSelectedApp] = useState({
     label: "Android",
     value: "Android",
   });
-  const columns = useMemo(() => tableColumns, []);
-  const data = useMemo(() => tableData, []);
+  const dataColumns = useMemo(
+    () => [
+      ...tableColumns,
+      {
+        Header: "Actions",
+        accessor: "id",
+        Cell: ({ value, row }) => {
+          const [isEditing, setIsEditing] = useState(false);
+
+          return (
+            <Stack direction="row" justifyContent="flex-end" spacing={2}>
+              <Tooltip title="View" placement="top" arrow>
+                <Button
+                  className="mui-icon-button"
+                  variant="outlined"
+                  startIcon={<VisibilityOutlined />}
+                />
+              </Tooltip>
+              <Tooltip title="Edit" placement="top" arrow>
+                <LoadingButton
+                  loading={isEditing}
+                  disabled={isEditing}
+                  className="mui-icon-button"
+                  variant="outlined"
+                  startIcon={<BorderColorOutlinedIcon />}
+                  onClick={async () => {
+                    console.log(row);
+                    console.log(tableData);
+                  }}
+                />
+              </Tooltip>
+
+              <Tooltip title="Delete" placement="top" arrow>
+                <Button
+                  className="mui-icon-button"
+                  variant="outlined"
+                  startIcon={<DeleteForeverOutlinedIcon />}
+                  onClick={() => {
+                    // setDeleteItem(row?.original);
+                    // handleDeleteConfirmation();
+                  }}
+                />
+              </Tooltip>
+            </Stack>
+          );
+        },
+      },
+    ],
+    [tableData]
+  );
+  const columns = useMemo(() => dataColumns, [dataColumns]);
+  const data = useMemo(() => tableData, [tableData]);
   const {
     getTableProps,
     getTableBodyProps,
@@ -181,6 +241,9 @@ function Application() {
     }
     return item;
   });
+  useEffect(() => {
+    getProjectDropdown();
+  }, []);
 
   return (
     <>
@@ -217,7 +280,12 @@ function Application() {
                 <Grid item md={3} xs={6}>
                   <CustomSelect
                     placeholder="Select Project"
-                    options={projectArr}
+                    options={projectDropdown}
+                    value={selectedProject}
+                    onChange={(e) => {
+                      setSelectedProject(e);
+                      getApplication(e);
+                    }}
                     id="project"
                     isClearable
                   />
@@ -244,82 +312,68 @@ function Application() {
                             <HeaderSort column={column} />
                           </StyledTableCell>
                         ))}
-                        <StyledTableCell
-                          sx={{
-                            textAlign: "right",
-                          }}
-                        >
-                          Actions
-                        </StyledTableCell>
                       </TableRow>
                     ))}
                   </TableHead>
-                  <TableBody
-                    className="table_body_main"
-                    {...getTableBodyProps()}
-                  >
-                    {page.length > 0 ? (
-                      page.map((row) => {
-                        prepareRow(row);
-                        return (
-                          <TableRow key={row.id} {...row.getRowProps()}>
-                            {row.cells.map((cell) => (
-                              <StyledTableCell
-                                key={cell.column.id}
-                                {...cell.getCellProps({
-                                  style: { minWidth: cell.column.minWidth },
-                                })}
-                                sx={{
-                                  border: "1px solid #dbe0e5a6",
-                                }}
-                              >
-                                {cell.column.customCell ? (
-                                  <cell.column.customCell value={cell.value} />
-                                ) : (
-                                  cell.render("Cell")
-                                )}
-                              </StyledTableCell>
-                            ))}
-                            <StyledTableCell align="right">
-                              <Stack
-                                direction="row"
-                                justifyContent="flex-end"
-                                spacing={2}
-                              >
-                                <Tooltip title="View" placement="top" arrow>
-                                  <Button
-                                    className="mui-icon-button"
-                                    variant="outlined"
-                                    startIcon={<VisibilityOutlined />}
-                                  />
-                                </Tooltip>
-                                <Tooltip title="Edit" placement="top" arrow>
-                                  <Button
-                                    className="mui-icon-button"
-                                    variant="outlined"
-                                    startIcon={<BorderColorOutlinedIcon />}
-                                  />
-                                </Tooltip>
-                                <Tooltip title="Delete" placement="top" arrow>
-                                  <Button
-                                    className="mui-icon-button"
-                                    variant="outlined"
-                                    startIcon={<DeleteForeverOutlinedIcon />}
-                                  />
-                                </Tooltip>
-                              </Stack>
-                            </StyledTableCell>
-                          </TableRow>
-                        );
-                      })
-                    ) : (
+                  {loadingData ? (
+                    <TableBody>
                       <TableRow>
                         <TableCell colSpan={columns.length + 1} align="center">
-                          No Data
+                          <Box p={5} display="flex" justifyContent="center">
+                            <CircularProgress
+                              className="table_loader"
+                              sx={{
+                                color: "#757575",
+                              }}
+                            />
+                          </Box>
                         </TableCell>
                       </TableRow>
-                    )}
-                  </TableBody>
+                    </TableBody>
+                  ) : (
+                    <TableBody
+                      className="table_body_main"
+                      {...getTableBodyProps()}
+                    >
+                      {page.length > 0 ? (
+                        page.map((row) => {
+                          prepareRow(row);
+                          return (
+                            <TableRow key={row.id} {...row.getRowProps()}>
+                              {row.cells.map((cell) => (
+                                <StyledTableCell
+                                  key={cell.column.id}
+                                  {...cell.getCellProps({
+                                    style: { minWidth: cell.column.minWidth },
+                                  })}
+                                  sx={{
+                                    border: "1px solid #dbe0e5a6",
+                                  }}
+                                >
+                                  {cell.column.customCell ? (
+                                    <cell.column.customCell
+                                      value={cell.value}
+                                    />
+                                  ) : (
+                                    cell.render("Cell")
+                                  )}
+                                </StyledTableCell>
+                              ))}
+                            </TableRow>
+                          );
+                        })
+                      ) : (
+                        <TableRow>
+                          <TableCell
+                            colSpan={columns.length + 1}
+                            align="center"
+                          >
+                            No Data
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  )}
                 </Table>
               </Box>
               <Box sx={{ p: 2, borderTop: "1px solid #dbe0e5a6" }}>
@@ -361,7 +415,7 @@ function Application() {
                       </Typography>
                       <CustomSelect
                         placeholder="Select Project"
-                        options={projectArr}
+                        options={projectDropdown}
                         id="project"
                       />
                     </FormControl>
@@ -581,3 +635,22 @@ function Application() {
 }
 
 export default Application;
+
+// const handleAndroidOpen = () => {
+//   setOpenAndroid(true);
+// };
+// const handleAndroidClose = () => {
+//   setOpenAndroid(false);
+// };
+// const handleIOSOpen = () => {
+//   setOpenIOS(true);
+// };
+// const handleIOSClose = () => {
+//   setOpenIOS(false);
+// };
+// const handleWebOpen = () => {
+//   setOpenWeb(true);
+// };
+// const handleWebClose = () => {
+//   setOpenWeb(false);
+// };

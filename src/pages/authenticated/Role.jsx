@@ -54,7 +54,6 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 
 function Role() {
   const { userProfile } = useSelector((state) => state.user);
-  const [open, setOpen] = React.useState(false);
   const [openForm, setOpenForm] = useState(false);
   const [submitForm, setSubmitForm] = useState(false);
   const [initialValues, setInitialValues] = useState({
@@ -65,7 +64,7 @@ function Role() {
   });
   const [selectedItems, setSelectedItems] = React.useState([]);
   const [tableData, setTableData] = useState([]);
-  const [loadingData, setLoadingData] = useState([]);
+  const [loadingData, setLoadingData] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [menuError, setMenuError] = useState("");
   const [deleteItem, setDeleteItem] = useState({});
@@ -141,6 +140,9 @@ function Role() {
     }
   };
 
+  // Multi Checkbox
+  const toggledItemRef = React.useRef({});
+  const apiRef = useTreeViewApiRef();
   const menus = [
     { id: "1", label: "Dashboard" },
     {
@@ -167,8 +169,6 @@ function Role() {
 
     return ids;
   }
-  const toggledItemRef = React.useRef({});
-  const apiRef = useTreeViewApiRef();
   const handleItemSelectionToggle = (event, itemId, isSelected) => {
     toggledItemRef.current[itemId] = isSelected;
   };
@@ -303,7 +303,7 @@ function Role() {
         setMenuError("");
       }
     }
-  }, [selectedItems]);
+  }, [menuError, selectedItems]);
 
   useEffect(() => {
     getRoles();

@@ -62,7 +62,7 @@ function User() {
   });
   const [tableData, setTableData] = useState([]);
   const [roleDropdown, setRoleDropdown] = useState([]);
-  const [loadingData, setLoadingData] = useState([]);
+  const [loadingData, setLoadingData] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteItem, setDeleteItem] = useState({});
   const [formEditing, setFormEditing] = useState(false);
