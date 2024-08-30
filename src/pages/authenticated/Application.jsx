@@ -66,7 +66,7 @@ function Application() {
     p_id: null,
     platform: {
       label: "Android",
-      value: "Android",
+      value: "android",
     },
     package_name: "",
     description: "",
@@ -100,7 +100,7 @@ function Application() {
       p_id: null,
       platform: {
         label: "Android",
-        value: "Android",
+        value: "android",
       },
       package_name: "",
       description: "",
@@ -175,7 +175,7 @@ function Application() {
           p_id: null,
           platform: {
             label: "Android",
-            value: "Android",
+            value: "android",
           },
           package_name: "",
           description: "",
