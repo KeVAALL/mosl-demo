@@ -15,6 +15,11 @@ const tableColumns = [
     Header: "Store URL",
     accessor: "store_url",
   },
+  {
+    Header: "Description",
+    accessor: "description",
+    minWidth: 250,
+  },
 ];
 
 const tableData = [

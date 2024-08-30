@@ -51,15 +51,17 @@ function Role() {
   const [submitForm, setSubmitForm] = useState(false);
   const [initialValues, setInitialValues] = useState({
     role_name: "",
+    selectedMenus: [],
   });
   const validationSchema = Yup.object().shape({
     role_name: Yup.string().required("Name is required"),
+    selectedMenus: Yup.array()
+      .min(1, "At least one menu must be selected")
+      .required("Please select at least one menu"),
   });
-  const [selectedItems, setSelectedItems] = React.useState([]);
   const [tableData, setTableData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [menuError, setMenuError] = useState("");
   const [deleteItem, setDeleteItem] = useState({});
   const [formEditing, setFormEditing] = useState(false);
   const theme = useTheme();
@@ -76,8 +78,9 @@ function Role() {
     setFormEditing(false);
     setInitialValues({
       role_name: "",
+      selectedMenus: [],
     });
-    setSelectedItems([]);
+    // setSelectedItems([]);
   };
   async function getRoles() {
     try {
@@ -97,13 +100,13 @@ function Role() {
   }
   const onSubmit = async (values) => {
     console.log(values);
-    if (selectedItems?.length < 1) {
-      setMenuError("Please select menus");
-      return;
-    }
+    // if (selectedItems?.length < 1) {
+    //   setMenuError("Please select menus");
+    //   return;
+    // }
     const reqdata = {
-      ...values,
-      assign_menu: selectedItems,
+      role_name: values?.role_name,
+      menuIds: values?.selectedMenus,
       created_by: userProfile?.user_role_id,
       created_by_name: userProfile?.user_name,
     };
@@ -121,6 +124,7 @@ function Role() {
         setFormEditing(false);
         setInitialValues({
           role_name: "",
+          selectedMenus: [],
         });
         getRoles();
       }
@@ -137,21 +141,21 @@ function Role() {
   const toggledItemRef = React.useRef({});
   const apiRef = useTreeViewApiRef();
   const menus = [
-    { id: "1", label: "Dashboard" },
+    { id: 1, label: "Dashboard" },
     {
-      id: "2",
+      id: 2,
       label: "Project",
     },
     {
-      id: "3",
+      id: 3,
       label: "Application",
     },
     {
-      id: "4",
+      id: 4,
       label: "Dynamic Links",
     },
-    { id: "5", label: "Users" },
-    { id: "6", label: "Role" },
+    { id: 5, label: "Users" },
+    { id: 6, label: "Role" },
   ];
   function getItemDescendantsIds(item) {
     const ids = [];
@@ -164,35 +168,6 @@ function Role() {
   }
   const handleItemSelectionToggle = (event, itemId, isSelected) => {
     toggledItemRef.current[itemId] = isSelected;
-  };
-  const handleSelectedItemsChange = (event, newSelectedItems) => {
-    setSelectedItems(newSelectedItems);
-
-    // Select / unselect the children of the toggled item
-    const itemsToSelect = [];
-    const itemsToUnSelect = {};
-    Object.entries(toggledItemRef.current).forEach(([itemId, isSelected]) => {
-      const item = apiRef.current.getItem(itemId);
-      if (isSelected) {
-        itemsToSelect.push(...getItemDescendantsIds(item));
-      } else {
-        getItemDescendantsIds(item).forEach((descendantId) => {
-          itemsToUnSelect[descendantId] = true;
-        });
-      }
-    });
-
-    const newSelectedItemsWithChildren = Array.from(
-      new Set(
-        [...newSelectedItems, ...itemsToSelect].filter(
-          (itemId) => !itemsToUnSelect[itemId]
-        )
-      )
-    );
-
-    setSelectedItems(newSelectedItemsWithChildren);
-
-    toggledItemRef.current = {};
   };
 
   const dataColumns = useMemo(
@@ -272,7 +247,6 @@ function Role() {
         hiddenColumns: columns
           .filter((col) => VisibleColumn.includes(col.accessor))
           .map((col) => col.accessor),
-        // filters: [{ id: "status", value: "" }],
       },
     },
     useGlobalFilter,
@@ -287,16 +261,16 @@ function Role() {
     return item;
   });
 
-  useEffect(() => {
-    console.log(selectedItems);
-    if (menuError) {
-      if (selectedItems?.length < 1) {
-        setMenuError("Please select menus");
-      } else {
-        setMenuError("");
-      }
-    }
-  }, [menuError, selectedItems]);
+  // useEffect(() => {
+  //   console.log(selectedItems);
+  //   if (menuError) {
+  //     if (selectedItems?.length < 1) {
+  //       setMenuError("Please select menus");
+  //     } else {
+  //       setMenuError("");
+  //     }
+  //   }
+  // }, [menuError, selectedItems]);
 
   useEffect(() => {
     getRoles();
@@ -443,6 +417,7 @@ function Role() {
                 setFieldTouched,
                 setFieldError,
                 handleSubmit,
+                values,
               }) => (
                 <Form onSubmit={handleSubmit}>
                   <Paper elevation={3}>
@@ -513,17 +488,61 @@ function Role() {
                               checkboxSelection
                               apiRef={apiRef}
                               items={menus}
-                              selectedItems={selectedItems}
-                              onSelectedItemsChange={handleSelectedItemsChange}
+                              selectedItems={values.selectedMenus}
+                              onSelectedItemsChange={(
+                                event,
+                                newSelectedItems
+                              ) => {
+                                setFieldValue(
+                                  "selectedMenus",
+                                  newSelectedItems
+                                );
+
+                                // Select / unselect the children of the toggled item
+                                const itemsToSelect = [];
+                                const itemsToUnSelect = {};
+                                Object.entries(toggledItemRef.current).forEach(
+                                  ([itemId, isSelected]) => {
+                                    const item = apiRef.current.getItem(itemId);
+                                    if (isSelected) {
+                                      itemsToSelect.push(
+                                        ...getItemDescendantsIds(item)
+                                      );
+                                    } else {
+                                      getItemDescendantsIds(item).forEach(
+                                        (descendantId) => {
+                                          itemsToUnSelect[descendantId] = true;
+                                        }
+                                      );
+                                    }
+                                  }
+                                );
+
+                                const newSelectedItemsWithChildren = Array.from(
+                                  new Set(
+                                    [
+                                      ...newSelectedItems,
+                                      ...itemsToSelect,
+                                    ].filter(
+                                      (itemId) => !itemsToUnSelect[itemId]
+                                    )
+                                  )
+                                );
+
+                                setFieldValue(
+                                  "selectedMenus",
+                                  newSelectedItemsWithChildren
+                                );
+
+                                toggledItemRef.current = {};
+                              }}
                               onItemSelectionToggle={handleItemSelectionToggle}
                             />
-                            {menuError ? (
-                              <div className="text-error text-12 mt-5">
-                                {menuError}
-                              </div>
-                            ) : (
-                              <></>
-                            )}
+                            <ErrorMessage
+                              name="selectedMenus"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
                           </FormControl>
                         </Grid>
                       </Grid>
@@ -568,6 +587,35 @@ function Role() {
 
 export default Role;
 
+// const handleSelectedItemsChange = (event, newSelectedItems) => {
+//   setSelectedItems(newSelectedItems);
+
+//   // Select / unselect the children of the toggled item
+//   const itemsToSelect = [];
+//   const itemsToUnSelect = {};
+//   Object.entries(toggledItemRef.current).forEach(([itemId, isSelected]) => {
+//     const item = apiRef.current.getItem(itemId);
+//     if (isSelected) {
+//       itemsToSelect.push(...getItemDescendantsIds(item));
+//     } else {
+//       getItemDescendantsIds(item).forEach((descendantId) => {
+//         itemsToUnSelect[descendantId] = true;
+//       });
+//     }
+//   });
+
+//   const newSelectedItemsWithChildren = Array.from(
+//     new Set(
+//       [...newSelectedItems, ...itemsToSelect].filter(
+//         (itemId) => !itemsToUnSelect[itemId]
+//       )
+//     )
+//   );
+
+//   setSelectedItems(newSelectedItemsWithChildren);
+
+//   toggledItemRef.current = {};
+// };
 // {
 /* <Grid
                   item
