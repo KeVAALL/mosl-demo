@@ -78,7 +78,11 @@ function App() {
       children: [
         {
           path: "home",
-          element: <Layout />,
+          element: (
+            <AuthGuard>
+              <Layout />
+            </AuthGuard>
+          ),
           children: menu?.map((item) => ({
             path: item.menu_url,
             element: componentMapping[item.menu_url] || <>No Component Found</>,

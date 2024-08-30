@@ -8,6 +8,11 @@ import {
   Box,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   Grid,
   Paper,
@@ -100,11 +105,9 @@ function Role() {
   }
   const onSubmit = async (values) => {
     console.log(values);
-    // if (selectedItems?.length < 1) {
-    //   setMenuError("Please select menus");
-    //   return;
-    // }
+
     const reqdata = {
+      role_id: formEditing ? values?.role_id : "",
       role_name: values?.role_name,
       menuIds: values?.selectedMenus,
       created_by: userProfile?.user_role_id,
@@ -134,6 +137,38 @@ function Role() {
       toast.error(error?.response?.data?.message);
     } finally {
       setSubmitForm(false);
+    }
+  };
+  const deleteRoles = async () => {
+    console.log(deleteItem);
+    const reqdata = {
+      ...deleteItem,
+      is_deleted: 1,
+      is_active: 0,
+    };
+    // Handle form submission
+    try {
+      setDeleteItem({
+        ...deleteItem,
+        isDeleting: true,
+      });
+
+      const result = await ApiService(reqdata, "application/create");
+
+      if (result?.status === 201) {
+        toast.error("Role Deleted");
+        handleDeleteConfirmation();
+        getRoles();
+      }
+
+      return result;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setDeleteItem({
+        ...deleteItem,
+        isDeleting: false,
+      });
     }
   };
 
@@ -198,7 +233,31 @@ function Role() {
                   startIcon={<BorderColorOutlinedIcon />}
                   onClick={async () => {
                     console.log(row);
-                    console.log(tableData);
+                    try {
+                      // Find the index of the matched element in the tableData array
+                      setIsEditing(true);
+
+                      const result = await ApiService(
+                        { role_id: row?.original?.role_id },
+                        "role/getone-role"
+                      );
+
+                      const resp = result?.data;
+                      console.log(resp);
+
+                      const newMap = {
+                        ...resp,
+                        selectedMenus: resp?.menus,
+                      };
+
+                      setInitialValues(newMap);
+                      setFormEditing(true);
+                      setOpenForm(true);
+                    } catch (error) {
+                      toast.error(error?.response?.data?.message);
+                    } finally {
+                      setIsEditing(false);
+                    }
                   }}
                 />
               </Tooltip>
@@ -300,111 +359,150 @@ function Role() {
         </Grid>
         <Grid item xs={12}>
           {!openForm ? (
-            <TableContainer component={Paper}>
-              <Grid container spacing={2} px={2} py={2}>
-                <Grid item md={2} xs={6}>
-                  <GlobalFilter
-                    globalFilter={globalFilter}
-                    setGlobalFilter={setGlobalFilter}
-                  />
+            <>
+              <Dialog
+                open={openDeleteModal}
+                aria-labelledby="responsive-dialog-title"
+                PaperProps={{
+                  style: {
+                    width: "500px",
+                  },
+                }}
+              >
+                <DialogTitle id="responsive-dialog-title">
+                  Are you sure ?
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText color="black">
+                    Delete {deleteItem?.package_name}?
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ display: "flex", gap: "10px" }}>
+                  <Button autoFocus onClick={handleDeleteConfirmation}>
+                    Cancel
+                  </Button>
+                  <LoadingButton
+                    loading={deleteItem?.isDeleting}
+                    disabled={deleteItem?.isDeleting}
+                    variant="outlined"
+                    onClick={deleteRoles}
+                    autoFocus
+                  >
+                    Delete
+                  </LoadingButton>
+                </DialogActions>
+              </Dialog>
+              <TableContainer component={Paper}>
+                <Grid container spacing={2} px={2} py={2}>
+                  <Grid item md={2} xs={6}>
+                    <GlobalFilter
+                      globalFilter={globalFilter}
+                      setGlobalFilter={setGlobalFilter}
+                    />
+                  </Grid>
                 </Grid>
-              </Grid>
-              <Box sx={{ width: "100%", overflowX: "auto", display: "block" }}>
-                <Table {...getTableProps()}>
-                  <TableHead>
-                    {headerGroups.map((headerGroup) => (
-                      <TableRow
-                        className="last-header-right"
-                        key={headerGroup.id}
-                        {...headerGroup.getHeaderGroupProps()}
-                      >
-                        {headerGroup.headers.map((column) => (
-                          <StyledTableCell
-                            key={column.id}
-                            {...column.getHeaderProps({
-                              style: { minWidth: column.minWidth },
-                            })}
-                            sx={{
-                              border: "1px solid #dbe0e5a6",
-                            }}
-                          >
-                            <HeaderSort column={column} />
-                          </StyledTableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableHead>
-                  {loadingData ? (
-                    <TableBody>
-                      <TableRow>
-                        <TableCell colSpan={columns.length + 1} align="center">
-                          <Box p={5} display="flex" justifyContent="center">
-                            <CircularProgress
-                              className="table_loader"
+                <Box
+                  sx={{ width: "100%", overflowX: "auto", display: "block" }}
+                >
+                  <Table {...getTableProps()}>
+                    <TableHead>
+                      {headerGroups.map((headerGroup) => (
+                        <TableRow
+                          className="last-header-right"
+                          key={headerGroup.id}
+                          {...headerGroup.getHeaderGroupProps()}
+                        >
+                          {headerGroup.headers.map((column) => (
+                            <StyledTableCell
+                              key={column.id}
+                              {...column.getHeaderProps({
+                                style: { minWidth: column.minWidth },
+                              })}
                               sx={{
-                                color: "#757575",
+                                border: "1px solid #dbe0e5a6",
                               }}
-                            />
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  ) : (
-                    <TableBody
-                      className="table_body_main"
-                      {...getTableBodyProps()}
-                    >
-                      {page.length > 0 ? (
-                        page.map((row) => {
-                          prepareRow(row);
-                          return (
-                            <TableRow key={row.id} {...row.getRowProps()}>
-                              {row.cells.map((cell) => (
-                                <StyledTableCell
-                                  key={cell.column.id}
-                                  {...cell.getCellProps({
-                                    style: { minWidth: cell.column.minWidth },
-                                  })}
-                                  sx={{
-                                    border: "1px solid #dbe0e5a6",
-                                  }}
-                                >
-                                  {cell.column.customCell ? (
-                                    <cell.column.customCell
-                                      value={cell.value}
-                                    />
-                                  ) : (
-                                    cell.render("Cell")
-                                  )}
-                                </StyledTableCell>
-                              ))}
-                            </TableRow>
-                          );
-                        })
-                      ) : (
+                            >
+                              <HeaderSort column={column} />
+                            </StyledTableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableHead>
+                    {loadingData ? (
+                      <TableBody>
                         <TableRow>
                           <TableCell
                             colSpan={columns.length + 1}
                             align="center"
                           >
-                            No Data
+                            <Box p={5} display="flex" justifyContent="center">
+                              <CircularProgress
+                                className="table_loader"
+                                sx={{
+                                  color: "#757575",
+                                }}
+                              />
+                            </Box>
                           </TableCell>
                         </TableRow>
-                      )}
-                    </TableBody>
-                  )}
-                </Table>
-              </Box>
-              <Box sx={{ p: 2, borderTop: "1px solid #dbe0e5a6" }}>
-                <TablePagination
-                  gotoPage={gotoPage}
-                  rows={data}
-                  setPageSize={setPageSize}
-                  pageIndex={pageIndex}
-                  pageSize={pageSize}
-                />
-              </Box>
-            </TableContainer>
+                      </TableBody>
+                    ) : (
+                      <TableBody
+                        className="table_body_main"
+                        {...getTableBodyProps()}
+                      >
+                        {page.length > 0 ? (
+                          page.map((row) => {
+                            prepareRow(row);
+                            return (
+                              <TableRow key={row.id} {...row.getRowProps()}>
+                                {row.cells.map((cell) => (
+                                  <StyledTableCell
+                                    key={cell.column.id}
+                                    {...cell.getCellProps({
+                                      style: { minWidth: cell.column.minWidth },
+                                    })}
+                                    sx={{
+                                      border: "1px solid #dbe0e5a6",
+                                    }}
+                                  >
+                                    {cell.column.customCell ? (
+                                      <cell.column.customCell
+                                        value={cell.value}
+                                      />
+                                    ) : (
+                                      cell.render("Cell")
+                                    )}
+                                  </StyledTableCell>
+                                ))}
+                              </TableRow>
+                            );
+                          })
+                        ) : (
+                          <TableRow>
+                            <TableCell
+                              colSpan={columns.length + 1}
+                              align="center"
+                            >
+                              No Data
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    )}
+                  </Table>
+                </Box>
+                <Box sx={{ p: 2, borderTop: "1px solid #dbe0e5a6" }}>
+                  <TablePagination
+                    gotoPage={gotoPage}
+                    rows={data}
+                    setPageSize={setPageSize}
+                    pageIndex={pageIndex}
+                    pageSize={pageSize}
+                  />
+                </Box>
+              </TableContainer>
+            </>
           ) : (
             <Formik
               enableReinitialize
