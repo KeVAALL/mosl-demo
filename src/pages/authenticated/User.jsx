@@ -381,7 +381,7 @@ function User() {
                 }}
               >
                 <DialogTitle id="responsive-dialog-title">
-                  {"Are you sure?"}
+                  {"Are you sure ?"}
                 </DialogTitle>
                 <DialogContent>
                   <DialogContentText color="black">

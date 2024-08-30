@@ -1,11 +1,19 @@
 const tableColumns = [
   {
-    Header: "App nickname",
-    accessor: "app_nickname",
+    Header: "Application name",
+    accessor: "package_name",
   },
   {
-    Header: "App ID",
-    accessor: "app_id",
+    Header: "Platform",
+    accessor: "platform",
+  },
+  {
+    Header: "Dynamic URL",
+    accessor: "dynamic_url",
+  },
+  {
+    Header: "Store URL",
+    accessor: "store_url",
   },
 ];
 

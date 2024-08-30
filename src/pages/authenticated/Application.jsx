@@ -3,45 +3,40 @@ import React, { useEffect, useMemo, useState } from "react";
 import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
-import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
-import { styled } from "@mui/material/styles";
 import {
-  Backdrop,
   Box,
   Button,
-  Card,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   FormControl,
   Grid,
-  IconButton,
-  InputLabel,
-  Modal,
   Paper,
   Stack,
   Table,
   TableBody,
   TableCell,
-  tableCellClasses,
   TableContainer,
   TableHead,
   TableRow,
   Tooltip,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from "@mui/material";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import AdbOutlinedIcon from "@mui/icons-material/AdbOutlined";
-import CodeOffOutlinedIcon from "@mui/icons-material/CodeOffOutlined";
-import AirplayOutlinedIcon from "@mui/icons-material/AirplayOutlined";
-import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
+// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+// import AdbOutlinedIcon from "@mui/icons-material/AdbOutlined";
+// import CodeOffOutlinedIcon from "@mui/icons-material/CodeOffOutlined";
+// import AirplayOutlinedIcon from "@mui/icons-material/AirplayOutlined";
+// import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import { CustomSelect } from "../../utils/Input/reactSelect";
 // third-party
 import { useTable, usePagination, useGlobalFilter } from "react-table";
-
+import * as Yup from "yup";
 // project-imports
 import {
   TablePagination,
@@ -51,28 +46,42 @@ import {
   StyledTableCell,
 } from "../../utils/ReactTable/index";
 import { useSortBy } from "react-table";
-import { tableColumns, tableData, VisibleColumn } from "../../data/Application";
+import { tableColumns, VisibleColumn } from "../../data/Application";
 // import AndroidStepper from "../../section/Application/AndroidStepper";
-import AndroidModal from "../../section/Application/AndroidModal";
-import IOSModal from "../../section/Application/IOSModal";
-import WebAppModal from "../../section/Application/WebAppModal";
+// import AndroidModal from "../../section/Application/AndroidModal";
+// import IOSModal from "../../section/Application/IOSModal";
+// import WebAppModal from "../../section/Application/WebAppModal";
 import { BootstrapInput } from "../../utils/Input/textfield";
 import { ApiService } from "../../utils/api/apiCall";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { LoadingButton } from "@mui/lab";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 
 function Application() {
   const { userProfile } = useSelector((state) => state.user);
   const [openForm, setOpenForm] = useState(false);
-  const [checkUniqueID, setCheckUniqueID] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
   const [submitForm, setSubmitForm] = useState(false);
   const [initialValues, setInitialValues] = useState({
-    project_name: "",
-    project_id: "",
-    project_owner: null, // Assuming user is selected from CustomSelect
-    project_description: "",
+    p_id: null,
+    platform: {
+      label: "Android",
+      value: "Android",
+    },
+    package_name: "",
+    description: "",
+    bundle_id: "",
+    store_url: "",
+    dynamic_url: "",
+  });
+  const validationSchema = Yup.object().shape({
+    p_id: Yup.object().required("Project is required"),
+    platform: Yup.object().required("Platform is required"),
+    package_name: Yup.string().required("Package Name is required"),
+    description: Yup.string().required("Description is required"),
+    bundle_id: Yup.string().required("Bundle ID is required"),
+    store_url: Yup.string().required("Store URL is required"),
+    dynamic_url: Yup.string().required("Dynamic URL is required"),
   });
   const [tableData, setTableData] = useState([]);
   const [projectDropdown, setProjectDropdown] = useState([]);
@@ -81,15 +90,24 @@ function Application() {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteItem, setDeleteItem] = useState({});
   const [formEditing, setFormEditing] = useState(false);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const handleOpen = () => {
-    // setOpen(true);
     setOpenForm(true);
   };
   const handleClose = () => {
-    // setOpen(false);
     setOpenForm(false);
+    setFormEditing(false);
+    setInitialValues({
+      p_id: null,
+      platform: {
+        label: "Android",
+        value: "Android",
+      },
+      package_name: "",
+      description: "",
+      bundle_id: "",
+      store_url: "",
+      dynamic_url: "",
+    });
   };
   // Delete Modal
   const handleDeleteConfirmation = () => {
@@ -132,26 +150,98 @@ function Application() {
       toast.error(error?.response?.data?.message);
     }
   }
+  const onSubmit = async (values) => {
+    console.log(values);
+    const reqdata = {
+      ...values,
+      platform: values?.platform?.value,
+      p_id: values?.p_id?.value,
+      created_by: userProfile?.user_id,
+      created_by_name: userProfile?.user_name,
+    };
+    // Handle form submission
+    try {
+      setSubmitForm(true);
+
+      const result = await ApiService(reqdata, "application/create");
+
+      console.log(result);
+
+      if (result?.status === 201) {
+        toast.success(`Application${formEditing ? " Edited" : " Added"}`);
+        setOpenForm(false);
+        setFormEditing(false);
+        setInitialValues({
+          p_id: null,
+          platform: {
+            label: "Android",
+            value: "Android",
+          },
+          package_name: "",
+          description: "",
+          bundle_id: "",
+          store_url: "",
+          dynamic_url: "",
+        });
+        setSelectedProject(values?.p_id);
+        getApplication(values?.p_id);
+      }
+
+      // return result;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setSubmitForm(false);
+    }
+  };
+  const deleteApplication = async () => {
+    console.log(deleteItem);
+    const reqdata = {
+      ...deleteItem,
+      is_deleted: 1,
+      is_active: 0,
+    };
+    // Handle form submission
+    try {
+      setDeleteItem({
+        ...deleteItem,
+        isDeleting: true,
+      });
+
+      const result = await ApiService(reqdata, "application/create");
+
+      if (result?.status === 201) {
+        toast.error("Application Deleted");
+        handleDeleteConfirmation();
+        getApplication(selectedProject);
+      }
+
+      return result;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setDeleteItem({
+        ...deleteItem,
+        isDeleting: false,
+      });
+    }
+  };
 
   const applicationArr = [
     {
       label: "Android",
-      value: "Android",
+      value: "android",
     },
     {
       label: "IOS",
-      value: "IOS",
+      value: "ios",
     },
     {
       label: "Web App",
-      value: "Web App",
+      value: "webapp",
     },
   ];
 
-  const [selectedApp, setSelectedApp] = useState({
-    label: "Android",
-    value: "Android",
-  });
   const dataColumns = useMemo(
     () => [
       ...tableColumns,
@@ -179,7 +269,35 @@ function Application() {
                   startIcon={<BorderColorOutlinedIcon />}
                   onClick={async () => {
                     console.log(row);
-                    console.log(tableData);
+                    try {
+                      // Find the index of the matched element in the tableData array
+                      setIsEditing(true);
+
+                      const result = await ApiService(
+                        { id: row?.original?.id },
+                        "application/getone-application"
+                      );
+
+                      const resp = result?.data[0];
+
+                      const newMap = {
+                        ...resp,
+                        p_id: projectDropdown?.filter(
+                          (project) => project?.value === resp?.p_id
+                        )[0],
+                        platform: applicationArr?.filter(
+                          (app) => app?.value === resp?.platform?.toLowerCase()
+                        )[0],
+                      };
+
+                      setInitialValues(newMap);
+                      setFormEditing(true);
+                      setOpenForm(true);
+                    } catch (error) {
+                      toast.error(error?.response?.data?.message);
+                    } finally {
+                      setIsEditing(false);
+                    }
                   }}
                 />
               </Tooltip>
@@ -190,8 +308,8 @@ function Application() {
                   variant="outlined"
                   startIcon={<DeleteForeverOutlinedIcon />}
                   onClick={() => {
-                    // setDeleteItem(row?.original);
-                    // handleDeleteConfirmation();
+                    setDeleteItem(row?.original);
+                    handleDeleteConfirmation();
                   }}
                 />
               </Tooltip>
@@ -269,250 +387,437 @@ function Application() {
         </Grid>
         <Grid item xs={12}>
           {!openForm ? (
-            <TableContainer component={Paper}>
-              <Grid container spacing={1} px={2} py={2}>
-                <Grid item md={2} xs={6}>
-                  <GlobalFilter
-                    globalFilter={globalFilter}
-                    setGlobalFilter={setGlobalFilter}
-                  />
+            <>
+              <Dialog
+                open={openDeleteModal}
+                aria-labelledby="responsive-dialog-title"
+                PaperProps={{
+                  style: {
+                    width: "500px",
+                  },
+                }}
+              >
+                <DialogTitle id="responsive-dialog-title">
+                  Are you sure ?
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText color="black">
+                    Delete {deleteItem?.package_name}?
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ display: "flex", gap: "10px" }}>
+                  <Button autoFocus onClick={handleDeleteConfirmation}>
+                    Cancel
+                  </Button>
+                  <LoadingButton
+                    loading={deleteItem?.isDeleting}
+                    disabled={deleteItem?.isDeleting}
+                    variant="outlined"
+                    onClick={deleteApplication}
+                    autoFocus
+                  >
+                    Delete
+                  </LoadingButton>
+                </DialogActions>
+              </Dialog>
+              <TableContainer component={Paper}>
+                <Grid container spacing={1} px={2} py={2}>
+                  <Grid item md={2} xs={6}>
+                    <GlobalFilter
+                      globalFilter={globalFilter}
+                      setGlobalFilter={setGlobalFilter}
+                    />
+                  </Grid>
+                  <Grid item md={3} xs={6}>
+                    <CustomSelect
+                      placeholder="Select Project"
+                      options={projectDropdown}
+                      value={selectedProject}
+                      onChange={(e) => {
+                        setSelectedProject(e);
+                        getApplication(e);
+                      }}
+                      id="project"
+                      isClearable
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item md={3} xs={6}>
-                  <CustomSelect
-                    placeholder="Select Project"
-                    options={projectDropdown}
-                    value={selectedProject}
-                    onChange={(e) => {
-                      setSelectedProject(e);
-                      getApplication(e);
-                    }}
-                    id="project"
-                    isClearable
-                  />
-                </Grid>
-              </Grid>
-              <Box sx={{ width: "100%", overflowX: "auto", display: "block" }}>
-                <Table {...getTableProps()}>
-                  <TableHead>
-                    {headerGroups.map((headerGroup) => (
-                      <TableRow
-                        key={headerGroup.id}
-                        {...headerGroup.getHeaderGroupProps()}
-                      >
-                        {headerGroup.headers.map((column) => (
-                          <StyledTableCell
-                            key={column.id}
-                            {...column.getHeaderProps({
-                              style: { minWidth: column.minWidth },
-                            })}
-                            sx={{
-                              border: "1px solid #dbe0e5a6",
-                            }}
-                          >
-                            <HeaderSort column={column} />
-                          </StyledTableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableHead>
-                  {loadingData ? (
-                    <TableBody>
-                      <TableRow>
-                        <TableCell colSpan={columns.length + 1} align="center">
-                          <Box p={5} display="flex" justifyContent="center">
-                            <CircularProgress
-                              className="table_loader"
+                <Box
+                  sx={{ width: "100%", overflowX: "auto", display: "block" }}
+                >
+                  <Table {...getTableProps()}>
+                    <TableHead>
+                      {headerGroups.map((headerGroup) => (
+                        <TableRow
+                          className="last-header-right"
+                          key={headerGroup.id}
+                          {...headerGroup.getHeaderGroupProps()}
+                        >
+                          {headerGroup.headers.map((column) => (
+                            <StyledTableCell
+                              key={column.id}
+                              {...column.getHeaderProps({
+                                style: { minWidth: column.minWidth },
+                              })}
                               sx={{
-                                color: "#757575",
+                                border: "1px solid #dbe0e5a6",
                               }}
-                            />
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  ) : (
-                    <TableBody
-                      className="table_body_main"
-                      {...getTableBodyProps()}
-                    >
-                      {page.length > 0 ? (
-                        page.map((row) => {
-                          prepareRow(row);
-                          return (
-                            <TableRow key={row.id} {...row.getRowProps()}>
-                              {row.cells.map((cell) => (
-                                <StyledTableCell
-                                  key={cell.column.id}
-                                  {...cell.getCellProps({
-                                    style: { minWidth: cell.column.minWidth },
-                                  })}
-                                  sx={{
-                                    border: "1px solid #dbe0e5a6",
-                                  }}
-                                >
-                                  {cell.column.customCell ? (
-                                    <cell.column.customCell
-                                      value={cell.value}
-                                    />
-                                  ) : (
-                                    cell.render("Cell")
-                                  )}
-                                </StyledTableCell>
-                              ))}
-                            </TableRow>
-                          );
-                        })
-                      ) : (
+                            >
+                              <HeaderSort column={column} />
+                            </StyledTableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableHead>
+                    {loadingData ? (
+                      <TableBody>
                         <TableRow>
                           <TableCell
                             colSpan={columns.length + 1}
                             align="center"
                           >
-                            No Data
+                            <Box p={5} display="flex" justifyContent="center">
+                              <CircularProgress
+                                className="table_loader"
+                                sx={{
+                                  color: "#757575",
+                                }}
+                              />
+                            </Box>
                           </TableCell>
                         </TableRow>
-                      )}
-                    </TableBody>
-                  )}
-                </Table>
-              </Box>
-              <Box sx={{ p: 2, borderTop: "1px solid #dbe0e5a6" }}>
-                <TablePagination
-                  gotoPage={gotoPage}
-                  rows={data}
-                  setPageSize={setPageSize}
-                  pageIndex={pageIndex}
-                  pageSize={pageSize}
-                />
-              </Box>
-            </TableContainer>
+                      </TableBody>
+                    ) : (
+                      <TableBody
+                        className="table_body_main"
+                        {...getTableBodyProps()}
+                      >
+                        {page.length > 0 ? (
+                          page.map((row) => {
+                            prepareRow(row);
+                            return (
+                              <TableRow key={row.id} {...row.getRowProps()}>
+                                {row.cells.map((cell) => (
+                                  <StyledTableCell
+                                    key={cell.column.id}
+                                    {...cell.getCellProps({
+                                      style: { minWidth: cell.column.minWidth },
+                                    })}
+                                    sx={{
+                                      border: "1px solid #dbe0e5a6",
+                                    }}
+                                  >
+                                    {cell.column.customCell ? (
+                                      <cell.column.customCell
+                                        value={cell.value}
+                                      />
+                                    ) : (
+                                      cell.render("Cell")
+                                    )}
+                                  </StyledTableCell>
+                                ))}
+                              </TableRow>
+                            );
+                          })
+                        ) : (
+                          <TableRow>
+                            <TableCell
+                              colSpan={columns.length + 1}
+                              align="center"
+                            >
+                              No Data
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    )}
+                  </Table>
+                </Box>
+                <Box sx={{ p: 2, borderTop: "1px solid #dbe0e5a6" }}>
+                  <TablePagination
+                    gotoPage={gotoPage}
+                    rows={data}
+                    setPageSize={setPageSize}
+                    pageIndex={pageIndex}
+                    pageSize={pageSize}
+                  />
+                </Box>
+              </TableContainer>
+            </>
           ) : (
-            <Paper elevation={3}>
-              <Box>
-                <Grid container spacing={2.5} mt={1} className="pl-20 pr-20">
-                  <Grid item md={4} sx={{ pb: 2.5 }} className="w-full">
-                    <FormControl variant="standard" fullWidth>
-                      <Typography className="label d-flex items-center">
-                        Platform
-                        <sup className="asc">*</sup>
-                      </Typography>
-                      <CustomSelect
-                        placeholder="Select Application"
-                        options={applicationArr}
-                        value={selectedApp}
-                        onChange={(e) => {
-                          setSelectedApp(e);
-                        }}
-                        id="application"
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item md={4} sx={{ pb: 2.5 }} className="w-full">
-                    <FormControl variant="standard" fullWidth>
-                      <Typography className="label d-flex items-center">
-                        Project
-                        <sup className="asc">*</sup>
-                      </Typography>
-                      <CustomSelect
-                        placeholder="Select Project"
-                        options={projectDropdown}
-                        id="project"
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item md={12} className="w-full">
-                    <Divider textAlign="left">
-                      {selectedApp?.value?.toUpperCase()}
-                    </Divider>
-                  </Grid>
-                  {/* {selectedApp?.value === "Android" && ( */}
-                  <Grid item md={12} className="w-full">
-                    <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
-                      <Grid container sx={{ pt: 2.5, pb: 5 }}>
-                        <Grid item md={4} className="pr-24 w-full">
+            <Formik
+              enableReinitialize
+              initialValues={initialValues}
+              validationSchema={validationSchema}
+              onSubmit={onSubmit}
+            >
+              {({ setFieldValue, handleSubmit, values }) => (
+                <Form onSubmit={handleSubmit}>
+                  <Paper elevation={3}>
+                    <Box>
+                      <Grid
+                        container
+                        spacing={2.5}
+                        mt={1}
+                        className="pl-20 pr-20"
+                      >
+                        <Grid item md={4} sx={{ pb: 2.5 }} className="w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
-                              Package Name
+                              Platform
                               <sup className="asc">*</sup>
                             </Typography>
-                            <BootstrapInput
-                              fullWidth
-                              id="name"
-                              size="small"
-                              label="Name"
-                              name="name"
-                              placeholder="Name"
+                            <Field name="platform">
+                              {({ field }) => (
+                                <CustomSelect
+                                  {...field}
+                                  options={applicationArr}
+                                  placeholder="Select Application"
+                                  onChange={(option) =>
+                                    setFieldValue("platform", option)
+                                  }
+                                  id="application"
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="platform"
+                              component="div"
+                              className="text-error text-12 mt-5"
                             />
                           </FormControl>
                         </Grid>
-                        <Grid item md={8} className="w-full">
+                        <Grid item md={4} sx={{ pb: 2.5 }} className="w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
-                              Description
+                              Project
                               <sup className="asc">*</sup>
                             </Typography>
-                            <BootstrapInput
-                              fullWidth
-                              id="description"
-                              size="small"
-                              name="description"
-                              placeholder="Description"
+                            <Field name="p_id">
+                              {({ field }) => (
+                                <CustomSelect
+                                  {...field}
+                                  placeholder="Select Project"
+                                  options={projectDropdown}
+                                  id="p_id"
+                                  onChange={(option) =>
+                                    setFieldValue("p_id", option)
+                                  }
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="p_id"
+                              component="div"
+                              className="text-error text-12 mt-5"
                             />
                           </FormControl>
                         </Grid>
+                        <Grid item md={12} className="w-full">
+                          <Divider textAlign="left">
+                            {values?.platform?.value.toUpperCase()}
+                          </Divider>
+                        </Grid>
+                        {/* {selectedApp?.value === "Android" && ( */}
+                        <Grid item md={12} className="w-full">
+                          <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
+                            <Grid container sx={{ pt: 2.5, pb: 5 }}>
+                              <Grid item md={4} className="pr-24 w-full">
+                                <FormControl variant="standard" fullWidth>
+                                  <Typography className="label d-flex items-center">
+                                    Package Name
+                                    <sup className="asc">*</sup>
+                                  </Typography>
+                                  <Field name="package_name">
+                                    {({ field }) => (
+                                      <BootstrapInput
+                                        {...field}
+                                        fullWidth
+                                        id="package_name"
+                                        size="small"
+                                        placeholder="Package Name"
+                                        InputLabelProps={{ shrink: true }}
+                                      />
+                                    )}
+                                  </Field>
+                                  <ErrorMessage
+                                    name="package_name"
+                                    component="div"
+                                    className="text-error text-12 mt-5"
+                                  />
+                                </FormControl>
+                              </Grid>
+                              <Grid item md={8} className="w-full">
+                                <FormControl variant="standard" fullWidth>
+                                  <Typography className="label d-flex items-center">
+                                    Description
+                                    <sup className="asc">*</sup>
+                                  </Typography>
+                                  <Field name="description">
+                                    {({ field }) => (
+                                      <BootstrapInput
+                                        {...field}
+                                        fullWidth
+                                        id="description"
+                                        size="small"
+                                        placeholder="Description"
+                                        InputLabelProps={{ shrink: true }}
+                                      />
+                                    )}
+                                  </Field>
+                                  <ErrorMessage
+                                    name="description"
+                                    component="div"
+                                    className="text-error text-12 mt-5"
+                                  />
+                                </FormControl>
+                              </Grid>
 
-                        <Grid item md={4} className="pt-24 pr-24 w-full">
-                          <FormControl variant="standard" fullWidth>
-                            <Typography className="label d-flex items-center">
-                              Bundle ID
-                              <sup className="asc">*</sup>
-                            </Typography>
-                            <BootstrapInput
-                              fullWidth
-                              id="bundle-id"
-                              size="small"
-                              name="bundle-id"
-                              placeholder="Bundle ID"
-                            />
-                          </FormControl>
-                        </Grid>
+                              <Grid item md={4} className="pt-24 pr-24 w-full">
+                                <FormControl variant="standard" fullWidth>
+                                  <Typography className="label d-flex items-center">
+                                    Bundle ID
+                                    <sup className="asc">*</sup>
+                                  </Typography>
+                                  <Field name="bundle_id">
+                                    {({ field }) => (
+                                      <BootstrapInput
+                                        {...field}
+                                        fullWidth
+                                        id="bundle-id"
+                                        size="small"
+                                        placeholder="Bundle ID"
+                                        InputLabelProps={{ shrink: true }}
+                                      />
+                                    )}
+                                  </Field>
+                                  <ErrorMessage
+                                    name="bundle_id"
+                                    component="div"
+                                    className="text-error text-12 mt-5"
+                                  />
+                                </FormControl>
+                              </Grid>
 
-                        <Grid item md={4} className="pt-24 pr-24 w-full">
-                          <FormControl variant="standard" fullWidth>
-                            <Typography className="label d-flex items-center">
-                              Store URL
-                              <sup className="asc">*</sup>
-                            </Typography>
-                            <BootstrapInput
-                              fullWidth
-                              id="store-url"
-                              size="small"
-                              name="store-url"
-                              placeholder="Store URL"
-                            />
-                          </FormControl>
-                        </Grid>
+                              <Grid item md={4} className="pt-24 pr-24 w-full">
+                                <FormControl variant="standard" fullWidth>
+                                  <Typography className="label d-flex items-center">
+                                    Store URL
+                                    <sup className="asc">*</sup>
+                                  </Typography>
+                                  <Field name="store_url">
+                                    {({ field }) => (
+                                      <BootstrapInput
+                                        {...field}
+                                        fullWidth
+                                        id="store-url"
+                                        size="small"
+                                        placeholder="Store URL"
+                                        InputLabelProps={{ shrink: true }}
+                                      />
+                                    )}
+                                  </Field>
+                                  <ErrorMessage
+                                    name="store_url"
+                                    component="div"
+                                    className="text-error text-12 mt-5"
+                                  />
+                                </FormControl>
+                              </Grid>
 
-                        <Grid item md={4} className="pt-24 w-full">
-                          <FormControl variant="standard" fullWidth>
-                            <Typography className="label d-flex items-center">
-                              Dynamic URL
-                              <sup className="asc">*</sup>
-                            </Typography>
-                            <BootstrapInput
-                              fullWidth
-                              id="dynamic-url"
-                              size="small"
-                              name="dynamic-url"
-                              placeholder="Dynamic URL"
-                            />
-                          </FormControl>
+                              <Grid item md={4} className="pt-24 w-full">
+                                <FormControl variant="standard" fullWidth>
+                                  <Typography className="label d-flex items-center">
+                                    Dynamic URL
+                                    <sup className="asc">*</sup>
+                                  </Typography>
+                                  <Field name="dynamic_url">
+                                    {({ field }) => (
+                                      <BootstrapInput
+                                        {...field}
+                                        fullWidth
+                                        id="dynamic-url"
+                                        size="small"
+                                        placeholder="Dynamic URL"
+                                        InputLabelProps={{ shrink: true }}
+                                      />
+                                    )}
+                                  </Field>
+                                  <ErrorMessage
+                                    name="dynamic_url"
+                                    component="div"
+                                    className="text-error text-12 mt-5"
+                                  />
+                                </FormControl>
+                              </Grid>
+                            </Grid>
+                          </Box>
                         </Grid>
                       </Grid>
                     </Box>
-                  </Grid>
-                  {/* )} */}
-                  {/* {selectedApp?.value === "IOS" && (
+                    <Box className="p-20">
+                      <Grid container spacing={3}>
+                        <Grid item md={9} xs={2}></Grid>
+                        <Grid item md={1} xs={5}>
+                          <Button
+                            fullWidth
+                            variant="outlined"
+                            sx={{ backgroundColor: "primary.main" }}
+                            onClick={handleClose}
+                          >
+                            Cancel
+                          </Button>
+                        </Grid>
+                        <Grid item md={2} xs={5}>
+                          <LoadingButton
+                            loading={submitForm}
+                            disabled={submitForm}
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            sx={{ backgroundColor: "primary.main" }}
+                          >
+                            Save
+                          </LoadingButton>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  </Paper>
+                </Form>
+              )}
+            </Formik>
+          )}
+        </Grid>
+      </Grid>
+    </>
+  );
+}
+
+export default Application;
+
+// const handleAndroidOpen = () => {
+//   setOpenAndroid(true);
+// };
+// const handleAndroidClose = () => {
+//   setOpenAndroid(false);
+// };
+// const handleIOSOpen = () => {
+//   setOpenIOS(true);
+// };
+// const handleIOSClose = () => {
+//   setOpenIOS(false);
+// };
+// const handleWebOpen = () => {
+//   setOpenWeb(true);
+// };
+// const handleWebClose = () => {
+//   setOpenWeb(false);
+// };
+// {
+/* )} */
+// }
+// {
+/* {selectedApp?.value === "IOS" && (
                     <Grid item xs={12}>
                       <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
                         <Grid
@@ -597,60 +902,5 @@ function Application() {
                         </Grid>
                       </Box>
                     </Grid>
-                  )} */}
-                </Grid>
-              </Box>
-              <Box className="p-20">
-                <Grid container spacing={3}>
-                  <Grid item md={9} xs={2}></Grid>
-                  <Grid item md={1} xs={5}>
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      sx={{ backgroundColor: "primary.main" }}
-                      onClick={handleClose}
-                    >
-                      Cancel
-                    </Button>
-                  </Grid>
-                  <Grid item md={2} xs={5}>
-                    <Button
-                      type="submit"
-                      fullWidth
-                      variant="contained"
-                      sx={{ backgroundColor: "primary.main" }}
-                      onClick={handleClose}
-                    >
-                      Save
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Paper>
-          )}
-        </Grid>
-      </Grid>
-    </>
-  );
-}
-
-export default Application;
-
-// const handleAndroidOpen = () => {
-//   setOpenAndroid(true);
-// };
-// const handleAndroidClose = () => {
-//   setOpenAndroid(false);
-// };
-// const handleIOSOpen = () => {
-//   setOpenIOS(true);
-// };
-// const handleIOSClose = () => {
-//   setOpenIOS(false);
-// };
-// const handleWebOpen = () => {
-//   setOpenWeb(true);
-// };
-// const handleWebClose = () => {
-//   setOpenWeb(false);
-// };
+                  )} */
+// }

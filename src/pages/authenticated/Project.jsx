@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
-import { styled } from "@mui/material/styles";
 import {
   Box,
   Button,
@@ -21,14 +20,11 @@ import {
   Table,
   TableBody,
   TableCell,
-  tableCellClasses,
   TableContainer,
   TableHead,
   TableRow,
   Tooltip,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from "@mui/material";
 import { BootstrapInput } from "../../utils/Input/textfield";
 // third-party
@@ -381,7 +377,7 @@ function Project() {
                 }}
               >
                 <DialogTitle id="responsive-dialog-title">
-                  {"Are you sure?"}
+                  {"Are you sure ?"}
                 </DialogTitle>
                 <DialogContent>
                   <DialogContentText color="black">
