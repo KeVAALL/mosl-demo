@@ -56,7 +56,8 @@ export default function ResetSignIn() {
           navigate("/reset-password");
         } else {
           toast.success("Successful!");
-          navigate("/home/dashboard");
+          const firstURL = result?.data?.data?.menu[0]?.menu_url;
+          navigate(`/home/${firstURL ? firstURL : ""}`);
         }
 
         const apiResponse = {

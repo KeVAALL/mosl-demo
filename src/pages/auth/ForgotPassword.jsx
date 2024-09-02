@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import { ApiService } from "../../utils/api/apiCall";
 import { setProfile } from "../../redux/slices/userSlice";
 import { setMenu } from "../../redux/slices/menuSlice";
+import KeyboardBackspaceOutlinedIcon from "@mui/icons-material/KeyboardBackspaceOutlined";
 import "./auth.css";
 import { encryptData } from "../../utils/encryption";
 
@@ -160,6 +161,19 @@ export default function ForgotPassword() {
               )}
             </Formik>
           </Grid>
+          <Stack
+            flexDirection="row"
+            alignItems="center"
+            gap={0.5}
+            sx={{ width: "100%", mt: 2 }}
+          >
+            <KeyboardBackspaceOutlinedIcon
+              style={{ fontSize: "20px", paddingTop: "4px" }}
+            />
+            <Link href="/sign-in" className="custom-link">
+              <Typography variant="caption">Go back</Typography>
+            </Link>
+          </Stack>
         </Grid>
       </Container>
     </Box>
