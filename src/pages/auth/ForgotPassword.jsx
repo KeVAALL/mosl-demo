@@ -35,8 +35,9 @@ export default function ForgotPassword() {
         console.log(result);
 
         if (result?.data?.result_flag) {
-          navigate("/reset-password");
-          localStorage.setItem("resetEmail", encryptData("email@gmalil.com"));
+          toast.success("Please check your email for the new password.");
+          localStorage.setItem("resetEmail", encryptData(values?.email));
+          navigate("/reset-sign-in");
         }
         // const apiResponse = {
         //   userProfile: result?.data?.data,

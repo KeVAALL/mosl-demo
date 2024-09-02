@@ -5,45 +5,68 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { Field, Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import {
-  FormControl,
-  IconButton,
-  InputAdornment,
-  Link,
-  Stack,
-} from "@mui/material";
+import { FormControl, IconButton, InputAdornment, Stack } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import KeyboardBackspaceOutlinedIcon from "@mui/icons-material/KeyboardBackspaceOutlined";
 import { BootstrapInput } from "../../utils/Input/textfield";
+import { useNavigate } from "react-router-dom";
+import Link from "@mui/material/Link";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { ApiService } from "../../utils/api/apiCall";
 import "./auth.css";
-import { decryptData } from "../../utils/encryption";
-import { useNavigate } from "react-router-dom";
+import KeyboardBackspaceOutlinedIcon from "@mui/icons-material/KeyboardBackspaceOutlined";
+import { decryptData, encryptData } from "../../utils/encryption";
+import { setProfile } from "../../redux/slices/userSlice";
+import { setMenu } from "../../redux/slices/menuSlice";
 
-export default function ResetPassword() {
+export default function ResetSignIn() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [loginAttempt, setLoginAttempt] = useState(false);
   const resetEmail = decryptData(localStorage.getItem("resetEmail"));
+  const [signInForm, setSignInForm] = useState({
+    email: resetEmail ? resetEmail : "",
+    password: "",
+  });
+  const validationSchema = Yup.object({
+    email: Yup.string()
+      .trim()
+      .email("Invalid email")
+      .required("Email is required"),
+    password: Yup.string().required("Password is required"),
+  });
   const handleSubmit = async (values) => {
-    console.log({ email: resetEmail, password: values?.newPassword });
-
-    const reqdata = { email: resetEmail, password: values?.newPassword };
+    console.log(values);
 
     try {
       setLoginAttempt(true);
-      const result = await ApiService(reqdata, "user/updatePassword");
+      const result = await ApiService(values, "user/login");
       if (result) {
-        console.log(result?.data?.data);
+        console.log(result);
 
-        if (result?.data?.result_flag) {
-          toast.success(`Password Updated for ${resetEmail}`);
-          navigate("/sign-in");
-          localStorage.removeItem("resetEmail");
+        if (result?.data?.result_flag === 0) {
+          toast.error("Invalid Credentials");
+          return;
         }
+
+        if (result?.data?.data?.is_password_reset) {
+          toast.warn("Please reset your Password!");
+          localStorage.setItem("resetEmail", encryptData(values?.email));
+          navigate("/reset-password");
+        } else {
+          toast.success("Successful!");
+          navigate("/home/dashboard");
+        }
+
+        const apiResponse = {
+          userProfile: result?.data?.data,
+          token: result?.data?.data?.token?.access_token,
+        };
+        dispatch(setProfile(apiResponse));
+
+        const apiMenu = { menu: result?.data?.data?.menu };
+        dispatch(setMenu(apiMenu));
 
         return result;
       }
@@ -53,34 +76,13 @@ export default function ResetPassword() {
       setLoginAttempt(false);
     }
   };
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const handleClickShowNewPassword = () => {
-    setShowNewPassword(!showNewPassword);
-  };
-  const handleClickShowConfirmPassword = () => {
-    setShowConfirmPassword(!showConfirmPassword);
+  const [showPassword, setShowPassword] = useState(false);
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
   };
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-  const validationSchema = Yup.object({
-    newPassword: Yup.string()
-      .min(8, "Password must be at least 8 characters long")
-      .matches(/[0-9]/, "Password must contain at least 1 numeric character")
-      .matches(
-        /[!@#$%^&*(),.?":{}|<>]/,
-        "Password must contain at least 1 special character"
-      )
-      .required("Password is required"),
-    confirmPassword: Yup.string()
-      .required("Password is required")
-      .test(
-        "confirmPassword",
-        "Both Password should match!",
-        (confirmPassword, yup) => yup.parent.newPassword === confirmPassword
-      ),
-  });
 
   return (
     <Box
@@ -109,16 +111,16 @@ export default function ResetPassword() {
                 variant="h5"
                 sx={{ color: "primary.main", fontWeight: 500 }}
               >
-                Admin
+                MOSL Dynamic Links
               </Typography>
               <Typography variant="caption" sx={{ color: "text.grey" }}>
-                Reset Password for {resetEmail}
+                Sign In
               </Typography>
             </Stack>
           </Grid>
           <Grid container direction="column">
             <Formik
-              initialValues={{ newPassword: "", confirmPassword: "" }}
+              initialValues={signInForm}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
@@ -128,41 +130,24 @@ export default function ResetPassword() {
                     <Grid item xs={12}>
                       <FormControl variant="standard" fullWidth>
                         <Typography className="label d-flex items-center">
-                          New Password
+                          Email
                           <sup className="asc">*</sup>
                         </Typography>
-                        <Field name="newPassword">
+
+                        <Field name="email">
                           {({ field }) => (
                             <BootstrapInput
                               {...field}
-                              id="newPassword"
-                              placeholder="Password"
-                              type={showNewPassword ? "text" : "password"}
-                              fullWidth
+                              id="email"
                               size="small"
+                              placeholder="Email Address"
+                              fullWidth
                               InputLabelProps={{ shrink: true }}
-                              endAdornment={
-                                <InputAdornment position="end">
-                                  <IconButton
-                                    aria-label="toggle password visibility"
-                                    onClick={handleClickShowNewPassword}
-                                    onMouseDown={handleMouseDownPassword}
-                                    onMouseUp={handleMouseDownPassword}
-                                    edge="end"
-                                  >
-                                    {showNewPassword ? (
-                                      <Visibility fontSize="small" />
-                                    ) : (
-                                      <VisibilityOff fontSize="small" />
-                                    )}
-                                  </IconButton>
-                                </InputAdornment>
-                              }
                             />
                           )}
                         </Field>
                         <ErrorMessage
-                          name="newPassword"
+                          name="email"
                           component="div"
                           className="text-error text-12 mt-5"
                         />
@@ -171,16 +156,16 @@ export default function ResetPassword() {
                     <Grid item xs={12}>
                       <FormControl variant="standard" fullWidth>
                         <Typography className="label d-flex items-center">
-                          Confirm Password
+                          Password
                           <sup className="asc">*</sup>
                         </Typography>
-                        <Field name="confirmPassword">
+                        <Field name="password">
                           {({ field }) => (
                             <BootstrapInput
                               {...field}
-                              id="confirmPassword"
+                              id="password"
                               placeholder="Password"
-                              type={showConfirmPassword ? "text" : "password"}
+                              type={showPassword ? "text" : "password"}
                               fullWidth
                               size="small"
                               InputLabelProps={{ shrink: true }}
@@ -188,12 +173,12 @@ export default function ResetPassword() {
                                 <InputAdornment position="end">
                                   <IconButton
                                     aria-label="toggle password visibility"
-                                    onClick={handleClickShowConfirmPassword}
+                                    onClick={handleClickShowPassword}
                                     onMouseDown={handleMouseDownPassword}
                                     onMouseUp={handleMouseDownPassword}
                                     edge="end"
                                   >
-                                    {showConfirmPassword ? (
+                                    {showPassword ? (
                                       <Visibility fontSize="small" />
                                     ) : (
                                       <VisibilityOff fontSize="small" />
@@ -205,13 +190,20 @@ export default function ResetPassword() {
                           )}
                         </Field>
                         <ErrorMessage
-                          name="confirmPassword"
+                          name="password"
                           component="div"
                           className="text-error text-12 mt-5"
                         />
                       </FormControl>
                     </Grid>
 
+                    {/* <Grid item xs={6} alignItems="flex-end">
+                      <Link href="/forgot-password" className="custom-link">
+                        <Typography variant="caption">
+                          Forgot password?
+                        </Typography>
+                      </Link>
+                    </Grid> */}
                     <Grid item xs={12}>
                       <Box
                         sx={{
@@ -229,13 +221,14 @@ export default function ResetPassword() {
                           variant="contained"
                           sx={{ mt: 1, mb: 1, backgroundColor: "primary.main" }}
                         >
-                          Reset Password
+                          Sign In
                         </LoadingButton>
                       </Box>
                     </Grid>
+
                     <Grid
                       item
-                      md={3}
+                      md={6}
                       xs={6}
                       component={Stack}
                       flexDirection="row"
@@ -245,7 +238,7 @@ export default function ResetPassword() {
                       <KeyboardBackspaceOutlinedIcon
                         style={{ fontSize: "20px", paddingTop: "4px" }}
                       />
-                      <Link href="/sign-in" className="custom-link">
+                      <Link href="/forgot-password" className="custom-link">
                         <Typography variant="caption">Go back</Typography>
                       </Link>
                     </Grid>

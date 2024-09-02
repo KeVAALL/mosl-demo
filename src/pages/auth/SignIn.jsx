@@ -17,6 +17,7 @@ import { ApiService } from "../../utils/api/apiCall";
 import { setProfile } from "../../redux/slices/userSlice";
 import { setMenu } from "../../redux/slices/menuSlice";
 import "./auth.css";
+import { encryptData } from "../../utils/encryption";
 
 export default function SignIn() {
   const dispatch = useDispatch();
@@ -31,14 +32,13 @@ export default function SignIn() {
       .trim()
       .email("Invalid email")
       .required("Email is required"),
-    password: Yup.string()
-      .min(8, "Password must be at least 8 characters long")
-      .matches(/[0-9]/, "Password must contain at least 1 numeric character")
-      .matches(
-        /[!@#$%^&*(),.?":{}|<>]/,
-        "Password must contain at least 1 special character"
-      )
-      .required("Password is required"),
+    password: Yup.string().required("Password is required"),
+    // .min(8, "Password must be at least 8 characters long")
+    // .matches(/[0-9]/, "Password must contain at least 1 numeric character")
+    // .matches(
+    //   /[!@#$%^&*(),.?":{}|<>]/,
+    //   "Password must contain at least 1 special character"
+    // )
   });
   const handleSubmit = async (values) => {
     console.log(values);
@@ -56,6 +56,7 @@ export default function SignIn() {
 
         if (result?.data?.data?.is_password_reset) {
           toast.warn("Please reset your Password!");
+          localStorage.setItem("resetEmail", encryptData(values?.email));
           navigate("/reset-password");
         } else {
           toast.success("Successful!");
@@ -114,7 +115,7 @@ export default function SignIn() {
                 variant="h5"
                 sx={{ color: "primary.main", fontWeight: 500 }}
               >
-                Admin
+                MOSL Dynamic Links
               </Typography>
               <Typography variant="caption" sx={{ color: "text.grey" }}>
                 Sign In

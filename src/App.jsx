@@ -21,6 +21,7 @@ import DynamicLink from "./pages/authenticated/DynamicLink";
 import ResetPassword from "./pages/auth/ResetPassword";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import { useSelector } from "react-redux";
+import ResetSignIn from "./pages/auth/ResetSignIn.";
 
 const theme = createTheme({
   breakpoints: {
@@ -62,6 +63,10 @@ function App() {
         {
           path: "sign-in",
           element: <SignIn />,
+        },
+        {
+          path: "reset-sign-in",
+          element: <ResetSignIn />,
         },
         {
           path: "forgot-password",

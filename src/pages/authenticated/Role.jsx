@@ -268,6 +268,7 @@ function Role() {
                   variant="outlined"
                   startIcon={<DeleteForeverOutlinedIcon />}
                   onClick={() => {
+                    console.log(row?.original);
                     setDeleteItem(row?.original);
                     handleDeleteConfirmation();
                   }}
@@ -374,7 +375,7 @@ function Role() {
                 </DialogTitle>
                 <DialogContent>
                   <DialogContentText color="black">
-                    Delete {deleteItem?.package_name}?
+                    Delete {deleteItem?.role_name}?
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ display: "flex", gap: "10px" }}>
