@@ -161,7 +161,7 @@ export default function ForgotPassword() {
               )}
             </Formik>
           </Grid>
-          <Stack
+          {/* <Stack
             flexDirection="row"
             alignItems="center"
             gap={0.5}
@@ -173,7 +173,7 @@ export default function ForgotPassword() {
             <Link href="/sign-in" className="custom-link">
               <Typography variant="caption">Go back</Typography>
             </Link>
-          </Stack>
+          </Stack> */}
         </Grid>
       </Container>
     </Box>

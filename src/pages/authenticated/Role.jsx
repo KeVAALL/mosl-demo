@@ -107,7 +107,7 @@ function Role() {
     console.log(values);
 
     const reqdata = {
-      role_id: formEditing ? values?.role_id : "",
+      role_id: formEditing ? values?.role_id : 0,
       role_name: values?.role_name,
       menuIds: values?.selectedMenus,
       created_by: userProfile?.user_role_id,
