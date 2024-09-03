@@ -122,7 +122,7 @@ export default function ResetPassword() {
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
-              {({ errors, touched }) => (
+              {({ setFieldValue, errors, touched }) => (
                 <Form>
                   <Grid container spacing={2} direction="column">
                     <Grid item xs={12}>
@@ -141,6 +141,16 @@ export default function ResetPassword() {
                               fullWidth
                               size="small"
                               InputLabelProps={{ shrink: true }}
+                              onChange={async (e) => {
+                                const value = e.target.value;
+                                const regex = /^\S+$/;
+
+                                if (!value || regex.test(value.toString())) {
+                                  setFieldValue("newPassword", value);
+                                } else {
+                                  return;
+                                }
+                              }}
                               endAdornment={
                                 <InputAdornment position="end">
                                   <IconButton
@@ -184,6 +194,16 @@ export default function ResetPassword() {
                               fullWidth
                               size="small"
                               InputLabelProps={{ shrink: true }}
+                              onChange={async (e) => {
+                                const value = e.target.value;
+                                const regex = /^\S+$/;
+
+                                if (!value || regex.test(value.toString())) {
+                                  setFieldValue("confirmPassword", value);
+                                } else {
+                                  return;
+                                }
+                              }}
                               endAdornment={
                                 <InputAdornment position="end">
                                   <IconButton

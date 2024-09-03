@@ -125,7 +125,7 @@ export default function ResetSignIn() {
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
-              {({ errors, touched }) => (
+              {({ setFieldValue, errors, touched }) => (
                 <Form>
                   <Grid container spacing={2} direction="column">
                     <Grid item xs={12}>
@@ -144,6 +144,18 @@ export default function ResetSignIn() {
                               placeholder="Email Address"
                               fullWidth
                               InputLabelProps={{ shrink: true }}
+                              onChange={(e) => {
+                                e.preventDefault();
+                                const { value } = e.target;
+
+                                const regex = /[^-\s]/;
+
+                                if (!value || regex.test(value.toString())) {
+                                  setFieldValue("email", value);
+                                } else {
+                                  return;
+                                }
+                              }}
                             />
                           )}
                         </Field>
@@ -170,6 +182,16 @@ export default function ResetSignIn() {
                               fullWidth
                               size="small"
                               InputLabelProps={{ shrink: true }}
+                              onChange={async (e) => {
+                                const value = e.target.value;
+                                const regex = /^\S+$/;
+
+                                if (!value || regex.test(value.toString())) {
+                                  setFieldValue("password", value);
+                                } else {
+                                  return;
+                                }
+                              }}
                               endAdornment={
                                 <InputAdornment position="end">
                                   <IconButton

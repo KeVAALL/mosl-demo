@@ -111,7 +111,7 @@ export default function ForgotPassword() {
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
-              {({ errors, touched }) => (
+              {({ setFieldValue, errors, touched }) => (
                 <Form>
                   <Grid container spacing={2} direction="column">
                     <Grid item xs={12}>
@@ -130,6 +130,18 @@ export default function ForgotPassword() {
                               placeholder="Email Address"
                               fullWidth
                               InputLabelProps={{ shrink: true }}
+                              onChange={(e) => {
+                                e.preventDefault();
+                                const { value } = e.target;
+
+                                const regex = /[^-\s]/;
+
+                                if (!value || regex.test(value.toString())) {
+                                  setFieldValue("email", value);
+                                } else {
+                                  return;
+                                }
+                              }}
                             />
                           )}
                         </Field>
