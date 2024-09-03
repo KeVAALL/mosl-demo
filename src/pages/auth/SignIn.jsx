@@ -17,6 +17,7 @@ import { ApiService } from "../../utils/api/apiCall";
 import { setProfile } from "../../redux/slices/userSlice";
 import { setMenu } from "../../redux/slices/menuSlice";
 import "./auth.css";
+import mainLogo from "../../assets/img/mosl-main-logo.png";
 import { encryptData } from "../../utils/encryption";
 
 export default function SignIn() {
@@ -78,7 +79,7 @@ export default function SignIn() {
     } catch (err) {
       toast.error(err?.response?.data?.message);
     } finally {
-      setLoginAttempt(false);
+      // setLoginAttempt(false);
     }
   };
   const [showPassword, setShowPassword] = useState(false);
@@ -94,33 +95,43 @@ export default function SignIn() {
       className="poppins"
       sx={{
         minHeight: "100vh",
+        display: "flex",
       }}
     >
-      <Container component="main" maxWidth="xs">
+      <Container
+        component="main"
+        maxWidth="xs"
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          margin: "auto",
+        }}
+      >
         <Grid
           container
           spacing={3}
+          className="bg-secondary p-20"
           sx={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             width: "100%",
-            minHeight: "100vh",
+            minHeight: "400px",
             margin: "auto",
+            borderRadius: "8px",
           }}
         >
-          <Grid item xs={12} mb={3}>
+          <Grid item xs={12} mb={3} className="pt-0">
             <Stack alignItems="center">
-              <Typography
-                variant="h5"
-                sx={{ color: "primary.main", fontWeight: 500 }}
-              >
-                MOSL Dynamic Links
-              </Typography>
-              <Typography variant="caption" sx={{ color: "text.grey" }}>
-                Sign In
-              </Typography>
+              <img
+                src={mainLogo}
+                style={{
+                  height: "80px",
+                  width: "100%",
+                }}
+              />
             </Stack>
           </Grid>
           <Grid container direction="column">

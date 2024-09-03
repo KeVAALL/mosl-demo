@@ -524,6 +524,11 @@ h1 {
 .mt-10 {
   margin-top: 10px !important;
 }
+:root {
+  --primary: #eb6400;
+  --secondary: #fdaf17;
+  --highlight: #f5ecd7;
+}
 .text-error {
   color: red;
 }
@@ -538,6 +543,15 @@ h1 {
 }
 .items-center {
   align-items: center;
+}
+.bg-primary {
+  background-color: var(--primary) !important;
+}
+.bg-secondary {
+  background-color: var(--secondary) !important;
+}
+.bg-highlight {
+  background-color: var(--highlight) !important;
 }
 button {
   border-radius: 8px;
@@ -692,7 +706,7 @@ input:-webkit-autofill:active {
   width: 24px !important;
 }
 .MuiLoadingButton-loadingIndicator {
-  color: #757575 !important;
+  color: #ffffff !important;
 }
 .w-full {
   width: 100% !important;

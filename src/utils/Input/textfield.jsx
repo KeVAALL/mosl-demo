@@ -10,7 +10,7 @@ export const BootstrapInput = styled(InputBase)(
     "& .MuiInputBase-input": {
       borderRadius: 4,
       position: "relative",
-      backgroundColor: "#fff",
+      backgroundColor: "#fff !important",
       border: "1px solid",
       borderColor: theme.palette.mode === "light" ? "#E0E3E7" : "#2D3843",
       fontSize: 14,
@@ -24,8 +24,8 @@ export const BootstrapInput = styled(InputBase)(
       ]),
       fontFamily: '"Poppins", sans-serif',
       "&:focus": {
-        boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 0.1rem`,
-        borderColor: theme.palette.primary.main,
+        // boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 0.1rem`,
+        // borderColor: theme.palette.primary.main,
       },
     },
     "& .MuiInputAdornment-root": {
@@ -41,8 +41,8 @@ export const BootstrapInput = styled(InputBase)(
       right: 12, // Adjust position as required
     },
     "& .MuiInputBase-input:-webkit-autofill": {
-      backgroundColor: "#F3F6F9 !important",
-      color: "#000 !important",
+      // backgroundColor: "#F3F6F9 !important",
+      // color: "#000 !important",
     },
   })
 );

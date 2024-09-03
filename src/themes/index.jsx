@@ -52,10 +52,10 @@ export default function ThemeCustomization({ children }) {
         styleOverrides: {
           contained: {
             textTransform: "capitalize",
-            backgroundColor: "#000000", // Black background
-            // backgroundColor: "#fdaf17", // Black background
+            // backgroundColor: "#000000", // Black background
+            backgroundColor: "#eb6400", // Black background
             color: "#FFFFFF", // White text
-            border: "1px solid #000000", // Black border
+            // border: "1px solid #000000", // Black border
             padding: "6px 16px", // Set padding
             "&:hover": {
               backgroundColor: "#333333", // Slightly lighter black on hover
@@ -64,11 +64,36 @@ export default function ThemeCustomization({ children }) {
           outlined: {
             textTransform: "capitalize",
             backgroundColor: "#FFFFFF !important", // White background
-            // color: "#616161", // Black text
             color: "#000000", // Black text
             border: "1px solid #000000", // Border color
             padding: "6px 16px", // Set padding
             boxShadow: "0px 1px 3px rgba(0, 0, 0, 0.12)", // Subtle box shadow
+            "&:hover": {
+              backgroundColor: "#f5f5f5", // Slightly off-white on hover
+            },
+          },
+        },
+      },
+      MuiLoadingButton: {
+        styleOverrides: {
+          root: {
+            border: "none !important", // Black border
+            backgroundColor: "#eb6400 !important", // Custom background color
+            textTransform: "capitalize", // Capitalize text
+            padding: "6px 16px", // Set padding
+            borderRadius: "4px", // Rounded corners
+          },
+          contained: {
+            backgroundColor: "#eb6400 !important", // Custom background color
+            color: "#FFFFFF", // White text
+            "&:hover": {
+              backgroundColor: "#333333", // Slightly lighter black on hover
+            },
+          },
+          outlined: {
+            backgroundColor: "#FFFFFF", // White background
+            color: "#eb6400", // Black text
+            border: "1px solid #eb6400", // Black border
             "&:hover": {
               backgroundColor: "#f5f5f5", // Slightly off-white on hover
             },
