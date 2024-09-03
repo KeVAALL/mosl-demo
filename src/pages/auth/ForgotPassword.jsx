@@ -94,12 +94,12 @@ export default function ForgotPassword() {
         >
           <Grid item xs={12} mb={3}>
             <Stack alignItems="center">
-              <Typography
+              {/* <Typography
                 variant="h5"
                 sx={{ color: "primary.main", fontWeight: 500 }}
               >
                 Admin
-              </Typography>
+              </Typography> */}
               <Typography variant="caption" sx={{ color: "text.grey" }}>
                 Forgot Password
               </Typography>
