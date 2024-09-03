@@ -595,6 +595,21 @@ function User() {
                                   InputLabelProps={{
                                     shrink: true,
                                   }}
+                                  onChange={(e) => {
+                                    e.preventDefault();
+                                    const { value } = e.target;
+
+                                    const regex = /[^-\s]/;
+
+                                    if (
+                                      !value ||
+                                      regex.test(value.toString())
+                                    ) {
+                                      setFieldValue("email", value);
+                                    } else {
+                                      return;
+                                    }
+                                  }}
                                 />
                               )}
                             </Field>
@@ -622,6 +637,19 @@ function User() {
                                   placeholder="Password"
                                   InputLabelProps={{
                                     shrink: true,
+                                  }}
+                                  onChange={async (e) => {
+                                    const value = e.target.value;
+                                    const regex = /^\S+$/;
+
+                                    if (
+                                      !value ||
+                                      regex.test(value.toString())
+                                    ) {
+                                      setFieldValue("password", value);
+                                    } else {
+                                      return;
+                                    }
                                   }}
                                   endAdornment={
                                     <InputAdornment position="end">
@@ -711,6 +739,7 @@ function User() {
                                   options={roleDropdown}
                                   placeholder="Select Role"
                                   id="role_id"
+                                  isSearchable={false}
                                   onChange={(selectedOption) =>
                                     setFieldValue("role_id", selectedOption)
                                   }

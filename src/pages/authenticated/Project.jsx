@@ -548,6 +548,21 @@ function Project() {
                                   size="small"
                                   placeholder="Project Name"
                                   InputLabelProps={{ shrink: true }}
+                                  onChange={(e) => {
+                                    e.preventDefault();
+                                    const { value } = e.target;
+
+                                    const regex = /^[a-zA-Z][a-zA-Z\s]*$/;
+
+                                    if (
+                                      !value ||
+                                      regex.test(value.toString())
+                                    ) {
+                                      setFieldValue("project_name", value);
+                                    } else {
+                                      return;
+                                    }
+                                  }}
                                 />
                               )}
                             </Field>
@@ -577,8 +592,17 @@ function Project() {
                                   InputLabelProps={{ shrink: true }}
                                   onChange={async (e) => {
                                     const value = e.target.value;
-                                    setFieldValue("project_id", value);
-                                    setSuccessMessage("");
+                                    const regex = /^\S+$/;
+
+                                    if (
+                                      !value ||
+                                      regex.test(value.toString())
+                                    ) {
+                                      setFieldValue("project_id", value);
+                                      setSuccessMessage("");
+                                    } else {
+                                      return;
+                                    }
                                     if (value?.length > 15) {
                                       const response = await checkProjectUnique(
                                         value
@@ -676,6 +700,24 @@ function Project() {
                                   size="small"
                                   placeholder="Project Description"
                                   InputLabelProps={{ shrink: true }}
+                                  onChange={(e) => {
+                                    e.preventDefault();
+                                    const { value } = e.target;
+
+                                    const regex = /^[a-zA-Z][a-zA-Z\s]*$/;
+
+                                    if (
+                                      !value ||
+                                      regex.test(value.toString())
+                                    ) {
+                                      setFieldValue(
+                                        "project_description",
+                                        value
+                                      );
+                                    } else {
+                                      return;
+                                    }
+                                  }}
                                 />
                               )}
                             </Field>

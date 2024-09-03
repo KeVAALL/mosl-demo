@@ -573,6 +573,7 @@ function Application() {
                                     setFieldValue("platform", option)
                                   }
                                   id="application"
+                                  isSearchable={false}
                                 />
                               )}
                             </Field>
@@ -633,6 +634,24 @@ function Application() {
                                         size="small"
                                         placeholder="Package Name"
                                         InputLabelProps={{ shrink: true }}
+                                        onChange={(e) => {
+                                          e.preventDefault();
+                                          const { value } = e.target;
+
+                                          const regex = /^[a-zA-Z][a-zA-Z\s]*$/;
+
+                                          if (
+                                            !value ||
+                                            regex.test(value.toString())
+                                          ) {
+                                            setFieldValue(
+                                              "package_name",
+                                              value
+                                            );
+                                          } else {
+                                            return;
+                                          }
+                                        }}
                                       />
                                     )}
                                   </Field>
@@ -658,6 +677,21 @@ function Application() {
                                         size="small"
                                         placeholder="Description"
                                         InputLabelProps={{ shrink: true }}
+                                        onChange={(e) => {
+                                          e.preventDefault();
+                                          const { value } = e.target;
+
+                                          const regex = /^[a-zA-Z][a-zA-Z\s]*$/;
+
+                                          if (
+                                            !value ||
+                                            regex.test(value.toString())
+                                          ) {
+                                            setFieldValue("description", value);
+                                          } else {
+                                            return;
+                                          }
+                                        }}
                                       />
                                     )}
                                   </Field>
@@ -684,6 +718,19 @@ function Application() {
                                         size="small"
                                         placeholder="Bundle ID"
                                         InputLabelProps={{ shrink: true }}
+                                        onChange={async (e) => {
+                                          const value = e.target.value;
+                                          const regex = /^\S+$/;
+
+                                          if (
+                                            !value ||
+                                            regex.test(value.toString())
+                                          ) {
+                                            setFieldValue("bundle_id", value);
+                                          } else {
+                                            return;
+                                          }
+                                        }}
                                       />
                                     )}
                                   </Field>
@@ -710,6 +757,19 @@ function Application() {
                                         size="small"
                                         placeholder="Store URL"
                                         InputLabelProps={{ shrink: true }}
+                                        onChange={async (e) => {
+                                          const value = e.target.value;
+                                          const regex = /^\S+$/;
+
+                                          if (
+                                            !value ||
+                                            regex.test(value.toString())
+                                          ) {
+                                            setFieldValue("store_url", value);
+                                          } else {
+                                            return;
+                                          }
+                                        }}
                                       />
                                     )}
                                   </Field>
@@ -736,6 +796,19 @@ function Application() {
                                         size="small"
                                         placeholder="Dynamic URL"
                                         InputLabelProps={{ shrink: true }}
+                                        onChange={async (e) => {
+                                          const value = e.target.value;
+                                          const regex = /^\S+$/;
+
+                                          if (
+                                            !value ||
+                                            regex.test(value.toString())
+                                          ) {
+                                            setFieldValue("dynamic_url", value);
+                                          } else {
+                                            return;
+                                          }
+                                        }}
                                       />
                                     )}
                                   </Field>

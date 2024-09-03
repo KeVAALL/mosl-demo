@@ -62,7 +62,6 @@ function DynamicLink() {
   const [submitForm, setSubmitForm] = useState(false);
   const [initialValues, setInitialValues] = useState({
     p_id: null,
-    application_id: null,
     deep_link_url_prefix: "",
     deep_link_url_suffix: "",
     dynamic_link_url: "",
@@ -80,7 +79,6 @@ function DynamicLink() {
     open_in_android: Yup.string().required(
       "Link behavior for Android is required"
     ),
-    application_id: Yup.object().required("Application is required"),
     //   .when("open_in_apple", {
     //   is: "App",
     //   then: Yup.object().required("Application is required"),
