@@ -230,13 +230,13 @@ function Project() {
 
           return (
             <Stack direction="row" justifyContent="flex-end" spacing={2}>
-              <Tooltip title="View" placement="top" arrow>
+              {/* <Tooltip title="View" placement="top" arrow>
                 <Button
                   className="mui-icon-button"
                   variant="outlined"
                   startIcon={<VisibilityOutlined />}
                 />
-              </Tooltip>
+              </Tooltip> */}
               <Tooltip title="Edit" placement="top" arrow>
                 <LoadingButton
                   loading={isEditing}
