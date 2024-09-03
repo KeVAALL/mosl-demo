@@ -5,10 +5,16 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { Field, Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { FormControl, IconButton, InputAdornment, Stack } from "@mui/material";
+import {
+  FormControl,
+  IconButton,
+  InputAdornment,
+  Link,
+  Stack,
+} from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { BootstrapInput } from "../../utils/Input/textfield";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
@@ -24,7 +30,7 @@ export default function ForgotPassword() {
   const navigate = useNavigate();
   const [loginAttempt, setLoginAttempt] = useState(false);
   const [formValues, setFormValues] = useState({
-    email: "email@gmalil.com",
+    email: "",
   });
   const handleSubmit = async (values) => {
     console.log(values);
@@ -161,7 +167,7 @@ export default function ForgotPassword() {
               )}
             </Formik>
           </Grid>
-          {/* <Stack
+          <Stack
             flexDirection="row"
             alignItems="center"
             gap={0.5}
@@ -173,7 +179,7 @@ export default function ForgotPassword() {
             <Link href="/sign-in" className="custom-link">
               <Typography variant="caption">Go back</Typography>
             </Link>
-          </Stack> */}
+          </Stack>
         </Grid>
       </Container>
     </Box>

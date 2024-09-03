@@ -29,10 +29,7 @@ import {
 // import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 // import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 // import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-// import AdbOutlinedIcon from "@mui/icons-material/AdbOutlined";
-// import CodeOffOutlinedIcon from "@mui/icons-material/CodeOffOutlined";
-// import AirplayOutlinedIcon from "@mui/icons-material/AirplayOutlined";
-// import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
+
 import { CustomSelect } from "../../utils/Input/reactSelect";
 // third-party
 import { useTable, usePagination, useGlobalFilter } from "react-table";
@@ -83,10 +80,10 @@ function Application() {
     store_url: Yup.string().required("Store URL is required"),
     dynamic_url: Yup.string().required("Dynamic URL is required"),
   });
+  const [loadingData, setLoadingData] = useState(false);
   const [tableData, setTableData] = useState([]);
   const [projectDropdown, setProjectDropdown] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
-  const [loadingData, setLoadingData] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteItem, setDeleteItem] = useState({});
   const [formEditing, setFormEditing] = useState(false);
@@ -109,6 +106,20 @@ function Application() {
       dynamic_url: "",
     });
   };
+  const applicationArr = [
+    {
+      label: "Android",
+      value: "android",
+    },
+    {
+      label: "IOS",
+      value: "ios",
+    },
+    {
+      label: "Web App",
+      value: "webapp",
+    },
+  ];
   // Delete Modal
   const handleDeleteConfirmation = () => {
     setOpenDeleteModal(!openDeleteModal);
@@ -226,21 +237,6 @@ function Application() {
       });
     }
   };
-
-  const applicationArr = [
-    {
-      label: "Android",
-      value: "android",
-    },
-    {
-      label: "IOS",
-      value: "ios",
-    },
-    {
-      label: "Web App",
-      value: "webapp",
-    },
-  ];
 
   const dataColumns = useMemo(
     () => [

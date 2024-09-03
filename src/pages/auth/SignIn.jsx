@@ -24,7 +24,7 @@ export default function SignIn() {
   const navigate = useNavigate();
   const [loginAttempt, setLoginAttempt] = useState(false);
   const [signInForm, setSignInForm] = useState({
-    email: "email@gmalil.com",
+    email: "",
     password: "",
   });
   const validationSchema = Yup.object({

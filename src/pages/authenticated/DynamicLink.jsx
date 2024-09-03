@@ -41,6 +41,7 @@ import {
   HeaderSort,
   HidingSelect,
   GlobalFilter,
+  StyledTableCell,
 } from "../../utils/ReactTable/index";
 import { useSortBy } from "react-table";
 import { tableColumns, tableData, VisibleColumn } from "../../data/DynamicLink";
@@ -49,16 +50,60 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import { CustomSelect } from "../../utils/Input/reactSelect";
+import { ApiService } from "../../utils/api/apiCall";
+import { toast } from "react-toastify";
+import * as Yup from "yup";
+import { LoadingButton } from "@mui/lab";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 
 function DynamicLink() {
-  const [open, setOpen] = React.useState(false);
-  const [openForm, setOpenForm] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [openForm, setOpenForm] = useState(false);
+  const [submitForm, setSubmitForm] = useState(false);
+  const [initialValues, setInitialValues] = useState({
+    p_id: null,
+    application_id: null,
+    deep_link_url_prefix: "",
+    deep_link_url_suffix: "",
+    dynamic_link_url: "",
+    dynamic_link_name: "",
+    open_in_apple: "Browser",
+    open_in_android: "Browser",
+  });
+  const validationSchema = Yup.object().shape({
+    p_id: Yup.object().required("Project is required"),
+    deep_link_url_prefix: Yup.string().required("Prefix is required"),
+    deep_link_url_suffix: Yup.string().required("Suffix is required"),
+    dynamic_link_url: Yup.string().required("Deep Link URL is required"),
+    dynamic_link_name: Yup.string().required("Dynamic Link Name is required"),
+    open_in_apple: Yup.string().required("Link behavior for Apple is required"),
+    open_in_android: Yup.string().required(
+      "Link behavior for Android is required"
+    ),
+    application_id: Yup.object().required("Application is required"),
+    //   .when("open_in_apple", {
+    //   is: "App",
+    //   then: Yup.object().required("Application is required"),
+    //   otherwise: Yup.object().nullable(),
+    // }),
+  });
+  const [loadingData, setLoadingData] = useState(false);
+  const [tableData, setTableData] = useState([]);
+  const [projectDropdown, setProjectDropdown] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deleteItem, setDeleteItem] = useState({});
+  const [formEditing, setFormEditing] = useState(false);
   const handleOpen = () => {
     // setOpen(true);
     setOpenForm(true);
   };
   const handleClose = () => {
     setOpenForm(false);
+  };
+  // Delete Modal
+  const handleDeleteConfirmation = () => {
+    setOpenDeleteModal(!openDeleteModal);
   };
   const applicationArr = [
     {
@@ -70,42 +115,72 @@ function DynamicLink() {
       value: "react-auth-test-175bb",
     },
   ];
-  const projectArr = [
-    {
-      label: "push-notification-6787b",
-      value: "push-notification-6787b",
-    },
-    {
-      label: "react-auth-test-175bb",
-      value: "react-auth-test-175bb",
-    },
-  ];
+  async function getProjectDropdown() {
+    try {
+      const result = await ApiService({}, "project/getall-project");
 
-  const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: theme.palette.common.black,
-      color: theme.palette.common.white,
-      fontSize: 14,
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 13,
-    },
-  }));
+      console.log(result);
+      const newMap = result?.data?.map((project) => {
+        return { label: project?.project_name, value: project?.id };
+      });
 
-  const modalStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 400,
-    bgcolor: "background.paper",
-    border: "1px solid #000",
-    boxShadow: 24,
-  };
+      setProjectDropdown(newMap);
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    }
+  }
 
-  const columns = useMemo(() => tableColumns, []);
-  const data = useMemo(() => tableData, []);
+  const dataColumns = useMemo(
+    () => [
+      ...tableColumns,
+      {
+        Header: "Actions",
+        accessor: "id",
+        Cell: ({ value, row }) => {
+          const [isEditing, setIsEditing] = useState(false);
 
+          return (
+            <Stack direction="row" justifyContent="flex-end" spacing={2}>
+              <Tooltip title="View" placement="top" arrow>
+                <Button
+                  className="mui-icon-button"
+                  variant="outlined"
+                  startIcon={<VisibilityOutlined />}
+                />
+              </Tooltip>
+              <Tooltip title="Edit" placement="top" arrow>
+                <LoadingButton
+                  loading={isEditing}
+                  disabled={isEditing}
+                  className="mui-icon-button"
+                  variant="outlined"
+                  startIcon={<BorderColorOutlinedIcon />}
+                  onClick={async () => {
+                    console.log(row);
+                  }}
+                />
+              </Tooltip>
+
+              <Tooltip title="Delete" placement="top" arrow>
+                <Button
+                  className="mui-icon-button"
+                  variant="outlined"
+                  startIcon={<DeleteForeverOutlinedIcon />}
+                  onClick={() => {
+                    // setDeleteItem(row?.original);
+                    // handleDeleteConfirmation();
+                  }}
+                />
+              </Tooltip>
+            </Stack>
+          );
+        },
+      },
+    ],
+    [tableData]
+  );
+  const columns = useMemo(() => dataColumns, [dataColumns]);
+  const data = useMemo(() => tableData, [tableData]);
   const {
     getTableProps,
     getTableBodyProps,
@@ -143,6 +218,9 @@ function DynamicLink() {
     }
     return item;
   });
+  useEffect(() => {
+    getProjectDropdown();
+  }, []);
 
   return (
     <>
@@ -187,7 +265,7 @@ function DynamicLink() {
                 <Grid item md={3} xs={6}>
                   <CustomSelect
                     placeholder="Select Project"
-                    options={projectArr}
+                    options={projectDropdown}
                     id="project"
                     isClearable
                   />
@@ -214,13 +292,6 @@ function DynamicLink() {
                             <HeaderSort column={column} />
                           </StyledTableCell>
                         ))}
-                        <StyledTableCell
-                          sx={{
-                            textAlign: "right",
-                          }}
-                        >
-                          Actions
-                        </StyledTableCell>
                       </TableRow>
                     ))}
                   </TableHead>
@@ -250,35 +321,6 @@ function DynamicLink() {
                                 )}
                               </StyledTableCell>
                             ))}
-                            <StyledTableCell align="right">
-                              <Stack
-                                direction="row"
-                                justifyContent="flex-end"
-                                spacing={2}
-                              >
-                                <Tooltip title="View" placement="top" arrow>
-                                  <Button
-                                    className="mui-icon-button"
-                                    variant="outlined"
-                                    startIcon={<VisibilityOutlined />}
-                                  />
-                                </Tooltip>
-                                <Tooltip title="Edit" placement="top" arrow>
-                                  <Button
-                                    className="mui-icon-button"
-                                    variant="outlined"
-                                    startIcon={<BorderColorOutlinedIcon />}
-                                  />
-                                </Tooltip>
-                                <Tooltip title="Delete" placement="top" arrow>
-                                  <Button
-                                    className="mui-icon-button"
-                                    variant="outlined"
-                                    startIcon={<DeleteForeverOutlinedIcon />}
-                                  />
-                                </Tooltip>
-                              </Stack>
-                            </StyledTableCell>
                           </TableRow>
                         );
                       })
@@ -303,161 +345,202 @@ function DynamicLink() {
               </Box>
             </TableContainer>
           ) : (
-            <Paper elevation={3}>
-              <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
-                <Grid
-                  container
-                  spacing={2.5}
-                  mt={1}
-                  className="pl-20 pr-20 pb-20"
-                >
-                  <Grid item md={6} className="w-full">
-                    <FormControl variant="standard" fullWidth>
-                      <Typography className="label d-flex items-center">
-                        Application
-                        <sup className="asc">*</sup>
-                      </Typography>
-                      <CustomSelect
-                        placeholder="Select Application"
-                        options={applicationArr}
-                        id="application"
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item md={6} className="w-full">
-                    <FormControl variant="standard" fullWidth>
-                      <Typography className="label d-flex items-center">
-                        Project
-                        <sup className="asc">*</sup>
-                      </Typography>
-                      <CustomSelect
-                        placeholder="Select Project"
-                        options={projectArr}
-                        id="project"
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item md={6} className="w-full">
-                    <FormControl variant="standard" fullWidth>
-                      <Typography className="label d-flex items-center">
-                        URL Prefix
-                        <sup className="asc">*</sup>
-                      </Typography>
-                      <BootstrapInput
-                        fullWidth
-                        id="prefix"
-                        size="small"
-                        name="prefix"
-                        placeholder="https://page.link"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                      />
-                    </FormControl>
-                  </Grid>
-                  <Grid item md={6} className="w-full">
-                    <FormControl variant="standard" fullWidth>
-                      <Typography className="label d-flex items-center">
-                        URL Suffix
-                        <sup className="asc">*</sup>
-                      </Typography>
-                      <BootstrapInput
-                        fullWidth
-                        id="suffix"
-                        size="small"
-                        name="suffix"
-                        placeholder="/xyz"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                      />
-                    </FormControl>
-                  </Grid>
-
-                  <Grid item md={12} className="w-full">
-                    <Stack spacing={0.5}>
-                      <Typography variant="body1" className="label">
-                        Link Preview
-                      </Typography>
-                      <Typography
-                        sx={{ fontSize: "13px", color: "text.greyLight" }}
+            <Formik
+              enableReinitialize
+              initialValues={initialValues}
+              validationSchema={validationSchema}
+              onSubmit={(values) => {
+                console.log(values);
+              }}
+            >
+              {({ setFieldValue, handleSubmit, values }) => (
+                <Form onSubmit={handleSubmit}>
+                  <Paper elevation={3}>
+                    <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
+                      <Grid
+                        container
+                        spacing={2.5}
+                        mt={1}
+                        className="pl-20 pr-20 pb-20"
                       >
-                        https://page.link/xyz
-                      </Typography>
-                    </Stack>
-                  </Grid>
-
-                  <Grid item md={6} className="w-full">
-                    <FormControl variant="standard" fullWidth>
-                      <Typography className="label d-flex items-center">
-                        Deep Link URL
-                        <sup className="asc">*</sup>
-                      </Typography>
-                      <BootstrapInput
-                        fullWidth
-                        id="deep-link-url"
-                        size="small"
-                        //   label="Project Name"
-                        name="deep-link-url"
-                        placeholder="/xyz"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                      />
-                    </FormControl>
-                  </Grid>
-
-                  <Grid item md={6} className="w-full">
-                    <FormControl variant="standard" fullWidth>
-                      <Typography className="label d-flex items-center">
-                        Dynamic Link Name
-                        <sup className="asc">*</sup>
-                      </Typography>
-                      <BootstrapInput
-                        fullWidth
-                        id="deep-link-name"
-                        size="small"
-                        //   label="Project Name"
-                        name="deep-link-name"
-                        placeholder="/xyz"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                      />
-                    </FormControl>
-                  </Grid>
-
-                  <Grid item md={6} className="w-full">
-                    <FormControl variant="standard" fullWidth>
-                      <Typography className="label d-flex items-center">
-                        Link behavior for Apple
-                        <sup className="asc">*</sup>
-                      </Typography>
-                      <RadioGroup
-                        aria-labelledby="link-behavior"
-                        defaultValue="Browser"
-                        // name="radio-buttons-group"
-                      >
-                        <FormControlLabel
-                          value="App"
-                          control={<Radio className="label" />}
-                          label={
-                            <Typography variant="body1" className="label">
-                              Open the deep link URL in a browser
+                        <Grid item md={6} className="w-full">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Project
+                              <sup className="asc">*</sup>
                             </Typography>
-                          }
-                        />
-                        <FormControlLabel
-                          value="App"
-                          control={<Radio className="label" />}
-                          label={
-                            <Typography variant="body1" className="label">
-                              Open the deep link URL in the app
+                            <Field name="p_id">
+                              {({ field }) => (
+                                <CustomSelect
+                                  {...field}
+                                  placeholder="Select Project"
+                                  options={projectDropdown}
+                                  id="p_id"
+                                  onChange={(option) =>
+                                    setFieldValue("p_id", option)
+                                  }
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="p_id"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={6} className="w-full"></Grid>
+                        <Grid item md={6} className="w-full">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              URL Prefix
+                              <sup className="asc">*</sup>
                             </Typography>
-                          }
-                        />
-                      </RadioGroup>
-                      <CustomComponentSelect
+
+                            <Field name="deep_link_url_prefix">
+                              {({ field }) => (
+                                <BootstrapInput
+                                  {...field}
+                                  fullWidth
+                                  id="deep_link_url_prefix"
+                                  size="small"
+                                  placeholder="https://page.link"
+                                  InputLabelProps={{ shrink: true }}
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="deep_link_url_prefix"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={6} className="w-full">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              URL Suffix
+                              <sup className="asc">*</sup>
+                            </Typography>
+
+                            <Field name="deep_link_url_suffix">
+                              {({ field }) => (
+                                <BootstrapInput
+                                  {...field}
+                                  fullWidth
+                                  id="deep_link_url_suffix"
+                                  size="small"
+                                  placeholder="/zyx"
+                                  InputLabelProps={{ shrink: true }}
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="deep_link_url_suffix"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item md={12} className="w-full">
+                          <Stack spacing={0.5}>
+                            <Typography variant="body1" className="label">
+                              Link Preview
+                            </Typography>
+                            <Typography
+                              sx={{ fontSize: "13px", color: "text.greyLight" }}
+                            >
+                              {/* https://page.link/xyz */}
+                              {`${values?.deep_link_url_prefix}${values?.deep_link_url_suffix}`}
+                            </Typography>
+                          </Stack>
+                        </Grid>
+
+                        <Grid item md={6} className="w-full">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Dynamic Link URL
+                              <sup className="asc">*</sup>
+                            </Typography>
+                            <Field name="dynamic_link_url">
+                              {({ field }) => (
+                                <BootstrapInput
+                                  {...field}
+                                  fullWidth
+                                  id="dynamic_link_url"
+                                  size="small"
+                                  placeholder="/zyx"
+                                  InputLabelProps={{ shrink: true }}
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="dynamic_link_url"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item md={6} className="w-full">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Dynamic Link Name
+                              <sup className="asc">*</sup>
+                            </Typography>
+                            <Field name="dynamic_link_name">
+                              {({ field }) => (
+                                <BootstrapInput
+                                  {...field}
+                                  fullWidth
+                                  id="dynamic_link_name"
+                                  size="small"
+                                  placeholder="/zyx"
+                                  InputLabelProps={{ shrink: true }}
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="dynamic_link_name"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item md={6} className="w-full">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Link behavior for Apple
+                              <sup className="asc">*</sup>
+                            </Typography>
+                            <Field
+                              as={RadioGroup}
+                              aria-labelledby="open_in_apple"
+                              name="open_in_apple"
+                              defaultValue="Browser"
+                            >
+                              <FormControlLabel
+                                value="Browser"
+                                control={<Radio className="label" />}
+                                label={
+                                  <Typography variant="body1" className="label">
+                                    Open the deep link URL in a browser
+                                  </Typography>
+                                }
+                              />
+                              <FormControlLabel
+                                value="App"
+                                control={<Radio className="label" />}
+                                label={
+                                  <Typography variant="body1" className="label">
+                                    Open the deep link URL in the app
+                                  </Typography>
+                                }
+                              />
+                            </Field>
+                            {/* <CustomComponentSelect
                         options={[
                           { value: "Admin", label: "Admin" },
                           { value: "Customer", label: "Customer" },
@@ -465,80 +548,103 @@ function DynamicLink() {
                         ]}
                         menuPlacement="auto"
                         //   menuPosition="fixed"
-                      />
-                    </FormControl>
-                  </Grid>
+                      /> */}
+                            <Field name="application_id">
+                              {({ field }) => (
+                                <CustomSelect
+                                  {...field}
+                                  isDisabled={!values?.open_in_apple === "App"}
+                                  placeholder="Select Application"
+                                  options={applicationArr}
+                                  id="application_id"
+                                  onChange={(option) =>
+                                    setFieldValue("application_id", option)
+                                  }
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="application_id"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                          </FormControl>
+                        </Grid>
 
-                  <Grid item md={6} className="w-full">
-                    <FormControl variant="standard" fullWidth>
-                      <Typography className="label d-flex items-center">
-                        Link behavior for Android
-                        <sup className="asc">*</sup>
-                      </Typography>
-                      <RadioGroup
-                        aria-labelledby="link-behavior"
-                        defaultValue="Browser"
-                        // name="radio-buttons-group"
-                      >
-                        <FormControlLabel
-                          value="App"
-                          control={<Radio className="label" />}
-                          label={
-                            <Typography variant="body1" className="label">
-                              Open the deep link URL in a browser
+                        <Grid item md={6} className="w-full">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Link behavior for Android
+                              <sup className="asc">*</sup>
                             </Typography>
-                          }
-                        />
-                        <FormControlLabel
-                          value="App"
-                          control={<Radio className="label" />}
-                          label={
-                            <Typography variant="body1" className="label">
-                              Open the deep link URL in the app
-                            </Typography>
-                          }
-                        />
-                      </RadioGroup>
-                      <CustomComponentSelect
-                        options={[
-                          { value: "Admin", label: "Admin" },
-                          { value: "Customer", label: "Customer" },
-                          { value: "Admin 2", label: "Admin 2" },
-                        ]}
-                        menuPlacement="auto"
-                        //   menuPosition="fixed"
-                      />
-                    </FormControl>
-                  </Grid>
-                </Grid>
-              </Box>
-              <Box className="p-20">
-                <Grid container spacing={3}>
-                  <Grid item md={9} xs={2}></Grid>
-                  <Grid item md={1} xs={5}>
-                    <Button
-                      fullWidth
-                      variant="outlined"
-                      sx={{ backgroundColor: "primary.main" }}
-                      onClick={handleClose}
-                    >
-                      Cancel
-                    </Button>
-                  </Grid>
-                  <Grid item md={2} xs={5}>
-                    <Button
-                      type="submit"
-                      fullWidth
-                      variant="contained"
-                      sx={{ backgroundColor: "primary.main" }}
-                      onClick={handleClose}
-                    >
-                      Save
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Paper>
+                            <Field
+                              as={RadioGroup}
+                              aria-labelledby="open_in_android"
+                              name="open_in_android"
+                              defaultValue="Browser"
+                            >
+                              <FormControlLabel
+                                value="Browser"
+                                control={<Radio className="label" />}
+                                label={
+                                  <Typography variant="body1" className="label">
+                                    Open the deep link URL in a browser
+                                  </Typography>
+                                }
+                              />
+                              <FormControlLabel
+                                value="App"
+                                control={<Radio className="label" />}
+                                label={
+                                  <Typography variant="body1" className="label">
+                                    Open the deep link URL in the app
+                                  </Typography>
+                                }
+                              />
+                            </Field>
+
+                            <CustomSelect
+                              isDisabled={!values?.open_in_android === "App"}
+                              placeholder="Select Application"
+                              options={applicationArr}
+                              id="application"
+                              menuPlacement="auto"
+                            />
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                    <Box className="p-20">
+                      <Grid container spacing={3}>
+                        <Grid item md={9} xs={2}></Grid>
+                        <Grid item md={1} xs={5}>
+                          <Button
+                            fullWidth
+                            variant="outlined"
+                            sx={{ backgroundColor: "primary.main" }}
+                            onClick={handleClose}
+                          >
+                            Cancel
+                          </Button>
+                        </Grid>
+                        <Grid item md={2} xs={5}>
+                          <LoadingButton
+                            loading={submitForm}
+                            disabled={submitForm}
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            sx={{ backgroundColor: "primary.main" }}
+                          >
+                            Save
+                          </LoadingButton>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  </Paper>
+                </Form>
+              )}
+            </Formik>
           )}
         </Grid>
       </Grid>
