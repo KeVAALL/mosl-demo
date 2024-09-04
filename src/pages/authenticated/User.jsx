@@ -48,6 +48,7 @@ import { LoadingButton } from "@mui/lab";
 import { ApiService } from "../../utils/api/apiCall";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { HtmlLightTooltip } from "../../utils/components/Tooltip";
 
 function User() {
   const { userProfile } = useSelector((state) => state.user);
@@ -235,13 +236,17 @@ function User() {
                   startIcon={<VisibilityOutlined />}
                 />
               </Tooltip> */}
-              <Tooltip title="Edit" placement="top" arrow>
+              <HtmlLightTooltip title="Edit" placement="top" arrow>
                 <LoadingButton
                   loading={isEditing}
                   disabled={isEditing}
                   className="mui-icon-button"
                   variant="outlined"
-                  startIcon={<BorderColorOutlinedIcon />}
+                  startIcon={
+                    <BorderColorOutlinedIcon
+                      sx={{ color: isEditing ? "transparent" : "#fff" }}
+                    />
+                  }
                   onClick={async () => {
                     console.log(row);
                     console.log(tableData);
@@ -279,10 +284,10 @@ function User() {
                     }
                   }}
                 />
-              </Tooltip>
+              </HtmlLightTooltip>
 
-              <Tooltip title="Delete" placement="top" arrow>
-                <Button
+              <HtmlLightTooltip title="Delete" placement="top" arrow>
+                <LoadingButton
                   className="mui-icon-button"
                   variant="outlined"
                   startIcon={<DeleteForeverOutlinedIcon />}
@@ -291,7 +296,7 @@ function User() {
                     handleDeleteConfirmation();
                   }}
                 />
-              </Tooltip>
+              </HtmlLightTooltip>
             </Stack>
           );
         },
@@ -495,7 +500,7 @@ function User() {
                               colSpan={columns.length + 1}
                               align="center"
                             >
-                              No Data
+                              No Data Found
                             </TableCell>
                           </TableRow>
                         )}

@@ -49,6 +49,7 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { LoadingButton } from "@mui/lab";
 import { ErrorMessage, Field, Form, Formik } from "formik";
+import { HtmlLightTooltip } from "../../utils/components/Tooltip";
 
 function Role() {
   const { userProfile } = useSelector((state) => state.user);
@@ -224,13 +225,17 @@ function Role() {
                   startIcon={<VisibilityOutlined />}
                 />
               </Tooltip> */}
-              <Tooltip title="Edit" placement="top" arrow>
+              <HtmlLightTooltip title="Edit" placement="top" arrow>
                 <LoadingButton
                   loading={isEditing}
                   disabled={isEditing}
                   className="mui-icon-button"
                   variant="outlined"
-                  startIcon={<BorderColorOutlinedIcon />}
+                  startIcon={
+                    <BorderColorOutlinedIcon
+                      sx={{ color: isEditing ? "transparent" : "#fff" }}
+                    />
+                  }
                   onClick={async () => {
                     console.log(row);
                     try {
@@ -256,14 +261,14 @@ function Role() {
                     } catch (error) {
                       toast.error(error?.response?.data?.message);
                     } finally {
-                      setIsEditing(false);
+                      // setIsEditing(false);
                     }
                   }}
                 />
-              </Tooltip>
+              </HtmlLightTooltip>
 
-              <Tooltip title="Delete" placement="top" arrow>
-                <Button
+              <HtmlLightTooltip title="Delete" placement="top" arrow>
+                <LoadingButton
                   className="mui-icon-button"
                   variant="outlined"
                   startIcon={<DeleteForeverOutlinedIcon />}
@@ -273,7 +278,7 @@ function Role() {
                     handleDeleteConfirmation();
                   }}
                 />
-              </Tooltip>
+              </HtmlLightTooltip>
             </Stack>
           );
         },
@@ -485,7 +490,7 @@ function Role() {
                               colSpan={columns.length + 1}
                               align="center"
                             >
-                              No Data
+                              No Data Found
                             </TableCell>
                           </TableRow>
                         )}

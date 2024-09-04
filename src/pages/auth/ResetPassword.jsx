@@ -17,6 +17,7 @@ import KeyboardBackspaceOutlinedIcon from "@mui/icons-material/KeyboardBackspace
 import { BootstrapInput } from "../../utils/Input/textfield";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useDispatch } from "react-redux";
+import mainLogo from "../../assets/img/mosl-main-logo.png";
 import { toast } from "react-toastify";
 import { ApiService } from "../../utils/api/apiCall";
 import "./auth.css";
@@ -87,31 +88,44 @@ export default function ResetPassword() {
       className="poppins"
       sx={{
         minHeight: "100vh",
+        display: "flex",
       }}
     >
-      <Container component="main" maxWidth="xs">
+      <Container
+        component="main"
+        maxWidth="xs"
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          margin: "auto",
+        }}
+      >
         <Grid
           container
           spacing={3}
+          className="bg-secondary p-20"
           sx={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             width: "100%",
-            minHeight: "100vh",
+            minHeight: "400px",
             margin: "auto",
+            borderRadius: "8px",
           }}
         >
-          <Grid item xs={12} mb={3}>
+          <Grid item xs={12} mb={3} className="pt-0">
             <Stack alignItems="center">
-              {/* <Typography
-                variant="h5"
-                sx={{ color: "primary.main", fontWeight: 500 }}
-              >
-                Admin
-              </Typography> */}
-              <Typography variant="caption" sx={{ color: "text.grey" }}>
+              <img
+                src={mainLogo}
+                style={{
+                  height: "100%",
+                  width: "150px",
+                }}
+              />
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
                 Reset Password for {resetEmail}
               </Typography>
             </Stack>

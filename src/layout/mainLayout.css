@@ -1,7 +1,15 @@
+:root {
+  --primary: #eb6400;
+  --secondary: #fdaf17;
+  --highlight: #f5ecd7;
+  --link: #e0c252;
+}
 .sidebar {
-  background: #eeeeee;
   height: 100%;
   position: fixed;
+}
+.sidebar .ps-sidebar-container {
+  background-color: #000;
 }
 .sidebar-shadow {
   box-shadow: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
@@ -32,23 +40,26 @@
   width: calc(100% - 170px) !important;
 }
 .toggle-drawer-btn {
-  background-color: rgba(0, 0, 0, 0.04) !important;
+  /* background-color: rgba(0, 0, 0, 0.04) !important; */
+  background-color: var(--secondary) !important;
   padding: 8px;
   border-radius: 8px;
 }
 .menu-item {
-  color: #757575;
+  color: #fff;
   text-decoration: none;
   font-weight: 400;
+  font-size: 12px;
 }
 .menu-item:hover {
-  background-color: #e0e0e0 !important;
-  color: black; /* Hover color */
+  color: var(--link);
   text-decoration: none; /* Add underline on hover */
 }
+.menu-item:hover .ps-menu-button {
+  background-color: #000 !important;
+}
 .active-menu-item {
-  background-color: #e0e0e0 !important;
-  color: black !important;
+  color: var(--link) !important;
 }
 @media (max-width: 767px) {
   .main-toolbar {

@@ -629,6 +629,7 @@ input:-webkit-autofill:active {
 }
 .mui-icon-button .MuiButton-startIcon {
   margin: 0px !important;
+  color: #fff;
 }
 .button-30 {
   height: 60px;

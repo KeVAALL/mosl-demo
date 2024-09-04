@@ -33,33 +33,13 @@ import DynamicFeedIcon from "@mui/icons-material/DynamicFeed";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import mainLogo from "../assets/img/mosl-main-logo.png";
 import secondaryLogo from "../assets/img/mosl-small-transparent.png";
+import { HtmlLightTooltip } from "../utils/components/Tooltip";
 
 import { useDispatch, useSelector } from "react-redux";
 
 import "./mainLayout.css";
 import { clearProfile } from "../redux/slices/userSlice";
 
-const HtmlTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: "#f5f5f9",
-    color: "rgba(0, 0, 0, 0.87)",
-    maxWidth: 220,
-    height: 30,
-    fontSize: theme.typography.pxToRem(12),
-    border: "1px solid #dadde9",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  [`& .${tooltipClasses.arrow}`]: {
-    color: "#f5f5f9", // Match this to the backgroundColor of the tooltip
-    "&:before": {
-      border: "1px solid #dadde9",
-    },
-  },
-}));
 const iconMapping = {
   Dashboard: <HomeIcon />,
   Project: <BarChartRoundedIcon />,
@@ -93,7 +73,7 @@ const Header = ({ open, handleDrawerToggle }) => {
             aria-label="menu"
             onClick={handleDrawerToggle}
           >
-            <MenuIcon />
+            <MenuIcon sx={{ color: "#fff" }} />
           </IconButton>
           <Tooltip
             // open={true}
@@ -150,7 +130,7 @@ const Header = ({ open, handleDrawerToggle }) => {
             }}
             enterTouchDelay={20}
           >
-            <Avatar sx={{ bgcolor: "black" }}>N</Avatar>
+            <Avatar sx={{ bgcolor: "#fdaf17" }}>N</Avatar>
           </Tooltip>
         </Box>
       </Toolbar>
@@ -171,6 +151,7 @@ const MobileDrawer = ({ open, handleDrawerToggle, menu }) => {
         "& .MuiDrawer-paper": {
           boxSizing: "border-box",
           width: 240,
+          backgroundColor: "#000",
         },
       }}
     >
@@ -179,15 +160,28 @@ const MobileDrawer = ({ open, handleDrawerToggle, menu }) => {
           width: 240,
         }}
       >
-        <Menu iconShape="square">
-          <Box sx={{ px: 2 }}>
+        <Menu iconShape="square" style={{ backgroundColor: "#000" }}>
+          <Box
+            sx={{
+              px: 2,
+              py: 1.2,
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              mb: 2,
+            }}
+            className="bg-primary"
+          >
             <img
-              src={mainLogo}
+              src={secondaryLogo}
               style={{
-                height: "100px",
-                width: "100%",
+                height: "100%",
+                width: "50px",
               }}
             />
+            <Typography sx={{ fontSize: "14px" }} color="text.secondary">
+              MOSL Dynamic Links
+            </Typography>
           </Box>
 
           {menu.map((item) => (
@@ -224,32 +218,56 @@ const ReactSidebar = ({ open, menu }) => {
         collapsed={!open}
         className={`sidebar${!open ? " sidebar-shadow" : " sidebar-border"}`}
       >
-        <Menu iconShape="square">
+        <Menu iconShape="square" style={{ backgroundColor: "#000" }}>
           {open ? (
-            <Box sx={{ px: 2 }}>
+            <Box
+              sx={{
+                px: 2,
+                py: 1.2,
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                mb: 2,
+              }}
+              className="bg-primary"
+            >
               <img
-                src={mainLogo}
+                src={secondaryLogo}
                 style={{
-                  height: "100px",
-                  width: "100%",
+                  height: "100%",
+                  width: "50px",
+                }}
+              />
+              <Typography sx={{ fontSize: "14px" }} color="text.secondary">
+                MOSL Dynamic Links
+              </Typography>
+            </Box>
+          ) : (
+            <Box
+              className="bg-primary"
+              sx={{
+                px: 2,
+                py: 1.2,
+                display: "flex",
+                justifyContent: "center",
+                mb: 2,
+              }}
+            >
+              <img
+                src={secondaryLogo}
+                style={{
+                  height: "100%",
+                  width: "50px",
                 }}
               />
             </Box>
-          ) : (
-            <img
-              src={secondaryLogo}
-              style={{
-                height: "75px",
-                width: "100%",
-              }}
-            />
           )}
 
-          {menu.map((item) => (
+          {menu.map((item, index) => (
             <Link
               to={`/home/${item.menu_url}`}
               key={item.menu_id}
-              className="menu-item"
+              className={`menu-item${index === 0 ? " pt-20" : ""}`}
             >
               {open ? (
                 <MenuItem
@@ -260,10 +278,16 @@ const ReactSidebar = ({ open, menu }) => {
                       : ""
                   }
                 >
-                  <Typography variant="subtitle1">{item.menu_name}</Typography>
+                  <Typography sx={{ fontSize: "13px" }}>
+                    {item.menu_name}
+                  </Typography>
                 </MenuItem>
               ) : (
-                <HtmlTooltip arrow title={item.menu_name} placement="right">
+                <HtmlLightTooltip
+                  arrow
+                  title={item.menu_name}
+                  placement="right"
+                >
                   <MenuItem
                     icon={iconMapping[item.menu_name]}
                     className={
@@ -276,7 +300,7 @@ const ReactSidebar = ({ open, menu }) => {
                       {item.menu_name}
                     </Typography>
                   </MenuItem>
-                </HtmlTooltip>
+                </HtmlLightTooltip>
               )}
             </Link>
           ))}

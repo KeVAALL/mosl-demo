@@ -79,6 +79,7 @@ export default function ThemeCustomization({ children }) {
           root: {
             border: "none !important", // Black border
             backgroundColor: "#eb6400 !important", // Custom background color
+            color: "#fff !important",
             textTransform: "capitalize", // Capitalize text
             padding: "6px 16px", // Set padding
             borderRadius: "4px", // Rounded corners
@@ -134,11 +135,11 @@ export default function ThemeCustomization({ children }) {
           tooltip: {
             fontFamily: "Poppins, sans-serif !important", // Custom font family
             fontSize: "12px", // Adjust font size if needed
-            backgroundColor: "#333333", // Custom background color
-            color: "#ffffff", // Custom text color
+            backgroundColor: "#f5ecd7", // Custom background color
+            color: "#000", // Custom text color
           },
           arrow: {
-            color: "#333333",
+            color: "#f5ecd7",
           },
         },
       },
@@ -147,6 +148,7 @@ export default function ThemeCustomization({ children }) {
           root: {
             padding: 8, // Adjust the padding around the radio button
             "& .MuiSvgIcon-root": {
+              color: "#eb6400",
               fontSize: "1.2rem !important", // Adjust the size of the radio button icon
             },
           },
@@ -157,7 +159,7 @@ export default function ThemeCustomization({ children }) {
           root: {
             color: "#bdbdbd", // Black for unselected state
             "&.Mui-checked": {
-              color: "#000000", // White for selected state
+              color: "#eb6400", // White for selected state
             },
           },
         },

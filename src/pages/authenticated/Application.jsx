@@ -54,6 +54,7 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { LoadingButton } from "@mui/lab";
 import { ErrorMessage, Field, Form, Formik } from "formik";
+import { HtmlLightTooltip } from "../../utils/components/Tooltip";
 
 function Application() {
   const { userProfile } = useSelector((state) => state.user);
@@ -249,20 +250,17 @@ function Application() {
 
           return (
             <Stack direction="row" justifyContent="flex-end" spacing={2}>
-              {/* <Tooltip title="View" placement="top" arrow>
-                <Button
-                  className="mui-icon-button"
-                  variant="outlined"
-                  startIcon={<VisibilityOutlined />}
-                />
-              </Tooltip> */}
-              <Tooltip title="Edit" placement="top" arrow>
+              <HtmlLightTooltip title="Edit" placement="top" arrow>
                 <LoadingButton
                   loading={isEditing}
                   disabled={isEditing}
                   className="mui-icon-button"
                   variant="outlined"
-                  startIcon={<BorderColorOutlinedIcon />}
+                  startIcon={
+                    <BorderColorOutlinedIcon
+                      sx={{ color: isEditing ? "transparent" : "#fff" }}
+                    />
+                  }
                   onClick={async () => {
                     console.log(row);
                     try {
@@ -296,10 +294,10 @@ function Application() {
                     }
                   }}
                 />
-              </Tooltip>
+              </HtmlLightTooltip>
 
-              <Tooltip title="Delete" placement="top" arrow>
-                <Button
+              <HtmlLightTooltip title="Delete" placement="top" arrow>
+                <LoadingButton
                   className="mui-icon-button"
                   variant="outlined"
                   startIcon={<DeleteForeverOutlinedIcon />}
@@ -308,7 +306,7 @@ function Application() {
                     handleDeleteConfirmation();
                   }}
                 />
-              </Tooltip>
+              </HtmlLightTooltip>
             </Stack>
           );
         },
@@ -521,7 +519,7 @@ function Application() {
                               colSpan={columns.length + 1}
                               align="center"
                             >
-                              No Data
+                              No Data Found
                             </TableCell>
                           </TableRow>
                         )}

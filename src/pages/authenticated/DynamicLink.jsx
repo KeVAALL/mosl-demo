@@ -55,6 +55,7 @@ import { toast } from "react-toastify";
 import * as Yup from "yup";
 import { LoadingButton } from "@mui/lab";
 import { ErrorMessage, Field, Form, Formik } from "formik";
+import { HtmlLightTooltip } from "../../utils/components/Tooltip";
 
 function DynamicLink() {
   const [open, setOpen] = useState(false);
@@ -146,20 +147,24 @@ function DynamicLink() {
                   startIcon={<VisibilityOutlined />}
                 />
               </Tooltip> */}
-              <Tooltip title="Edit" placement="top" arrow>
+              <HtmlLightTooltip title="Edit" placement="top" arrow>
                 <LoadingButton
                   loading={isEditing}
                   disabled={isEditing}
                   className="mui-icon-button"
                   variant="outlined"
-                  startIcon={<BorderColorOutlinedIcon />}
+                  startIcon={
+                    <BorderColorOutlinedIcon
+                      sx={{ color: isEditing ? "transparent" : "#fff" }}
+                    />
+                  }
                   onClick={async () => {
                     console.log(row);
                   }}
                 />
-              </Tooltip>
+              </HtmlLightTooltip>
 
-              <Tooltip title="Delete" placement="top" arrow>
+              <HtmlLightTooltip title="Delete" placement="top" arrow>
                 <Button
                   className="mui-icon-button"
                   variant="outlined"
@@ -169,7 +174,7 @@ function DynamicLink() {
                     // handleDeleteConfirmation();
                   }}
                 />
-              </Tooltip>
+              </HtmlLightTooltip>
             </Stack>
           );
         },
@@ -274,6 +279,7 @@ function DynamicLink() {
                   <TableHead>
                     {headerGroups.map((headerGroup) => (
                       <TableRow
+                        className="last-header-right"
                         key={headerGroup.id}
                         {...headerGroup.getHeaderGroupProps()}
                       >
@@ -325,7 +331,7 @@ function DynamicLink() {
                     ) : (
                       <TableRow>
                         <TableCell colSpan={columns.length + 1} align="center">
-                          No Data
+                          No Data Found
                         </TableCell>
                       </TableRow>
                     )}

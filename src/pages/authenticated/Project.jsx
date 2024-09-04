@@ -47,6 +47,7 @@ import { toast } from "react-toastify";
 import { ApiService } from "../../utils/api/apiCall";
 import { useSelector } from "react-redux";
 import { LoadingButton } from "@mui/lab";
+import { HtmlLightTooltip } from "../../utils/components/Tooltip";
 
 function Project() {
   const { userProfile } = useSelector((state) => state.user);
@@ -237,13 +238,17 @@ function Project() {
                   startIcon={<VisibilityOutlined />}
                 />
               </Tooltip> */}
-              <Tooltip title="Edit" placement="top" arrow>
+              <HtmlLightTooltip title="Edit" placement="top" arrow>
                 <LoadingButton
                   loading={isEditing}
                   disabled={isEditing}
                   className="mui-icon-button"
                   variant="outlined"
-                  startIcon={<BorderColorOutlinedIcon />}
+                  startIcon={
+                    <BorderColorOutlinedIcon
+                      sx={{ color: isEditing ? "transparent" : "#fff" }}
+                    />
+                  }
                   onClick={async () => {
                     console.log(row);
                     console.log(tableData);
@@ -275,10 +280,10 @@ function Project() {
                     }
                   }}
                 />
-              </Tooltip>
+              </HtmlLightTooltip>
 
-              <Tooltip title="Delete" placement="top" arrow>
-                <Button
+              <HtmlLightTooltip title="Delete" placement="top" arrow>
+                <LoadingButton
                   className="mui-icon-button"
                   variant="outlined"
                   startIcon={<DeleteForeverOutlinedIcon />}
@@ -287,7 +292,7 @@ function Project() {
                     handleDeleteConfirmation();
                   }}
                 />
-              </Tooltip>
+              </HtmlLightTooltip>
             </Stack>
           );
         },
@@ -491,7 +496,7 @@ function Project() {
                               colSpan={columns.length + 1}
                               align="center"
                             >
-                              No Data
+                              No Data Found
                             </TableCell>
                           </TableRow>
                         )}

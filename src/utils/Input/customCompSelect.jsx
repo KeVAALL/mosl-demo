@@ -15,7 +15,7 @@ const customStyles = {
     ...provided,
     border: "1px solid #9e9e9e", // Set border color
     boxShadow: "none", // Remove box shadow
-    fontSize: "14px", // Match font size with BootstrapInput
+    fontSize: "12px", // Match font size with BootstrapInput
     "&:hover": {
       border: "1px solid #9e9e9e", // Border color on hover
     },
@@ -25,7 +25,7 @@ const customStyles = {
     ...base,
     backgroundColor: state.isSelected ? "#000000" : "#FFFFFF", // Black for selected, white otherwise
     color: state.isSelected ? "#FFFFFF" : "#000000", // White text for selected, black otherwise
-    fontSize: "14px", // Match font size with BootstrapInput
+    fontSize: "12px", // Match font size with BootstrapInput
     "&:hover": {
       backgroundColor: "#f5f5f5", // Light grey on hover
       color: "#000000", // Black text on hover
@@ -35,13 +35,13 @@ const customStyles = {
   singleValue: (provided) => ({
     ...provided,
     color: "#000000", // White text for selected value
-    fontSize: "14px", // Match font size with BootstrapInput
+    fontSize: "12px", // Match font size with BootstrapInput
   }),
   // Style the placeholder
   placeholder: (provided) => ({
     ...provided,
     color: "#000000", // Black placeholder text
-    fontSize: "14px", // Match font size with BootstrapInput
+    fontSize: "12px", // Match font size with BootstrapInput
   }),
 };
 

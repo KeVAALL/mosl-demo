@@ -79,7 +79,7 @@ export default function SignIn() {
     } catch (err) {
       toast.error(err?.response?.data?.message);
     } finally {
-      // setLoginAttempt(false);
+      setLoginAttempt(false);
     }
   };
   const [showPassword, setShowPassword] = useState(false);

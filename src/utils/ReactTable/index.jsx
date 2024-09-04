@@ -192,7 +192,6 @@ export const TablePagination = ({
           count={Math.ceil(rows.length / pageSize)}
           page={pageIndex + 1}
           onChange={handleChangePagination}
-          color="primary"
           showFirstButton
           showLastButton
         />
@@ -342,8 +341,8 @@ CSVExport.propTypes = {
 
 export const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
+    backgroundColor: "#f5ecd7",
+    color: theme.palette.common.dark,
     fontSize: 14,
   },
   [`&.${tableCellClasses.body}`]: {
