@@ -73,7 +73,7 @@ const Header = ({ open, handleDrawerToggle }) => {
             aria-label="menu"
             onClick={handleDrawerToggle}
           >
-            <MenuIcon sx={{ color: "#fff" }} />
+            <MenuIcon sx={{ color: "#000" }} />
           </IconButton>
           <Tooltip
             // open={true}
@@ -130,7 +130,7 @@ const Header = ({ open, handleDrawerToggle }) => {
             }}
             enterTouchDelay={20}
           >
-            <Avatar sx={{ bgcolor: "#fdaf17" }}>N</Avatar>
+            <Avatar sx={{ bgcolor: "#4db6ac" }}>N</Avatar>
           </Tooltip>
         </Box>
       </Toolbar>

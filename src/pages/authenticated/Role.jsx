@@ -60,7 +60,7 @@ function Role() {
     selectedMenus: [],
   });
   const validationSchema = Yup.object().shape({
-    role_name: Yup.string().required("Name is required"),
+    role_name: Yup.string().required("Role Name is required"),
     selectedMenus: Yup.array()
       .min(1, "At least one menu must be selected")
       .required("Please select at least one menu"),
@@ -308,7 +308,7 @@ function Role() {
       data,
       initialState: {
         pageIndex: 0,
-        pageSize: 5,
+        pageSize: 10,
         hiddenColumns: columns
           .filter((col) => VisibleColumn.includes(col.accessor))
           .map((col) => col.accessor),
@@ -525,7 +525,7 @@ function Role() {
               }) => (
                 <Form onSubmit={handleSubmit}>
                   <Paper elevation={3}>
-                    <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
+                    <Box sx={{}}>
                       <Grid
                         container
                         spacing={2.5}
@@ -651,9 +651,9 @@ function Role() {
                         </Grid>
                       </Grid>
                     </Box>
-                    <Box className="p-20">
-                      <Grid container spacing={3}>
-                        <Grid item md={9} xs={2}></Grid>
+                    <Box className="p-20 bg-highlight">
+                      <Grid container spacing={2}>
+                        <Grid item md={10} xs={2}></Grid>
                         <Grid item md={1} xs={5}>
                           <Button
                             fullWidth
@@ -664,7 +664,7 @@ function Role() {
                             Cancel
                           </Button>
                         </Grid>
-                        <Grid item md={2} xs={5}>
+                        <Grid item md={1} xs={5}>
                           <LoadingButton
                             loading={submitForm}
                             disabled={submitForm}

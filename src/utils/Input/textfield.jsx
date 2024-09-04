@@ -27,6 +27,11 @@ export const BootstrapInput = styled(InputBase)(
         // boxShadow: `${alpha(theme.palette.primary.main, 0.25)} 0 0 0 0.1rem`,
         // borderColor: theme.palette.primary.main,
       },
+      "&.Mui-disabled": {
+        backgroundColor: "#f3f3f3 !important", // Custom background color for disabled state
+        color: "#a0a0a0", // Optional: Change text color for disabled state
+        opacity: 1, // Ensures the custom color is not affected by default opacity
+      },
     },
     "& .MuiInputAdornment-root": {
       position: "absolute",

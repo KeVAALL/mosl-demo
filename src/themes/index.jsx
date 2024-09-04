@@ -79,7 +79,7 @@ export default function ThemeCustomization({ children }) {
           root: {
             border: "none !important", // Black border
             backgroundColor: "#eb6400 !important", // Custom background color
-            color: "#fff !important",
+            color: "#fff",
             textTransform: "capitalize", // Capitalize text
             padding: "6px 16px", // Set padding
             borderRadius: "4px", // Rounded corners

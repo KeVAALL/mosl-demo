@@ -60,7 +60,7 @@ export default function SignIn() {
           localStorage.setItem("resetEmail", encryptData(values?.email));
           navigate("/reset-password");
         } else {
-          toast.success("Successful!");
+          toast.success("Login successful!");
           const firstURL = result?.data?.data?.menu[0]?.menu_url;
           navigate(`/home/${firstURL ? firstURL : ""}`);
         }
@@ -79,7 +79,7 @@ export default function SignIn() {
     } catch (err) {
       toast.error(err?.response?.data?.message);
     } finally {
-      setLoginAttempt(false);
+      // setLoginAttempt(false);
     }
   };
   const [showPassword, setShowPassword] = useState(false);
@@ -156,7 +156,7 @@ export default function SignIn() {
                               {...field}
                               id="email"
                               size="small"
-                              placeholder="Email Address"
+                              placeholder="Email"
                               fullWidth
                               InputLabelProps={{ shrink: true }}
                               onChange={(e) => {
@@ -279,7 +279,7 @@ export default function SignIn() {
                         fullWidth
                         size="small"
                         id="email"
-                        label="Email Address"
+                        label="Email"
                         name="email"
                         autoComplete="email"
                         placeholder="Email"
@@ -296,7 +296,7 @@ export default function SignIn() {
                         fullWidth
                         id="email"
                         size="small"
-                        label="Email Address"
+                        label="Email"
                         name="email"
                         placeholder="Email"
                         InputLabelProps={{

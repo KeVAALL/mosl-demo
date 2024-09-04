@@ -63,28 +63,33 @@ function DynamicLink() {
   const [submitForm, setSubmitForm] = useState(false);
   const [initialValues, setInitialValues] = useState({
     p_id: null,
-    deep_link_url_prefix: "",
-    deep_link_url_suffix: "",
-    dynamic_link_url: "",
+    link_access_url: "",
     dynamic_link_name: "",
-    open_in_apple: "Browser",
+    browser_url: "",
+    open_in_ios: "Browser",
     open_in_android: "Browser",
+    open_in_app_ios_application_id: null,
+    open_in_app_android_application_id: null,
   });
   const validationSchema = Yup.object().shape({
     p_id: Yup.object().required("Project is required"),
-    deep_link_url_prefix: Yup.string().required("Prefix is required"),
-    deep_link_url_suffix: Yup.string().required("Suffix is required"),
-    dynamic_link_url: Yup.string().required("Deep Link URL is required"),
+    link_access_url: Yup.string(),
     dynamic_link_name: Yup.string().required("Dynamic Link Name is required"),
-    open_in_apple: Yup.string().required("Link behavior for Apple is required"),
+    browser_url: Yup.string().required("Browser URL is required"),
+    open_in_ios: Yup.string().required("Link behavior for IOS is required"),
     open_in_android: Yup.string().required(
       "Link behavior for Android is required"
     ),
-    //   .when("open_in_apple", {
-    //   is: "App",
-    //   then: Yup.object().required("Application is required"),
-    //   otherwise: Yup.object().nullable(),
-    // }),
+    open_in_app_ios_application_id: Yup.object().when("open_in_ios", {
+      is: (value) => value === "App",
+      then: () => Yup.object().required("Please select an Application"),
+      otherwise: () => Yup.object().nullable(),
+    }),
+    open_in_app_android_application_id: Yup.object().when("open_in_android", {
+      is: (value) => value === "App",
+      then: () => Yup.object().required("Please select an Application"),
+      otherwise: () => Yup.object().nullable(),
+    }),
   });
   const [loadingData, setLoadingData] = useState(false);
   const [tableData, setTableData] = useState([]);
@@ -140,13 +145,6 @@ function DynamicLink() {
 
           return (
             <Stack direction="row" justifyContent="flex-end" spacing={2}>
-              {/* <Tooltip title="View" placement="top" arrow>
-                <Button
-                  className="mui-icon-button"
-                  variant="outlined"
-                  startIcon={<VisibilityOutlined />}
-                />
-              </Tooltip> */}
               <HtmlLightTooltip title="Edit" placement="top" arrow>
                 <LoadingButton
                   loading={isEditing}
@@ -203,7 +201,7 @@ function DynamicLink() {
       data,
       initialState: {
         pageIndex: 0,
-        pageSize: 5,
+        pageSize: 10,
         hiddenColumns: columns
           .filter((col) => VisibleColumn.includes(col.accessor))
           .map((col) => col.accessor),
@@ -360,7 +358,7 @@ function DynamicLink() {
               {({ setFieldValue, handleSubmit, values }) => (
                 <Form onSubmit={handleSubmit}>
                   <Paper elevation={3}>
-                    <Box sx={{ borderBottom: "1px solid #9e9e9e" }}>
+                    <Box>
                       <Grid
                         container
                         spacing={2.5}
@@ -393,100 +391,6 @@ function DynamicLink() {
                             />
                           </FormControl>
                         </Grid>
-                        <Grid item md={6} className="w-full"></Grid>
-                        <Grid item md={6} className="w-full">
-                          <FormControl variant="standard" fullWidth>
-                            <Typography className="label d-flex items-center">
-                              URL Prefix
-                              <sup className="asc">*</sup>
-                            </Typography>
-
-                            <Field name="deep_link_url_prefix">
-                              {({ field }) => (
-                                <BootstrapInput
-                                  {...field}
-                                  fullWidth
-                                  id="deep_link_url_prefix"
-                                  size="small"
-                                  placeholder="https://page.link"
-                                  InputLabelProps={{ shrink: true }}
-                                />
-                              )}
-                            </Field>
-                            <ErrorMessage
-                              name="deep_link_url_prefix"
-                              component="div"
-                              className="text-error text-12 mt-5"
-                            />
-                          </FormControl>
-                        </Grid>
-                        <Grid item md={6} className="w-full">
-                          <FormControl variant="standard" fullWidth>
-                            <Typography className="label d-flex items-center">
-                              URL Suffix
-                              <sup className="asc">*</sup>
-                            </Typography>
-
-                            <Field name="deep_link_url_suffix">
-                              {({ field }) => (
-                                <BootstrapInput
-                                  {...field}
-                                  fullWidth
-                                  id="deep_link_url_suffix"
-                                  size="small"
-                                  placeholder="/zyx"
-                                  InputLabelProps={{ shrink: true }}
-                                />
-                              )}
-                            </Field>
-                            <ErrorMessage
-                              name="deep_link_url_suffix"
-                              component="div"
-                              className="text-error text-12 mt-5"
-                            />
-                          </FormControl>
-                        </Grid>
-
-                        <Grid item md={12} className="w-full">
-                          <Stack spacing={0.5}>
-                            <Typography variant="body1" className="label">
-                              Link Preview
-                            </Typography>
-                            <Typography
-                              sx={{ fontSize: "13px", color: "text.greyLight" }}
-                            >
-                              {/* https://page.link/xyz */}
-                              {`${values?.deep_link_url_prefix}${values?.deep_link_url_suffix}`}
-                            </Typography>
-                          </Stack>
-                        </Grid>
-
-                        <Grid item md={6} className="w-full">
-                          <FormControl variant="standard" fullWidth>
-                            <Typography className="label d-flex items-center">
-                              Dynamic Link URL
-                              <sup className="asc">*</sup>
-                            </Typography>
-                            <Field name="dynamic_link_url">
-                              {({ field }) => (
-                                <BootstrapInput
-                                  {...field}
-                                  fullWidth
-                                  id="dynamic_link_url"
-                                  size="small"
-                                  placeholder="/zyx"
-                                  InputLabelProps={{ shrink: true }}
-                                />
-                              )}
-                            </Field>
-                            <ErrorMessage
-                              name="dynamic_link_url"
-                              component="div"
-                              className="text-error text-12 mt-5"
-                            />
-                          </FormControl>
-                        </Grid>
-
                         <Grid item md={6} className="w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
@@ -500,7 +404,6 @@ function DynamicLink() {
                                   fullWidth
                                   id="dynamic_link_name"
                                   size="small"
-                                  placeholder="/zyx"
                                   InputLabelProps={{ shrink: true }}
                                 />
                               )}
@@ -516,13 +419,71 @@ function DynamicLink() {
                         <Grid item md={6} className="w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
-                              Link behavior for Apple
+                              Link Access URL
+                              <sup className="asc">*</sup>
+                            </Typography>
+
+                            <Field name="deep_link_url_suffix">
+                              {({ field }) => (
+                                <BootstrapInput
+                                  {...field}
+                                  disabled
+                                  fullWidth
+                                  id="deep_link_url_suffix"
+                                  size="small"
+                                  InputLabelProps={{ shrink: true }}
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="deep_link_url_suffix"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item md={6} className="w-full"></Grid>
+
+                        <Grid item md={6} className="w-full">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Browser URL
+                              <sup className="asc">*</sup>
+                            </Typography>
+
+                            <Field name="browser_url">
+                              {({ field }) => (
+                                <BootstrapInput
+                                  {...field}
+                                  fullWidth
+                                  id="browser_url"
+                                  size="small"
+                                  // placeholder="https://page.link"
+                                  InputLabelProps={{ shrink: true }}
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="browser_url"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                          </FormControl>
+                        </Grid>
+
+                        <Grid item md={6} className="w-full"></Grid>
+
+                        <Grid item md={6} className="w-full">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Link behavior for IOS
                               <sup className="asc">*</sup>
                             </Typography>
                             <Field
                               as={RadioGroup}
-                              aria-labelledby="open_in_apple"
-                              name="open_in_apple"
+                              aria-labelledby="open_in_ios"
+                              name="open_in_ios"
                               defaultValue="Browser"
                             >
                               <FormControlLabel
@@ -533,6 +494,7 @@ function DynamicLink() {
                                     Open the deep link URL in a browser
                                   </Typography>
                                 }
+                                sx={{ width: "55%" }}
                               />
                               <FormControlLabel
                                 value="App"
@@ -542,33 +504,32 @@ function DynamicLink() {
                                     Open the deep link URL in the app
                                   </Typography>
                                 }
+                                sx={{ width: "55%" }}
                               />
                             </Field>
-                            {/* <CustomComponentSelect
-                        options={[
-                          { value: "Admin", label: "Admin" },
-                          { value: "Customer", label: "Customer" },
-                          { value: "Admin 2", label: "Admin 2" },
-                        ]}
-                        menuPlacement="auto"
-                        //   menuPosition="fixed"
-                      /> */}
-                            <Field name="application_id">
+
+                            <Field
+                              disabled={!values?.open_in_ios === "App"}
+                              name="open_in_app_ios_application_id"
+                            >
                               {({ field }) => (
                                 <CustomSelect
-                                  {...field}
-                                  isDisabled={!values?.open_in_apple === "App"}
+                                  // {...field}
+                                  isDisabled={!values?.open_in_ios === "App"}
                                   placeholder="Select Application"
                                   options={applicationArr}
-                                  id="application_id"
+                                  id="open_in_app_ios_application_id"
                                   onChange={(option) =>
-                                    setFieldValue("application_id", option)
+                                    setFieldValue(
+                                      "open_in_app_ios_application_id",
+                                      option
+                                    )
                                   }
                                 />
                               )}
                             </Field>
                             <ErrorMessage
-                              name="application_id"
+                              name="open_in_app_ios_application_id"
                               component="div"
                               className="text-error text-12 mt-5"
                             />
@@ -595,6 +556,7 @@ function DynamicLink() {
                                     Open the deep link URL in a browser
                                   </Typography>
                                 }
+                                sx={{ width: "55%" }}
                               />
                               <FormControlLabel
                                 value="App"
@@ -604,23 +566,42 @@ function DynamicLink() {
                                     Open the deep link URL in the app
                                   </Typography>
                                 }
+                                sx={{ width: "55%" }}
                               />
                             </Field>
 
-                            <CustomSelect
-                              isDisabled={!values?.open_in_android === "App"}
-                              placeholder="Select Application"
-                              options={applicationArr}
-                              id="application"
-                              menuPlacement="auto"
+                            <Field name="open_in_app_android_application_id">
+                              {({ field }) => (
+                                <CustomSelect
+                                  {...field}
+                                  isDisabled={
+                                    !values?.open_in_android === "App"
+                                  }
+                                  placeholder="Select Application"
+                                  options={applicationArr}
+                                  id="open_in_app_android_application_id"
+                                  menuPlacement="auto"
+                                  onChange={(option) =>
+                                    setFieldValue(
+                                      "open_in_app_android_application_id",
+                                      option
+                                    )
+                                  }
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="open_in_app_android_application_id"
+                              component="div"
+                              className="text-error text-12 mt-5"
                             />
                           </FormControl>
                         </Grid>
                       </Grid>
                     </Box>
-                    <Box className="p-20">
-                      <Grid container spacing={3}>
-                        <Grid item md={9} xs={2}></Grid>
+                    <Box className="p-20 bg-highlight">
+                      <Grid container spacing={2}>
+                        <Grid item md={10} xs={2}></Grid>
                         <Grid item md={1} xs={5}>
                           <Button
                             fullWidth
@@ -631,7 +612,7 @@ function DynamicLink() {
                             Cancel
                           </Button>
                         </Grid>
-                        <Grid item md={2} xs={5}>
+                        <Grid item md={1} xs={5}>
                           <LoadingButton
                             loading={submitForm}
                             disabled={submitForm}
@@ -657,3 +638,69 @@ function DynamicLink() {
 }
 
 export default DynamicLink;
+
+/* <Grid item md={6} className="w-full">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Dynamic Link URL
+                              <sup className="asc">*</sup>
+                            </Typography>
+                            <Field name="link_access_url">
+                              {({ field }) => (
+                                <BootstrapInput
+                                  {...field}
+                                  fullWidth
+                                  id="link_access_url"
+                                  size="small"
+                                  placeholder="/zyx"
+                                  InputLabelProps={{ shrink: true }}
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="link_access_url"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                          </FormControl>
+                        </Grid> */
+/* <Grid item md={6} className="w-full">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              URL Suffix
+                              <sup className="asc">*</sup>
+                            </Typography>
+
+                            <Field name="deep_link_url_suffix">
+                              {({ field }) => (
+                                <BootstrapInput
+                                  {...field}
+                                  fullWidth
+                                  id="deep_link_url_suffix"
+                                  size="small"
+                                  placeholder="/zyx"
+                                  InputLabelProps={{ shrink: true }}
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="deep_link_url_suffix"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                          </FormControl>
+                        </Grid> */
+
+/* <Grid item md={12} className="w-full">
+                          <Stack spacing={0.5}>
+                            <Typography variant="body1" className="label">
+                              Link Preview
+                            </Typography>
+                            <Typography
+                              sx={{ fontSize: "13px", color: "text.greyLight" }}
+                            >
+                              https://page.link/xyz
+                              {`${values?.deep_link_url_prefix}${values?.deep_link_url_suffix}`}
+                            </Typography>
+                          </Stack>
+                        </Grid> */

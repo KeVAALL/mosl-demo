@@ -135,7 +135,7 @@ export default function ForgotPassword() {
                               {...field}
                               id="email"
                               size="small"
-                              placeholder="Email Address"
+                              placeholder="Email"
                               fullWidth
                               InputLabelProps={{ shrink: true }}
                               onChange={(e) => {

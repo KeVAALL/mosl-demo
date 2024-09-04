@@ -40,8 +40,8 @@
   width: calc(100% - 170px) !important;
 }
 .toggle-drawer-btn {
-  /* background-color: rgba(0, 0, 0, 0.04) !important; */
-  background-color: var(--secondary) !important;
+  background-color: rgba(0, 0, 0, 0.04) !important;
+  /* background-color: var(--secondary) !important; */
   padding: 8px;
   border-radius: 8px;
 }

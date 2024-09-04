@@ -56,7 +56,7 @@ export default function ResetSignIn() {
           localStorage.setItem("resetEmail", encryptData(values?.email));
           navigate("/reset-password");
         } else {
-          toast.success("Successful!");
+          toast.success("Login successful!");
           const firstURL = result?.data?.data?.menu[0]?.menu_url;
           navigate(`/home/${firstURL ? firstURL : ""}`);
         }
@@ -152,7 +152,7 @@ export default function ResetSignIn() {
                               {...field}
                               id="email"
                               size="small"
-                              placeholder="Email Address"
+                              placeholder="Email"
                               fullWidth
                               InputLabelProps={{ shrink: true }}
                               onChange={(e) => {
@@ -260,7 +260,7 @@ export default function ResetSignIn() {
                       </Box>
                     </Grid>
 
-                    <Grid
+                    {/* <Grid
                       item
                       md={6}
                       xs={6}
@@ -275,7 +275,7 @@ export default function ResetSignIn() {
                       <Link href="/forgot-password" className="custom-link">
                         <Typography variant="caption">Go back</Typography>
                       </Link>
-                    </Grid>
+                    </Grid> */}
                   </Grid>
                 </Form>
               )}

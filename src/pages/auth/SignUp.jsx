@@ -81,7 +81,7 @@ function SignUp() {
                     fullWidth
                     id="email"
                     size="small"
-                    label="Email Address"
+                    label="Email"
                     name="email"
                     placeholder="Email"
                     InputLabelProps={{
