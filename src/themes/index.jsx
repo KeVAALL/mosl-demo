@@ -151,6 +151,12 @@ export default function ThemeCustomization({ children }) {
               color: "#eb6400",
               fontSize: "1.2rem !important", // Adjust the size of the radio button icon
             },
+            "&.Mui-disabled": {
+              color: "#b0b0b0", // Greyed-out color for disabled state
+              "& .MuiSvgIcon-root": {
+                color: "#b0b0b0", // Icon color when disabled
+              },
+            },
           },
         },
       },

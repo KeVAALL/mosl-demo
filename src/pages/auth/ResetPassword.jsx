@@ -13,10 +13,10 @@ import {
   Stack,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import KeyboardBackspaceOutlinedIcon from "@mui/icons-material/KeyboardBackspaceOutlined";
 import { BootstrapInput } from "../../utils/Input/textfield";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { useDispatch } from "react-redux";
 import mainLogo from "../../assets/img/mosl-main-logo.png";
 import { toast } from "react-toastify";
 import { ApiService } from "../../utils/api/apiCall";
@@ -73,9 +73,9 @@ export default function ResetPassword() {
         /[!@#$%^&*(),.?":{}|<>]/,
         "Password must contain at least 1 special character"
       )
-      .required("Password is required"),
+      .required("New Password is required"),
     confirmPassword: Yup.string()
-      .required("Password is required")
+      .required("Confirm Password is required")
       .test(
         "confirmPassword",
         "Both Password should match!",
@@ -185,11 +185,21 @@ export default function ResetPassword() {
                             />
                           )}
                         </Field>
-                        <ErrorMessage
+                        {/* <ErrorMessage
                           name="newPassword"
                           component="div"
                           className="text-error text-12 mt-5"
-                        />
+                        /> */}
+                        <ErrorMessage name="newPassword">
+                          {(msg) => (
+                            <div className="custom-error-message">
+                              <ErrorOutlineOutlinedIcon
+                                sx={{ color: "#ff0000", fontSize: "18px" }} // Custom error icon color
+                              />
+                              <Typography variant="caption">{msg}</Typography>
+                            </div>
+                          )}
+                        </ErrorMessage>
                       </FormControl>
                     </Grid>
                     <Grid item xs={12}>
@@ -238,11 +248,16 @@ export default function ResetPassword() {
                             />
                           )}
                         </Field>
-                        <ErrorMessage
-                          name="confirmPassword"
-                          component="div"
-                          className="text-error text-12 mt-5"
-                        />
+                        <ErrorMessage name="confirmPassword">
+                          {(msg) => (
+                            <div className="custom-error-message">
+                              <ErrorOutlineOutlinedIcon
+                                sx={{ color: "#ff0000", fontSize: "18px" }} // Custom error icon color
+                              />
+                              <Typography variant="caption">{msg}</Typography>
+                            </div>
+                          )}
+                        </ErrorMessage>
                       </FormControl>
                     </Grid>
 

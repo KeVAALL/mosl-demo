@@ -56,25 +56,27 @@ import * as Yup from "yup";
 import { LoadingButton } from "@mui/lab";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { HtmlLightTooltip } from "../../utils/components/Tooltip";
+import { useSelector } from "react-redux";
 
 function DynamicLink() {
+  const { userProfile } = useSelector((state) => state.user);
   const [open, setOpen] = useState(false);
   const [openForm, setOpenForm] = useState(false);
   const [submitForm, setSubmitForm] = useState(false);
   const [initialValues, setInitialValues] = useState({
-    p_id: null,
-    link_access_url: "",
+    project_id: null,
     dynamic_link_name: "",
+    link_param: "",
     browser_url: "",
-    open_in_ios: "Browser",
-    open_in_android: "Browser",
+    open_in_ios: "",
+    open_in_android: "",
     open_in_app_ios_application_id: null,
     open_in_app_android_application_id: null,
   });
   const validationSchema = Yup.object().shape({
-    p_id: Yup.object().required("Project is required"),
-    link_access_url: Yup.string(),
+    project_id: Yup.object().required("Project is required"),
     dynamic_link_name: Yup.string().required("Dynamic Link Name is required"),
+    link_param: Yup.string().required("Link Access URL is required"),
     browser_url: Yup.string().required("Browser URL is required"),
     open_in_ios: Yup.string().required("Link behavior for IOS is required"),
     open_in_android: Yup.string().required(
@@ -94,6 +96,8 @@ function DynamicLink() {
   const [loadingData, setLoadingData] = useState(false);
   const [tableData, setTableData] = useState([]);
   const [projectDropdown, setProjectDropdown] = useState([]);
+  const [appDropdown, setAppDropdown] = useState([]);
+  const [fetchingLink, setFetchingLink] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteItem, setDeleteItem] = useState({});
@@ -104,21 +108,91 @@ function DynamicLink() {
   };
   const handleClose = () => {
     setOpenForm(false);
+    setFormEditing(false);
+    setInitialValues({
+      project_id: null,
+      dynamic_link_name: "",
+      link_param: "",
+      browser_url: "",
+      open_in_ios: "",
+      open_in_android: "",
+      open_in_app_ios_application_id: null,
+      open_in_app_android_application_id: null,
+    });
   };
   // Delete Modal
   const handleDeleteConfirmation = () => {
     setOpenDeleteModal(!openDeleteModal);
   };
-  const applicationArr = [
-    {
-      label: "push-notification-6787b",
-      value: "push-notification-6787b",
-    },
-    {
-      label: "react-auth-test-175bb",
-      value: "react-auth-test-175bb",
-    },
-  ];
+  const onSubmit = async (values) => {
+    console.log(values);
+
+    const reqdata = {
+      ...values,
+      project_id: values?.project_id?.value,
+      open_in_app_android: values?.open_in_android === "App" ? 1 : 0,
+      open_in_browser_android: values?.open_in_android === "Browser" ? 1 : 0,
+      open_in_app_android_application_id:
+        values?.open_in_app_android_application_id?.value,
+      open_in_app_ios: values?.open_in_ios === "App" ? 1 : 0,
+      open_in_browser_ios: values?.open_in_ios === "Browser" ? 1 : 0,
+      open_in_app_ios_application_id:
+        values?.open_in_app_ios_application_id?.value,
+    };
+    console.log(reqdata);
+    try {
+      setSubmitForm(true);
+
+      const result = await ApiService(reqdata, "dynamiclinks/link");
+
+      console.log(result);
+
+      if (result?.status === 201) {
+        toast.success(
+          `Dynamic Link${formEditing ? " Updated Successfully" : " Added"}`
+        );
+        setOpenForm(false);
+        setFormEditing(false);
+        setInitialValues({
+          project_id: null,
+          dynamic_link_name: "",
+          link_param: "",
+          browser_url: "",
+          open_in_ios: "",
+          open_in_android: "",
+          open_in_app_ios_application_id: null,
+          open_in_app_android_application_id: null,
+        });
+      }
+
+      // return result;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setSubmitForm(false);
+    }
+  };
+  async function getApplicationDropdown(project) {
+    try {
+      const result = await ApiService(
+        {
+          id: userProfile?.user_id,
+          name: userProfile?.user_name,
+          p_id: project.value,
+        },
+        "application/getall-application"
+      );
+      console.log(result);
+
+      const newMap = result?.data?.map((app) => {
+        return { label: app?.package_name, value: app?.id };
+      });
+
+      setAppDropdown(newMap);
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    }
+  }
   async function getProjectDropdown() {
     try {
       const result = await ApiService({}, "project/getall-project");
@@ -131,6 +205,34 @@ function DynamicLink() {
       setProjectDropdown(newMap);
     } catch (error) {
       toast.error(error?.response?.data?.message);
+    }
+  }
+  async function getAccessLinkUrl(values, setFieldTouched) {
+    const reqdata = {
+      ...values,
+      created_by: userProfile?.user_role_id,
+      created_by_name: userProfile?.user_name,
+    };
+    try {
+      setFetchingLink(true);
+      const result = await ApiService(reqdata, "dynamiclinks/link");
+
+      console.log(result);
+      const res = result?.data;
+      console.log(projectDropdown);
+      console.log(projectDropdown?.filter((p) => p?.value === res?.project_id));
+      setInitialValues({
+        ...res,
+        project_id: projectDropdown?.filter(
+          (p) => p?.value === res?.project_id
+        )[0],
+        open_in_ios: "Browser",
+        open_in_android: "Browser",
+      });
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setFetchingLink(false);
     }
   }
 
@@ -258,7 +360,7 @@ function DynamicLink() {
                 <Grid item md={3} xs={6}>
                   <CustomSelect
                     placeholder="Select Application"
-                    options={applicationArr}
+                    options={[]}
                     id="application"
                     isClearable
                   />
@@ -351,11 +453,16 @@ function DynamicLink() {
               enableReinitialize
               initialValues={initialValues}
               validationSchema={validationSchema}
-              onSubmit={(values) => {
-                console.log(values);
-              }}
+              onSubmit={onSubmit}
             >
-              {({ setFieldValue, handleSubmit, values }) => (
+              {({
+                setFieldTouched,
+                setFieldValue,
+                setFieldError,
+                validateForm,
+                handleSubmit,
+                values,
+              }) => (
                 <Form onSubmit={handleSubmit}>
                   <Paper elevation={3}>
                     <Box>
@@ -371,21 +478,24 @@ function DynamicLink() {
                               Project
                               <sup className="asc">*</sup>
                             </Typography>
-                            <Field name="p_id">
+                            <Field name="project_id">
                               {({ field }) => (
                                 <CustomSelect
-                                  {...field}
+                                  // {...field}
                                   placeholder="Select Project"
                                   options={projectDropdown}
-                                  id="p_id"
-                                  onChange={(option) =>
-                                    setFieldValue("p_id", option)
-                                  }
+                                  id="project_id"
+                                  onChange={(option) => {
+                                    setFieldValue("project_id", option);
+                                    setFieldValue("link_param", "");
+                                    getApplicationDropdown(option);
+                                  }}
+                                  value={values?.project_id}
                                 />
                               )}
                             </Field>
                             <ErrorMessage
-                              name="p_id"
+                              name="project_id"
                               component="div"
                               className="text-error text-12 mt-5"
                             />
@@ -405,6 +515,92 @@ function DynamicLink() {
                                   id="dynamic_link_name"
                                   size="small"
                                   InputLabelProps={{ shrink: true }}
+                                  onChange={async (e) => {
+                                    const value = e.target.value;
+                                    const regex = /^\S+$/;
+
+                                    if (
+                                      !value ||
+                                      regex.test(value.toString())
+                                    ) {
+                                      setFieldValue("link_param", "");
+                                      setFieldValue("dynamic_link_name", value);
+                                    } else {
+                                      return;
+                                    }
+                                  }}
+                                  endAdornment={
+                                    <LoadingButton
+                                      loading={fetchingLink}
+                                      disabled={fetchingLink}
+                                      variant="contained"
+                                      fullWidth
+                                      sx={{
+                                        position: "absolute",
+                                        backgroundColor: "primary.main",
+                                        width: "15%",
+                                        right: 0,
+                                        height: "37px",
+                                        borderTopLeftRadius: 0,
+                                        borderBottomLeftRadius: 0,
+                                        boxShadow: "none",
+                                      }}
+                                      onClick={async () => {
+                                        // Mark `project_id` and `dynamic_link_name` as touched
+                                        setFieldTouched("project_id", true);
+                                        setFieldTouched(
+                                          "dynamic_link_name",
+                                          true
+                                        );
+
+                                        // Validate the entire form, but only focus on `project_id` and `dynamic_link_name`
+                                        const validationErrors =
+                                          await validateForm();
+
+                                        let hasError = false;
+
+                                        // Check for `project_id` error and display it if found
+                                        if (validationErrors.project_id) {
+                                          setFieldError(
+                                            "project_id",
+                                            "Project is required."
+                                          );
+                                          toast.error("Project is required.");
+                                          hasError = true; // Set flag that there is an error
+                                        }
+
+                                        // Check for `dynamic_link_name` error and display it if found
+                                        if (
+                                          validationErrors.dynamic_link_name
+                                        ) {
+                                          setFieldError(
+                                            "dynamic_link_name",
+                                            "Dynamic Link Name is required."
+                                          );
+                                          toast.error(
+                                            "Dynamic Link Name is required."
+                                          );
+                                          hasError = true; // Set flag that there is an error
+                                        }
+
+                                        // If no errors, proceed with API call
+                                        if (!hasError) {
+                                          const formValues = {
+                                            project_id:
+                                              values?.project_id?.value,
+                                            dynamic_link_name:
+                                              values?.dynamic_link_name,
+                                          };
+                                          getAccessLinkUrl(
+                                            formValues,
+                                            setFieldTouched
+                                          );
+                                        }
+                                      }}
+                                    >
+                                      Save
+                                    </LoadingButton>
+                                  }
                                 />
                               )}
                             </Field>
@@ -423,20 +619,20 @@ function DynamicLink() {
                               <sup className="asc">*</sup>
                             </Typography>
 
-                            <Field name="deep_link_url_suffix">
+                            <Field name="link_param">
                               {({ field }) => (
                                 <BootstrapInput
                                   {...field}
                                   disabled
                                   fullWidth
-                                  id="deep_link_url_suffix"
+                                  id="link_param"
                                   size="small"
                                   InputLabelProps={{ shrink: true }}
                                 />
                               )}
                             </Field>
                             <ErrorMessage
-                              name="deep_link_url_suffix"
+                              name="link_param"
                               component="div"
                               className="text-error text-12 mt-5"
                             />
@@ -459,8 +655,21 @@ function DynamicLink() {
                                   fullWidth
                                   id="browser_url"
                                   size="small"
-                                  // placeholder="https://page.link"
+                                  disabled={!values.link_param}
                                   InputLabelProps={{ shrink: true }}
+                                  onChange={async (e) => {
+                                    const value = e.target.value;
+                                    const regex = /^\S+$/;
+
+                                    if (
+                                      !value ||
+                                      regex.test(value.toString())
+                                    ) {
+                                      setFieldValue("browser_url", value);
+                                    } else {
+                                      return;
+                                    }
+                                  }}
                                 />
                               )}
                             </Field>
@@ -495,6 +704,7 @@ function DynamicLink() {
                                   </Typography>
                                 }
                                 sx={{ width: "55%" }}
+                                disabled={!values.link_param}
                               />
                               <FormControlLabel
                                 value="App"
@@ -505,19 +715,30 @@ function DynamicLink() {
                                   </Typography>
                                 }
                                 sx={{ width: "55%" }}
+                                disabled={!values.link_param}
+                              />
+                              <ErrorMessage
+                                name="open_in_ios"
+                                component="div"
+                                className="text-error text-12 mt-5"
                               />
                             </Field>
 
                             <Field
-                              disabled={!values?.open_in_ios === "App"}
+                              disabled={
+                                values.open_in_ios !== "App" ||
+                                !values.link_param
+                              }
                               name="open_in_app_ios_application_id"
                             >
                               {({ field }) => (
                                 <CustomSelect
-                                  // {...field}
-                                  isDisabled={!values?.open_in_ios === "App"}
+                                  isDisabled={
+                                    values.open_in_ios !== "App" ||
+                                    !values.link_param
+                                  }
                                   placeholder="Select Application"
-                                  options={applicationArr}
+                                  options={appDropdown}
                                   id="open_in_app_ios_application_id"
                                   onChange={(option) =>
                                     setFieldValue(
@@ -557,6 +778,7 @@ function DynamicLink() {
                                   </Typography>
                                 }
                                 sx={{ width: "55%" }}
+                                disabled={!values.link_param}
                               />
                               <FormControlLabel
                                 value="App"
@@ -567,18 +789,31 @@ function DynamicLink() {
                                   </Typography>
                                 }
                                 sx={{ width: "55%" }}
+                                disabled={!values.link_param}
+                              />
+                              <ErrorMessage
+                                name="open_in_android"
+                                component="div"
+                                className="text-error text-12 mt-5"
                               />
                             </Field>
 
-                            <Field name="open_in_app_android_application_id">
+                            <Field
+                              disabled={
+                                values.open_in_android !== "App" ||
+                                !values.link_param
+                              }
+                              name="open_in_app_android_application_id"
+                            >
                               {({ field }) => (
                                 <CustomSelect
                                   {...field}
                                   isDisabled={
-                                    !values?.open_in_android === "App"
+                                    values.open_in_android !== "App" ||
+                                    !values.link_param
                                   }
                                   placeholder="Select Application"
-                                  options={applicationArr}
+                                  options={appDropdown}
                                   id="open_in_app_android_application_id"
                                   menuPlacement="auto"
                                   onChange={(option) =>
@@ -645,12 +880,12 @@ export default DynamicLink;
                               Dynamic Link URL
                               <sup className="asc">*</sup>
                             </Typography>
-                            <Field name="link_access_url">
+                            <Field name="link_param">
                               {({ field }) => (
                                 <BootstrapInput
                                   {...field}
                                   fullWidth
-                                  id="link_access_url"
+                                  id="link_param"
                                   size="small"
                                   placeholder="/zyx"
                                   InputLabelProps={{ shrink: true }}
@@ -658,7 +893,7 @@ export default DynamicLink;
                               )}
                             </Field>
                             <ErrorMessage
-                              name="link_access_url"
+                              name="link_param"
                               component="div"
                               className="text-error text-12 mt-5"
                             />

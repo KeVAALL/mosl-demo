@@ -5,29 +5,20 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { Field, Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import {
-  FormControl,
-  IconButton,
-  InputAdornment,
-  Link,
-  Stack,
-} from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { FormControl, Link, Stack } from "@mui/material";
 import { BootstrapInput } from "../../utils/Input/textfield";
 import { useNavigate } from "react-router-dom";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { ApiService } from "../../utils/api/apiCall";
-import { setProfile } from "../../redux/slices/userSlice";
-import { setMenu } from "../../redux/slices/menuSlice";
 import mainLogo from "../../assets/img/mosl-main-logo.png";
 import KeyboardBackspaceOutlinedIcon from "@mui/icons-material/KeyboardBackspaceOutlined";
+import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import "./auth.css";
 import { encryptData } from "../../utils/encryption";
 
 export default function ForgotPassword() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loginAttempt, setLoginAttempt] = useState(false);
   const [formValues, setFormValues] = useState({
@@ -153,11 +144,21 @@ export default function ForgotPassword() {
                             />
                           )}
                         </Field>
-                        <ErrorMessage
+                        {/* <ErrorMessage
                           name="email"
                           component="div"
                           className="text-error text-12 mt-5"
-                        />
+                        /> */}
+                        <ErrorMessage name="email">
+                          {(msg) => (
+                            <div className="custom-error-message">
+                              <ErrorOutlineOutlinedIcon
+                                sx={{ color: "#ff0000", fontSize: "18px" }} // Custom error icon color
+                              />
+                              <Typography variant="caption">{msg}</Typography>
+                            </div>
+                          )}
+                        </ErrorMessage>
                       </FormControl>
                     </Grid>
 

@@ -17,6 +17,7 @@ import { ApiService } from "../../utils/api/apiCall";
 import { setProfile } from "../../redux/slices/userSlice";
 import { setMenu } from "../../redux/slices/menuSlice";
 import "./auth.css";
+import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import mainLogo from "../../assets/img/mosl-main-logo.png";
 import { encryptData } from "../../utils/encryption";
 
@@ -174,11 +175,16 @@ export default function SignIn() {
                             />
                           )}
                         </Field>
-                        <ErrorMessage
-                          name="email"
-                          component="div"
-                          className="text-error text-12 mt-5"
-                        />
+                        <ErrorMessage name="email">
+                          {(msg) => (
+                            <div className="custom-error-message">
+                              <ErrorOutlineOutlinedIcon
+                                sx={{ color: "#ff0000", fontSize: "18px" }} // Custom error icon color
+                              />
+                              <Typography variant="caption">{msg}</Typography>
+                            </div>
+                          )}
+                        </ErrorMessage>
                       </FormControl>
                     </Grid>
                     <Grid item xs={12}>
@@ -227,11 +233,16 @@ export default function SignIn() {
                             />
                           )}
                         </Field>
-                        <ErrorMessage
-                          name="password"
-                          component="div"
-                          className="text-error text-12 mt-5"
-                        />
+                        <ErrorMessage name="password">
+                          {(msg) => (
+                            <div className="custom-error-message">
+                              <ErrorOutlineOutlinedIcon
+                                sx={{ color: "#ff0000", fontSize: "18px" }} // Custom error icon color
+                              />
+                              <Typography variant="caption">{msg}</Typography>
+                            </div>
+                          )}
+                        </ErrorMessage>
                       </FormControl>
                     </Grid>
                     <Grid item xs={6} alignItems="flex-end">

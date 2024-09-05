@@ -123,7 +123,9 @@ function Role() {
       console.log(result);
 
       if (result?.status === 201) {
-        toast.success(`Role${formEditing ? " Edited" : " Added"}`);
+        toast.success(
+          `Role${formEditing ? " Updated Successfully" : " Added"}`
+        );
         setOpenForm(false);
         setFormEditing(false);
         setInitialValues({
@@ -261,7 +263,7 @@ function Role() {
                     } catch (error) {
                       toast.error(error?.response?.data?.message);
                     } finally {
-                      // setIsEditing(false);
+                      setIsEditing(false);
                     }
                   }}
                 />
@@ -384,7 +386,12 @@ function Role() {
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ display: "flex", gap: "10px" }}>
-                  <Button autoFocus onClick={handleDeleteConfirmation}>
+                  <Button
+                    autoFocus
+                    onClick={() => {
+                      setOpenDeleteModal(false);
+                    }}
+                  >
                     Cancel
                   </Button>
                   <LoadingButton

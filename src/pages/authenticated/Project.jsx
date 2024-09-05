@@ -149,7 +149,9 @@ function Project() {
       console.log(result);
 
       if (result?.status === 201) {
-        toast.success(`Project${formEditing ? " Edited" : " Added"}`);
+        toast.success(
+          `Project${formEditing ? " Updated Successfully" : " Added"}`
+        );
         setOpenForm(false);
         setFormEditing(false);
         setInitialValues({
@@ -390,7 +392,12 @@ function Project() {
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ display: "flex", gap: "10px" }}>
-                  <Button autoFocus onClick={handleDeleteConfirmation}>
+                  <Button
+                    autoFocus
+                    onClick={() => {
+                      setOpenDeleteModal(false);
+                    }}
+                  >
                     Cancel
                   </Button>
                   <LoadingButton

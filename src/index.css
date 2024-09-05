@@ -535,6 +535,16 @@ h1 {
 .text-success {
   color: #22bb33;
 }
+.custom-error-message {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  padding: 4px 8px;
+  gap: 4px;
+  margin-top: 8px;
+  border-radius: 4px;
+  color: #ff0000; /* Custom error text color */
+}
 .text-12 {
   font-size: 12px;
 }

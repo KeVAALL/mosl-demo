@@ -4,6 +4,7 @@ import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import {
+  Backdrop,
   Box,
   Button,
   CircularProgress,
@@ -82,7 +83,9 @@ function User() {
         "Password must contain at least 1 special character"
       )
       .required("Password is required"),
-    phone_number: Yup.string().required("Phone Number is required"),
+    phone_number: Yup.string()
+      .min(10, "Invalid Phone number")
+      .required("Phone Number is required"),
     role_id: Yup.object().required("Role is required"),
   });
   const handleOpen = () => {
@@ -162,7 +165,9 @@ function User() {
       console.log(result);
 
       if (result?.status === 201) {
-        toast.success(`User${formEditing ? " Edited" : " Added"}`);
+        toast.success(
+          `User${formEditing ? " Updated Successfully" : " Added"}`
+        );
         setOpenForm(false);
         setFormEditing(false);
         setInitialValues({
@@ -394,7 +399,12 @@ function User() {
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ display: "flex", gap: "10px" }}>
-                  <Button autoFocus onClick={handleDeleteConfirmation}>
+                  <Button
+                    autoFocus
+                    onClick={() => {
+                      setOpenDeleteModal(false);
+                    }}
+                  >
                     Cancel
                   </Button>
                   <LoadingButton
@@ -476,7 +486,9 @@ function User() {
                                   <StyledTableCell
                                     key={cell.column.id}
                                     {...cell.getCellProps({
-                                      style: { minWidth: cell.column.minWidth },
+                                      style: {
+                                        minWidth: cell.column.minWidth,
+                                      },
                                     })}
                                     sx={{
                                       border: "1px solid #dbe0e5a6",
@@ -572,7 +584,8 @@ function User() {
 
                                     if (
                                       !value ||
-                                      regex.test(value.toString())
+                                      (regex.test(value.toString()) &&
+                                        value.length <= 50)
                                     ) {
                                       setFieldValue("name", value);
                                     } else {
@@ -614,7 +627,8 @@ function User() {
 
                                     if (
                                       !value ||
-                                      regex.test(value.toString())
+                                      (regex.test(value.toString()) &&
+                                        value.length <= 100)
                                     ) {
                                       setFieldValue("email", value);
                                     } else {
@@ -655,7 +669,8 @@ function User() {
 
                                     if (
                                       !value ||
-                                      regex.test(value.toString())
+                                      (regex.test(value.toString()) &&
+                                        value.length <= 50)
                                     ) {
                                       setFieldValue("password", value);
                                     } else {

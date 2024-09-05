@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import { ApiService } from "../../utils/api/apiCall";
 import mainLogo from "../../assets/img/mosl-main-logo.png";
 import "./auth.css";
-import KeyboardBackspaceOutlinedIcon from "@mui/icons-material/KeyboardBackspaceOutlined";
+import ErrorOutlineOutlinedIcon from "@mui/icons-material/ErrorOutlineOutlined";
 import { decryptData, encryptData } from "../../utils/encryption";
 import { setProfile } from "../../redux/slices/userSlice";
 import { setMenu } from "../../redux/slices/menuSlice";
@@ -170,11 +170,16 @@ export default function ResetSignIn() {
                             />
                           )}
                         </Field>
-                        <ErrorMessage
-                          name="email"
-                          component="div"
-                          className="text-error text-12 mt-5"
-                        />
+                        <ErrorMessage name="email">
+                          {(msg) => (
+                            <div className="custom-error-message">
+                              <ErrorOutlineOutlinedIcon
+                                sx={{ color: "#ff0000", fontSize: "18px" }} // Custom error icon color
+                              />
+                              <Typography variant="caption">{msg}</Typography>
+                            </div>
+                          )}
+                        </ErrorMessage>
                       </FormControl>
                     </Grid>
                     <Grid item xs={12}>
@@ -223,11 +228,16 @@ export default function ResetSignIn() {
                             />
                           )}
                         </Field>
-                        <ErrorMessage
-                          name="password"
-                          component="div"
-                          className="text-error text-12 mt-5"
-                        />
+                        <ErrorMessage name="password">
+                          {(msg) => (
+                            <div className="custom-error-message">
+                              <ErrorOutlineOutlinedIcon
+                                sx={{ color: "#ff0000", fontSize: "18px" }} // Custom error icon color
+                              />
+                              <Typography variant="caption">{msg}</Typography>
+                            </div>
+                          )}
+                        </ErrorMessage>
                       </FormControl>
                     </Grid>
 

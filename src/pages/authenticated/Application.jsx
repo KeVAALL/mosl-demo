@@ -180,7 +180,9 @@ function Application() {
       console.log(result);
 
       if (result?.status === 201) {
-        toast.success(`Application${formEditing ? " Edited" : " Added"}`);
+        toast.success(
+          `Application${formEditing ? " Updated Successfully" : " Added"}`
+        );
         setOpenForm(false);
         setFormEditing(false);
         setInitialValues({
@@ -400,7 +402,12 @@ function Application() {
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ display: "flex", gap: "10px" }}>
-                  <Button autoFocus onClick={handleDeleteConfirmation}>
+                  <Button
+                    autoFocus
+                    onClick={() => {
+                      setOpenDeleteModal(false);
+                    }}
+                  >
                     Cancel
                   </Button>
                   <LoadingButton
@@ -432,7 +439,7 @@ function Application() {
                         getApplication(e);
                       }}
                       id="project"
-                      isClearable
+                      isClearable={false}
                     />
                   </Grid>
                 </Grid>
