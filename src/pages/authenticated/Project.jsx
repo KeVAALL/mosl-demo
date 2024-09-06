@@ -568,7 +568,8 @@ function Project() {
 
                                     if (
                                       !value ||
-                                      regex.test(value.toString())
+                                      (regex.test(value.toString()) &&
+                                        value.length <= 50)
                                     ) {
                                       setFieldValue("project_name", value);
                                     } else {
@@ -608,7 +609,8 @@ function Project() {
 
                                     if (
                                       !value ||
-                                      regex.test(value.toString())
+                                      (regex.test(value.toString()) &&
+                                        value.length <= 50)
                                     ) {
                                       setFieldValue("project_id", value);
                                       setSuccessMessage("");
@@ -720,7 +722,8 @@ function Project() {
 
                                     if (
                                       !value ||
-                                      regex.test(value.toString())
+                                      (regex.test(value.toString()) &&
+                                        value.length <= 200)
                                     ) {
                                       setFieldValue(
                                         "project_description",

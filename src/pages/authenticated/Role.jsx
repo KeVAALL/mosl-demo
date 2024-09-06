@@ -565,7 +565,8 @@ function Role() {
 
                                     if (
                                       !value ||
-                                      regex.test(value.toString())
+                                      (regex.test(value.toString()) &&
+                                        value.length <= 50)
                                     ) {
                                       setFieldValue("role_name", value);
                                     } else {

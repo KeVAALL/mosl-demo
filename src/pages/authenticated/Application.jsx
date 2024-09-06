@@ -653,7 +653,8 @@ function Application() {
 
                                           if (
                                             !value ||
-                                            regex.test(value.toString())
+                                            (regex.test(value.toString()) &&
+                                              value.length <= 50)
                                           ) {
                                             setFieldValue(
                                               "package_name",
@@ -696,7 +697,8 @@ function Application() {
 
                                           if (
                                             !value ||
-                                            regex.test(value.toString())
+                                            (regex.test(value.toString()) &&
+                                              value.length <= 200)
                                           ) {
                                             setFieldValue("description", value);
                                           } else {
@@ -735,7 +737,8 @@ function Application() {
 
                                           if (
                                             !value ||
-                                            regex.test(value.toString())
+                                            (regex.test(value.toString()) &&
+                                              value.length <= 200)
                                           ) {
                                             setFieldValue("bundle_id", value);
                                           } else {
@@ -774,7 +777,8 @@ function Application() {
 
                                           if (
                                             !value ||
-                                            regex.test(value.toString())
+                                            (regex.test(value.toString()) &&
+                                              value.length <= 200)
                                           ) {
                                             setFieldValue("store_url", value);
                                           } else {
@@ -813,7 +817,8 @@ function Application() {
 
                                           if (
                                             !value ||
-                                            regex.test(value.toString())
+                                            (regex.test(value.toString()) &&
+                                              value.length <= 200)
                                           ) {
                                             setFieldValue("dynamic_url", value);
                                           } else {
