@@ -9,6 +9,12 @@ import {
   Backdrop,
   Box,
   Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   FormControlLabel,
   FormLabel,
@@ -98,6 +104,7 @@ function DynamicLink() {
   const [projectDropdown, setProjectDropdown] = useState([]);
   const [appDropdown, setAppDropdown] = useState([]);
   const [fetchingLink, setFetchingLink] = useState(false);
+  const [fetchingApps, setFetchingApp] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteItem, setDeleteItem] = useState({});
@@ -124,6 +131,28 @@ function DynamicLink() {
   const handleDeleteConfirmation = () => {
     setOpenDeleteModal(!openDeleteModal);
   };
+  async function getLinks(link_id = 0, project_id = 0) {
+    try {
+      setLoadingData(true);
+      const result = await ApiService(
+        {
+          link_id: link_id,
+          project_id: project_id,
+        },
+        "dynamiclinks/get-link"
+      );
+
+      const newMap = result?.data?.map((table) => {
+        return { ...table, isDeleting: false, isEditing: false };
+      });
+
+      setTableData(newMap);
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setLoadingData(false);
+    }
+  }
   const onSubmit = async (values) => {
     console.log(values);
 
@@ -138,6 +167,7 @@ function DynamicLink() {
       open_in_browser_ios: values?.open_in_ios === "Browser" ? 1 : 0,
       open_in_app_ios_application_id:
         values?.open_in_app_ios_application_id?.value,
+      is_deleted: 0,
     };
     console.log(reqdata);
     try {
@@ -174,6 +204,7 @@ function DynamicLink() {
   };
   async function getApplicationDropdown(project) {
     try {
+      setFetchingApp(true);
       const result = await ApiService(
         {
           id: userProfile?.user_id,
@@ -191,6 +222,8 @@ function DynamicLink() {
       setAppDropdown(newMap);
     } catch (error) {
       toast.error(error?.response?.data?.message);
+    } finally {
+      setFetchingApp(false);
     }
   }
   async function getProjectDropdown() {
@@ -235,6 +268,37 @@ function DynamicLink() {
       setFetchingLink(false);
     }
   }
+  const deleteApplication = async () => {
+    console.log(deleteItem);
+    const reqdata = {
+      ...deleteItem,
+      is_deleted: 1,
+      is_active: 0,
+    };
+    // Handle form submission
+    try {
+      setDeleteItem({
+        ...deleteItem,
+        isDeleting: true,
+      });
+
+      const result = await ApiService(reqdata, "application/create");
+
+      if (result?.status === 201) {
+        toast.error("Application Deleted");
+        handleDeleteConfirmation();
+      }
+
+      return result;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setDeleteItem({
+        ...deleteItem,
+        isDeleting: false,
+      });
+    }
+  };
 
   const dataColumns = useMemo(
     () => [
@@ -260,18 +324,42 @@ function DynamicLink() {
                   }
                   onClick={async () => {
                     console.log(row);
+                    try {
+                      // Find the index of the matched element in the tableData array
+                      setIsEditing(true);
+
+                      const result = await ApiService(
+                        { link_id: row?.original?.link_id },
+                        "dynamiclinks/get-link"
+                      );
+
+                      const resp = result?.data[0];
+                      console.log(resp);
+
+                      const newMap = {
+                        ...resp,
+                      };
+
+                      // setInitialValues(newMap);
+                      // setFormEditing(true);
+                      // setOpenForm(true);
+                    } catch (error) {
+                      toast.error(error?.response?.data?.message);
+                    } finally {
+                      setIsEditing(false);
+                    }
                   }}
                 />
               </HtmlLightTooltip>
 
               <HtmlLightTooltip title="Delete" placement="top" arrow>
-                <Button
+                <LoadingButton
                   className="mui-icon-button"
                   variant="outlined"
                   startIcon={<DeleteForeverOutlinedIcon />}
                   onClick={() => {
-                    // setDeleteItem(row?.original);
-                    // handleDeleteConfirmation();
+                    setDeleteItem(row?.original);
+                    handleDeleteConfirmation();
                   }}
                 />
               </HtmlLightTooltip>
@@ -324,6 +412,9 @@ function DynamicLink() {
   useEffect(() => {
     getProjectDropdown();
   }, []);
+  useEffect(() => {
+    getLinks();
+  }, []);
 
   return (
     <>
@@ -349,105 +440,177 @@ function DynamicLink() {
         </Grid>
         <Grid item xs={12}>
           {!openForm ? (
-            <TableContainer component={Paper}>
-              <Grid container spacing={1.5} px={2} py={2}>
-                <Grid item md={2} xs={6}>
-                  <GlobalFilter
-                    globalFilter={globalFilter}
-                    setGlobalFilter={setGlobalFilter}
-                  />
-                </Grid>
-                <Grid item md={3} xs={6}>
+            <>
+              <Dialog
+                open={openDeleteModal}
+                aria-labelledby="responsive-dialog-title"
+                PaperProps={{
+                  style: {
+                    width: "500px",
+                  },
+                }}
+              >
+                <DialogTitle id="responsive-dialog-title">
+                  Are you sure ?
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText color="black">
+                    Delete {deleteItem?.package_name}?
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ display: "flex", gap: "10px" }}>
+                  <Button
+                    autoFocus
+                    onClick={() => {
+                      setOpenDeleteModal(false);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <LoadingButton
+                    loading={deleteItem?.isDeleting}
+                    disabled={deleteItem?.isDeleting}
+                    variant="outlined"
+                    onClick={deleteApplication}
+                    autoFocus
+                  >
+                    Delete
+                  </LoadingButton>
+                </DialogActions>
+              </Dialog>
+              <TableContainer component={Paper}>
+                <Grid container spacing={1.5} px={2} py={2}>
+                  <Grid item md={2} xs={6}>
+                    <GlobalFilter
+                      globalFilter={globalFilter}
+                      setGlobalFilter={setGlobalFilter}
+                    />
+                  </Grid>
+                  <Grid item md={3} xs={6}>
+                    <CustomSelect
+                      placeholder="Select Project"
+                      options={projectDropdown}
+                      id="project"
+                      isClearable
+                      onChange={(option) => {
+                        setSelectedProject(option);
+                        getLinks(0, option?.value);
+                      }}
+                      value={selectedProject}
+                    />
+                  </Grid>
+                  {/* <Grid item md={3} xs={6}>
                   <CustomSelect
                     placeholder="Select Application"
-                    options={[]}
+                    options={appDropdown}
+                    isLoading={fetchingApps}
                     id="application"
                     isClearable
                   />
+                </Grid> */}
                 </Grid>
-                <Grid item md={3} xs={6}>
-                  <CustomSelect
-                    placeholder="Select Project"
-                    options={projectDropdown}
-                    id="project"
-                    isClearable
-                  />
-                </Grid>
-              </Grid>
-              <Box sx={{ width: "100%", overflowX: "auto", display: "block" }}>
-                <Table {...getTableProps()}>
-                  <TableHead>
-                    {headerGroups.map((headerGroup) => (
-                      <TableRow
-                        className="last-header-right"
-                        key={headerGroup.id}
-                        {...headerGroup.getHeaderGroupProps()}
-                      >
-                        {headerGroup.headers.map((column) => (
-                          <StyledTableCell
-                            key={column.id}
-                            {...column.getHeaderProps({
-                              style: { minWidth: column.minWidth },
-                            })}
-                            sx={{
-                              border: "1px solid #dbe0e5a6",
-                            }}
+                <Box
+                  sx={{ width: "100%", overflowX: "auto", display: "block" }}
+                >
+                  <Table {...getTableProps()}>
+                    <TableHead>
+                      {headerGroups.map((headerGroup) => (
+                        <TableRow
+                          className="last-header-right"
+                          key={headerGroup.id}
+                          {...headerGroup.getHeaderGroupProps()}
+                        >
+                          {headerGroup.headers.map((column) => (
+                            <StyledTableCell
+                              key={column.id}
+                              {...column.getHeaderProps({
+                                style: { minWidth: column.minWidth },
+                              })}
+                              sx={{
+                                border: "1px solid #dbe0e5a6",
+                              }}
+                            >
+                              <HeaderSort column={column} />
+                            </StyledTableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableHead>
+                    {loadingData ? (
+                      <TableBody>
+                        <TableRow>
+                          <TableCell
+                            colSpan={columns.length + 1}
+                            align="center"
                           >
-                            <HeaderSort column={column} />
-                          </StyledTableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableHead>
-                  <TableBody
-                    className="table_body_main"
-                    {...getTableBodyProps()}
-                  >
-                    {page.length > 0 ? (
-                      page.map((row) => {
-                        prepareRow(row);
-                        return (
-                          <TableRow key={row.id} {...row.getRowProps()}>
-                            {row.cells.map((cell) => (
-                              <StyledTableCell
-                                key={cell.column.id}
-                                {...cell.getCellProps({
-                                  style: { minWidth: cell.column.minWidth },
-                                })}
+                            <Box p={5} display="flex" justifyContent="center">
+                              <CircularProgress
+                                className="table_loader"
                                 sx={{
-                                  border: "1px solid #dbe0e5a6",
+                                  color: "#757575",
                                 }}
-                              >
-                                {cell.column.customCell ? (
-                                  <cell.column.customCell value={cell.value} />
-                                ) : (
-                                  cell.render("Cell")
-                                )}
-                              </StyledTableCell>
-                            ))}
-                          </TableRow>
-                        );
-                      })
+                              />
+                            </Box>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
                     ) : (
-                      <TableRow>
-                        <TableCell colSpan={columns.length + 1} align="center">
-                          No Data Found
-                        </TableCell>
-                      </TableRow>
+                      <TableBody
+                        className="table_body_main"
+                        {...getTableBodyProps()}
+                      >
+                        {page.length > 0 ? (
+                          page.map((row) => {
+                            prepareRow(row);
+                            return (
+                              <TableRow key={row.id} {...row.getRowProps()}>
+                                {row.cells.map((cell) => (
+                                  <StyledTableCell
+                                    key={cell.column.id}
+                                    {...cell.getCellProps({
+                                      style: { minWidth: cell.column.minWidth },
+                                    })}
+                                    sx={{
+                                      border: "1px solid #dbe0e5a6",
+                                    }}
+                                  >
+                                    {cell.column.customCell ? (
+                                      <cell.column.customCell
+                                        value={cell.value}
+                                      />
+                                    ) : (
+                                      cell.render("Cell")
+                                    )}
+                                  </StyledTableCell>
+                                ))}
+                              </TableRow>
+                            );
+                          })
+                        ) : (
+                          <TableRow>
+                            <TableCell
+                              colSpan={columns.length + 1}
+                              align="center"
+                            >
+                              No Data Found
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
                     )}
-                  </TableBody>
-                </Table>
-              </Box>
-              <Box sx={{ p: 2, borderTop: "1px solid #dbe0e5a6" }}>
-                <TablePagination
-                  gotoPage={gotoPage}
-                  rows={data}
-                  setPageSize={setPageSize}
-                  pageIndex={pageIndex}
-                  pageSize={pageSize}
-                />
-              </Box>
-            </TableContainer>
+                  </Table>
+                </Box>
+                <Box sx={{ p: 2, borderTop: "1px solid #dbe0e5a6" }}>
+                  <TablePagination
+                    gotoPage={gotoPage}
+                    rows={data}
+                    setPageSize={setPageSize}
+                    pageIndex={pageIndex}
+                    pageSize={pageSize}
+                  />
+                </Box>
+              </TableContainer>
+            </>
           ) : (
             <Formik
               enableReinitialize

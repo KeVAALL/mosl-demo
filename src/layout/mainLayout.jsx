@@ -49,7 +49,7 @@ const iconMapping = {
   Role: <SettingsApplicationsRoundedIcon />,
 };
 
-const Header = ({ open, handleDrawerToggle }) => {
+const Header = ({ open, handleDrawerToggle, userProfile }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -130,7 +130,9 @@ const Header = ({ open, handleDrawerToggle }) => {
             }}
             enterTouchDelay={20}
           >
-            <Avatar sx={{ bgcolor: "#4db6ac" }}>N</Avatar>
+            <Avatar sx={{ bgcolor: "#4db6ac" }}>
+              {userProfile?.user_name?.slice(0, 1)}
+            </Avatar>
           </Tooltip>
         </Box>
       </Toolbar>
@@ -319,6 +321,7 @@ export const Layout = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const theme = useTheme();
   const { menu } = useSelector((state) => state.menu);
+  const { userProfile } = useSelector((state) => state.user);
   console.log(menu);
   const isDesktop = useMediaQuery(theme.breakpoints.up("sm"));
 
@@ -360,6 +363,7 @@ export const Layout = () => {
           handleDrawerToggle={
             isDesktop ? handleDesktopDrawerToggle : handleMobileDrawerToggle
           }
+          userProfile={userProfile}
         />
         <Toolbar
           style={{

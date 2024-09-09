@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
-import Select from "react-select";
+import { CircularProgress } from "@mui/material";
+import Select, { components } from "react-select";
 
 const customStyles = {
   // Style the container (e.g., remove border and box shadow)
@@ -50,12 +51,27 @@ const customStyles = {
   }),
 };
 
-export function CustomSelect({ options, ...props }) {
-  // console.log(props);
+// Custom dropdown indicator with a loading spinner
+const CustomDropdownIndicator = (props) => {
+  const { isLoading } = props.selectProps;
+
+  return (
+    <components.DropdownIndicator {...props}>
+      {isLoading ? (
+        <CircularProgress size={20} color="inherit" /> // Show spinner when loading
+      ) : (
+        <components.DropdownIndicator {...props} /> // Default indicator when not loading
+      )}
+    </components.DropdownIndicator>
+  );
+};
+
+export function CustomSelect({ options, isLoading, ...props }) {
   return (
     <Select
       options={options}
       styles={customStyles}
+      isLoading={isLoading} // Pass loading state to the select
       placeholder="Select an option"
       {...props}
     />

@@ -1,23 +1,19 @@
 const tableColumns = [
   {
     Header: "Link Name",
-    accessor: "link_name",
+    accessor: "dynamic_link_name",
   },
   {
-    Header: "URL",
-    accessor: "app_url",
+    Header: "Project Name",
+    accessor: "project_name",
   },
   {
-    Header: "Full URL",
-    accessor: "full_url",
+    Header: "Dynamic Link",
+    accessor: "link_param",
   },
   {
-    Header: "Web URL",
-    accessor: "web_url",
-  },
-  {
-    Header: "Open Count",
-    accessor: "open_count",
+    Header: "Browser URL",
+    accessor: "browser_url",
   },
 ];
 
