@@ -26,6 +26,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 // import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 // import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 // import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -392,13 +393,14 @@ function Application() {
                     width: "500px",
                   },
                 }}
+                className="delete-dialog"
               >
-                <DialogTitle id="responsive-dialog-title">
-                  Are you sure ?
+                <DialogTitle>
+                  <ErrorOutlineIcon />
                 </DialogTitle>
                 <DialogContent>
                   <DialogContentText color="black">
-                    Delete {deleteItem?.package_name}?
+                    Are you sure you want to delete {deleteItem?.package_name}?
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ display: "flex", gap: "10px" }}>

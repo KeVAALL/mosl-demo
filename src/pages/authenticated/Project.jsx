@@ -26,7 +26,8 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { BootstrapInput } from "../../utils/Input/textfield";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+
 // third-party
 import * as Yup from "yup";
 import { useTable, usePagination, useGlobalFilter } from "react-table";
@@ -39,6 +40,7 @@ import {
   HidingSelect,
   StyledTableCell,
 } from "../../utils/ReactTable/index";
+import { BootstrapInput } from "../../utils/Input/textfield";
 import { useSortBy } from "react-table";
 import { tableColumns, VisibleColumn } from "../../data/Project";
 import { CustomSelect } from "../../utils/Input/reactSelect";
@@ -382,13 +384,14 @@ function Project() {
                     width: "500px",
                   },
                 }}
+                className="delete-dialog"
               >
-                <DialogTitle id="responsive-dialog-title">
-                  {"Are you sure ?"}
+                <DialogTitle>
+                  <ErrorOutlineIcon />
                 </DialogTitle>
                 <DialogContent>
                   <DialogContentText color="black">
-                    Delete {deleteItem?.project_name}?
+                    Are you sure you want to delete {deleteItem?.project_name}?
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ display: "flex", gap: "10px" }}>

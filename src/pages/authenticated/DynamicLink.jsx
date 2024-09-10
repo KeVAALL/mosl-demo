@@ -36,25 +36,20 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { BootstrapInput } from "../../utils/Input/textfield";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 // third-party
 import { useTable, usePagination, useGlobalFilter } from "react-table";
 
 // project-imports
-import iosIcon from "../../assets/img/ios-icon.png";
 import {
   TablePagination,
   HeaderSort,
-  HidingSelect,
   GlobalFilter,
   StyledTableCell,
 } from "../../utils/ReactTable/index";
+import { BootstrapInput } from "../../utils/Input/textfield";
 import { useSortBy } from "react-table";
-import { tableColumns, tableData, VisibleColumn } from "../../data/DynamicLink";
-import { CustomComponentSelect } from "../../utils/Input/customCompSelect";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
+import { tableColumns, VisibleColumn } from "../../data/DynamicLink";
 import { CustomSelect } from "../../utils/Input/reactSelect";
 import { ApiService } from "../../utils/api/apiCall";
 import { toast } from "react-toastify";
@@ -156,8 +151,9 @@ function DynamicLink() {
   const onSubmit = async (values) => {
     console.log(values);
 
+    const { link_param, ...newObj } = values;
     const reqdata = {
-      ...values,
+      ...newObj,
       project_id: values?.project_id?.value,
       open_in_app_android: values?.open_in_android === "App" ? 1 : 0,
       open_in_browser_android: values?.open_in_android === "Browser" ? 1 : 0,
@@ -193,6 +189,7 @@ function DynamicLink() {
           open_in_app_ios_application_id: null,
           open_in_app_android_application_id: null,
         });
+        getLinks(0, 0);
       }
 
       // return result;
@@ -209,7 +206,7 @@ function DynamicLink() {
         {
           id: userProfile?.user_id,
           name: userProfile?.user_name,
-          p_id: project.value,
+          p_id: project.value ? project.value : project,
         },
         "application/getall-application"
       );
@@ -220,6 +217,7 @@ function DynamicLink() {
       });
 
       setAppDropdown(newMap);
+      return newMap;
     } catch (error) {
       toast.error(error?.response?.data?.message);
     } finally {
@@ -250,10 +248,8 @@ function DynamicLink() {
       setFetchingLink(true);
       const result = await ApiService(reqdata, "dynamiclinks/link");
 
-      console.log(result);
       const res = result?.data;
-      console.log(projectDropdown);
-      console.log(projectDropdown?.filter((p) => p?.value === res?.project_id));
+      console.log(res);
       setInitialValues({
         ...res,
         project_id: projectDropdown?.filter(
@@ -268,7 +264,7 @@ function DynamicLink() {
       setFetchingLink(false);
     }
   }
-  const deleteApplication = async () => {
+  const deleteDynamicLinks = async () => {
     console.log(deleteItem);
     const reqdata = {
       ...deleteItem,
@@ -282,11 +278,12 @@ function DynamicLink() {
         isDeleting: true,
       });
 
-      const result = await ApiService(reqdata, "application/create");
+      const result = await ApiService(reqdata, "dynamiclinks/get-link");
 
       if (result?.status === 201) {
-        toast.error("Application Deleted");
+        toast.error("Dynamic Link Deleted");
         handleDeleteConfirmation();
+        getLinks(0, 0);
       }
 
       return result;
@@ -324,6 +321,7 @@ function DynamicLink() {
                   }
                   onClick={async () => {
                     console.log(row);
+
                     try {
                       // Find the index of the matched element in the tableData array
                       setIsEditing(true);
@@ -336,13 +334,39 @@ function DynamicLink() {
                       const resp = result?.data[0];
                       console.log(resp);
 
+                      const dropdownApp = await getApplicationDropdown(
+                        resp?.project_id
+                      );
+                      console.log(dropdownApp);
+
+                      const app1 = dropdownApp?.find(
+                        (app) =>
+                          app?.value === resp?.open_in_app_ios_application_id
+                      );
+                      const app2 = dropdownApp?.find(
+                        (app) =>
+                          app?.value ===
+                          resp?.open_in_app_android_application_id
+                      );
+
                       const newMap = {
                         ...resp,
+                        project_id: projectDropdown?.filter(
+                          (pr) => pr?.value === resp?.project_id
+                        )[0],
+                        open_in_ios: resp?.open_in_browser_ios
+                          ? "Browser"
+                          : "App",
+                        open_in_android: resp?.open_in_browser_android
+                          ? "Browser"
+                          : "App",
+                        open_in_app_ios_application_id: app1,
+                        open_in_app_android_application_id: app2,
                       };
 
-                      // setInitialValues(newMap);
-                      // setFormEditing(true);
-                      // setOpenForm(true);
+                      setInitialValues(newMap);
+                      setFormEditing(true);
+                      setOpenForm(true);
                     } catch (error) {
                       toast.error(error?.response?.data?.message);
                     } finally {
@@ -358,6 +382,7 @@ function DynamicLink() {
                   variant="outlined"
                   startIcon={<DeleteForeverOutlinedIcon />}
                   onClick={() => {
+                    console.log(row.original);
                     setDeleteItem(row?.original);
                     handleDeleteConfirmation();
                   }}
@@ -449,13 +474,15 @@ function DynamicLink() {
                     width: "500px",
                   },
                 }}
+                className="delete-dialog"
               >
-                <DialogTitle id="responsive-dialog-title">
-                  Are you sure ?
+                <DialogTitle>
+                  <ErrorOutlineIcon />
                 </DialogTitle>
                 <DialogContent>
                   <DialogContentText color="black">
-                    Delete {deleteItem?.package_name}?
+                    Are you sure you want to delete{" "}
+                    {deleteItem?.dynamic_link_name}?
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ display: "flex", gap: "10px" }}>
@@ -471,7 +498,7 @@ function DynamicLink() {
                     loading={deleteItem?.isDeleting}
                     disabled={deleteItem?.isDeleting}
                     variant="outlined"
-                    onClick={deleteApplication}
+                    onClick={deleteDynamicLinks}
                     autoFocus
                   >
                     Delete
@@ -644,16 +671,14 @@ function DynamicLink() {
                             <Field name="project_id">
                               {({ field }) => (
                                 <CustomSelect
-                                  // {...field}
+                                  {...field}
                                   placeholder="Select Project"
                                   options={projectDropdown}
                                   id="project_id"
                                   onChange={(option) => {
                                     setFieldValue("project_id", option);
-                                    setFieldValue("link_param", "");
                                     getApplicationDropdown(option);
                                   }}
-                                  value={values?.project_id}
                                 />
                               )}
                             </Field>
@@ -686,7 +711,7 @@ function DynamicLink() {
                                       !value ||
                                       regex.test(value.toString())
                                     ) {
-                                      setFieldValue("link_param", "");
+                                      // setFieldValue("link_param", "");
                                       setFieldValue("dynamic_link_name", value);
                                     } else {
                                       return;
@@ -748,16 +773,29 @@ function DynamicLink() {
 
                                         // If no errors, proceed with API call
                                         if (!hasError) {
-                                          const formValues = {
-                                            project_id:
-                                              values?.project_id?.value,
-                                            dynamic_link_name:
-                                              values?.dynamic_link_name,
-                                          };
-                                          getAccessLinkUrl(
-                                            formValues,
-                                            setFieldTouched
-                                          );
+                                          if (formEditing) {
+                                            const formValues = {
+                                              ...values,
+                                              project_id:
+                                                values?.project_id?.value,
+                                            };
+                                            getAccessLinkUrl(
+                                              formValues,
+                                              setFieldTouched
+                                            );
+                                          } else {
+                                            const formValues = {
+                                              project_id:
+                                                values?.project_id?.value,
+                                              dynamic_link_name:
+                                                values?.dynamic_link_name,
+                                              link_id: 0,
+                                            };
+                                            getAccessLinkUrl(
+                                              formValues,
+                                              setFieldTouched
+                                            );
+                                          }
                                         }
                                       }}
                                     >
@@ -857,6 +895,17 @@ function DynamicLink() {
                               aria-labelledby="open_in_ios"
                               name="open_in_ios"
                               defaultValue="Browser"
+                              onChange={(e) => {
+                                setFieldValue("open_in_ios", e.target.value);
+
+                                // Clear the dropdown if 'Browser' is selected
+                                if (e.target.value === "Browser") {
+                                  setFieldValue(
+                                    "open_in_app_ios_application_id",
+                                    null
+                                  );
+                                }
+                              }}
                             >
                               <FormControlLabel
                                 value="Browser"
@@ -896,6 +945,7 @@ function DynamicLink() {
                             >
                               {({ field }) => (
                                 <CustomSelect
+                                  {...field}
                                   isDisabled={
                                     values.open_in_ios !== "App" ||
                                     !values.link_param
@@ -931,6 +981,20 @@ function DynamicLink() {
                               aria-labelledby="open_in_android"
                               name="open_in_android"
                               defaultValue="Browser"
+                              onChange={(e) => {
+                                setFieldValue(
+                                  "open_in_android",
+                                  e.target.value
+                                );
+
+                                // Clear the dropdown if 'Browser' is selected
+                                if (e.target.value === "Browser") {
+                                  setFieldValue(
+                                    "open_in_app_android_application_id",
+                                    null
+                                  );
+                                }
+                              }}
                             >
                               <FormControlLabel
                                 value="Browser"

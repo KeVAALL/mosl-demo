@@ -28,6 +28,8 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+
 // third-party
 import * as Yup from "yup";
 // project-imports
@@ -389,13 +391,14 @@ function User() {
                     width: "500px",
                   },
                 }}
+                className="delete-dialog"
               >
-                <DialogTitle id="responsive-dialog-title">
-                  {"Are you sure ?"}
+                <DialogTitle>
+                  <ErrorOutlineIcon />
                 </DialogTitle>
                 <DialogContent>
                   <DialogContentText color="black">
-                    Delete {deleteItem?.user_name}?
+                    Are you sure you want to delete {deleteItem?.user_name}?
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ display: "flex", gap: "10px" }}>

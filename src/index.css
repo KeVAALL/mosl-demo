@@ -744,3 +744,20 @@ input:disabled {
   display: flex;
   justify-content: flex-end;
 }
+.delete-dialog .MuiDialogTitle-root {
+  text-align: center;
+}
+.delete-dialog .MuiDialogTitle-root .MuiSvgIcon-root {
+  font-size: 5.5rem;
+  color: red;
+}
+.delete-dialog .MuiDialogContent-root {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+.delete-dialog .MuiDialogActions-root {
+  display: flex;
+  justify-content: center;
+  padding: 10px 24px 20px 24px;
+}

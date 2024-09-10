@@ -27,6 +27,7 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { RichTreeView } from "@mui/x-tree-view/RichTreeView";
 import { useTreeViewApiRef } from "@mui/x-tree-view/hooks";
 import { BootstrapInput } from "../../utils/Input/textfield";
@@ -376,13 +377,14 @@ function Role() {
                     width: "500px",
                   },
                 }}
+                className="delete-dialog"
               >
-                <DialogTitle id="responsive-dialog-title">
-                  Are you sure ?
+                <DialogTitle>
+                  <ErrorOutlineIcon />
                 </DialogTitle>
                 <DialogContent>
                   <DialogContentText color="black">
-                    Delete {deleteItem?.role_name}?
+                    Are you sure you want to delete {deleteItem?.role_name}?
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ display: "flex", gap: "10px" }}>

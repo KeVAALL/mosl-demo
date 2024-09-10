@@ -99,7 +99,7 @@ export default function ForgotPassword() {
                   }}
                 />
               </Stack>
-              <Typography variant="caption" sx={{ color: "text.secondary" }}>
+              <Typography variant="body1" sx={{ color: "text.secondary" }}>
                 Forgot Password
               </Typography>
             </Stack>
