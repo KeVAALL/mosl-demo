@@ -71,7 +71,7 @@ function Application() {
     description: "",
     bundle_id: "",
     store_url: "",
-    dynamic_url: "",
+    // dynamic_url: "",
   });
   const validationSchema = Yup.object().shape({
     p_id: Yup.object().required("Project is required"),
@@ -80,7 +80,7 @@ function Application() {
     description: Yup.string().required("Description is required"),
     bundle_id: Yup.string().required("Bundle ID is required"),
     store_url: Yup.string().required("Store URL is required"),
-    dynamic_url: Yup.string().required("Dynamic URL is required"),
+    // dynamic_url: Yup.string().required("Dynamic URL is required"),
   });
   const [loadingData, setLoadingData] = useState(false);
   const [tableData, setTableData] = useState([]);
@@ -105,7 +105,7 @@ function Application() {
       description: "",
       bundle_id: "",
       store_url: "",
-      dynamic_url: "",
+      // dynamic_url: "",
     });
   };
   const applicationArr = [
@@ -196,7 +196,7 @@ function Application() {
           description: "",
           bundle_id: "",
           store_url: "",
-          dynamic_url: "",
+          // dynamic_url: "",
         });
         setSelectedProject(values?.p_id);
         getApplication(values?.p_id);
@@ -798,7 +798,7 @@ function Application() {
                                 </FormControl>
                               </Grid>
 
-                              <Grid item md={4} className="pt-24 w-full">
+                              {/* <Grid item md={4} className="pt-24 w-full">
                                 <FormControl variant="standard" fullWidth>
                                   <Typography className="label d-flex items-center">
                                     Dynamic URL
@@ -836,7 +836,7 @@ function Application() {
                                     className="text-error text-12 mt-5"
                                   />
                                 </FormControl>
-                              </Grid>
+                              </Grid> */}
                             </Grid>
                           </Box>
                         </Grid>
