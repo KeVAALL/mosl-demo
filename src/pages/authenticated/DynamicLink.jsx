@@ -726,7 +726,7 @@ function DynamicLink() {
                                       sx={{
                                         position: "absolute",
                                         backgroundColor: "primary.main",
-                                        width: "15%",
+                                        width: "20%",
                                         right: 0,
                                         height: "37px",
                                         borderTopLeftRadius: 0,
@@ -799,7 +799,7 @@ function DynamicLink() {
                                         }
                                       }}
                                     >
-                                      Save
+                                      Generate Link
                                     </LoadingButton>
                                   }
                                 />
