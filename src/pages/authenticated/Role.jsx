@@ -157,7 +157,7 @@ function Role() {
         isDeleting: true,
       });
 
-      const result = await ApiService(reqdata, "application/create");
+      const result = await ApiService(reqdata, "role/create");
 
       if (result?.status === 201) {
         toast.error("Role Deleted");
