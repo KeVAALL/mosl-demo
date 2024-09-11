@@ -721,16 +721,16 @@ function Project() {
                                     e.preventDefault();
                                     const { value } = e.target;
 
-                                    const regex = /^[a-zA-Z][a-zA-Z\s]*$/;
+                                    // const regex = /^[a-zA-Z][a-zA-Z\s]*$/;
 
                                     if (
                                       !value ||
-                                      (regex.test(value.toString()) &&
-                                        value.length <= 200)
+                                      value.length <= 200
+                                      // (regex.test(value.toString()) &&
                                     ) {
                                       setFieldValue(
                                         "project_description",
-                                        value
+                                        value?.trimStart()
                                       );
                                     } else {
                                       return;

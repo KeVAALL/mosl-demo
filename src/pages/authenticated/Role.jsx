@@ -147,6 +147,7 @@ function Role() {
     console.log(deleteItem);
     const reqdata = {
       ...deleteItem,
+      menuIds: [],
       is_deleted: 1,
       is_active: 0,
     };

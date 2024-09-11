@@ -21,9 +21,11 @@ function AuthGuard({ children }) {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.user.token);
 
+  console.log(verifyToken(token));
   useEffect(() => {
     if (!verifyToken(token)) {
       dispatch(clearProfile());
+
       navigate("/", { replace: true });
     }
   }, [token, dispatch, navigate]);

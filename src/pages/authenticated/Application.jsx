@@ -699,10 +699,13 @@ function Application() {
 
                                           if (
                                             !value ||
-                                            (regex.test(value.toString()) &&
-                                              value.length <= 200)
+                                            value.length <= 200
+                                            // (regex.test(value.toString()) &&
                                           ) {
-                                            setFieldValue("description", value);
+                                            setFieldValue(
+                                              "description",
+                                              value?.trimStart()
+                                            );
                                           } else {
                                             return;
                                           }
