@@ -62,19 +62,35 @@ function App() {
         },
         {
           path: "sign-in",
-          element: <SignIn />,
+          element: (
+            <GuestGuard>
+              <SignIn />
+            </GuestGuard>
+          ),
         },
         {
           path: "reset-sign-in",
-          element: <ResetSignIn />,
+          element: (
+            <GuestGuard>
+              <ResetSignIn />
+            </GuestGuard>
+          ),
         },
         {
           path: "forgot-password",
-          element: <ForgotPassword />,
+          element: (
+            <GuestGuard>
+              <ForgotPassword />
+            </GuestGuard>
+          ),
         },
         {
           path: "reset-password",
-          element: <ResetPassword />,
+          element: (
+            <GuestGuard>
+              <ResetPassword />
+            </GuestGuard>
+          ),
         },
       ],
     },
