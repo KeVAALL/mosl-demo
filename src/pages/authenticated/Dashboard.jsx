@@ -82,7 +82,7 @@ function Dashboard() {
             <Grid item xs={12} sm={6} md={4}>
               <Card
                 onClick={() => {
-                  navigate("/home/project", { state: { id: 1 } });
+                  navigate("/home/project");
                 }}
                 sx={{
                   minHeight: 200,
@@ -122,6 +122,7 @@ function Dashboard() {
                   key={proj?.id}
                   title={proj?.project_name}
                   description={proj?.project_id}
+                  project={proj}
                 />
               );
             })}

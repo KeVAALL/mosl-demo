@@ -5,8 +5,11 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import CodeOffOutlinedIcon from "@mui/icons-material/CodeOffOutlined";
 import { Stack } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-export default function ProjectBox({ title, description, id }) {
+export default function ProjectBox({ title, description, project }) {
+  const navigate = useNavigate();
+
   return (
     <Grid item xs={12} sm={6} md={4}>
       <Card
@@ -19,6 +22,9 @@ export default function ProjectBox({ title, description, id }) {
             backgroundColor: "#f4f0ea",
             transition: "background-color 0.3s ease-in-out", // Add smooth transition
           },
+        }}
+        onClick={() => {
+          navigate("/home/project", { state: { project_data: project } });
         }}
       >
         <CardContent

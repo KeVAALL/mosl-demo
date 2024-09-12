@@ -4,6 +4,7 @@ import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import {
+  Backdrop,
   Box,
   Button,
   CircularProgress,
@@ -50,13 +51,14 @@ import { ApiService } from "../../utils/api/apiCall";
 import { useSelector } from "react-redux";
 import { LoadingButton } from "@mui/lab";
 import { HtmlLightTooltip } from "../../utils/components/Tooltip";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Project() {
   const { userProfile } = useSelector((state) => state.user);
   const location = useLocation();
-  const { id } = location.state || {}; // Access 'id' from the state
-  console.log(id);
+  const navigate = useNavigate();
+  const { project_data } = location.state || {}; // Access 'id' from the state
+  console.log(project_data);
   const [openForm, setOpenForm] = useState(false);
   const [checkUniqueID, setCheckUniqueID] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -73,6 +75,7 @@ function Project() {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteItem, setDeleteItem] = useState({});
   const [formEditing, setFormEditing] = useState(false);
+  const [loadingProjectData, setLoadingProjectData] = useState(false);
 
   // Delete Modal
   const handleDeleteConfirmation = () => {
@@ -107,6 +110,34 @@ function Project() {
       setLoadingData(false);
     }
   }
+  // async function getOneProject(project) {
+  //   try {
+  //     // Find the index of the matched element in the tableData array
+  //     setLoadingProjectData(true);
+
+  //     const result = await ApiService(
+  //       { id: project?.id },
+  //       "project/getone-project"
+  //     );
+
+  //     const resp = result?.data[0];
+
+  //     const newMap = {
+  //       ...resp,
+  //       project_owner: ownerDropdown?.filter(
+  //         (user) => user?.value === resp?.project_owner
+  //       )[0],
+  //     };
+
+  //     setInitialValues(newMap);
+  //     setFormEditing(true);
+  //     setOpenForm(true);
+  //   } catch (error) {
+  //     toast.error(error?.response?.data?.message);
+  //   } finally {
+  //     setLoadingProjectData(false);
+  //   }
+  // }
   async function getOwnerDropdown() {
     try {
       const result = await ApiService({ method: "getusers" }, "masters/get");
@@ -117,6 +148,7 @@ function Project() {
       });
 
       setOwnerDropdown(newMap);
+      return newMap;
     } catch (error) {
       toast.error(error?.response?.data?.message);
     }
@@ -348,12 +380,111 @@ function Project() {
     return item;
   });
 
+  // useEffect(() => {
+  //   getOwnerDropdown();
+  // }, []);
+  // useEffect(() => {
+  //   getProjects();
+  // }, []);
+  // useEffect(() => {
+  // async function getOneProject(project) {
+  //   try {
+  //     // Find the index of the matched element in the tableData array
+  //     setLoadingProjectData(true);
+
+  //     const result = await ApiService(
+  //       { id: project?.id },
+  //       "project/getone-project"
+  //     );
+
+  //     const resp = result?.data[0];
+
+  //     const newMap = {
+  //       ...resp,
+  //       project_owner: ownerDropdown?.filter(
+  //         (user) => user?.value === resp?.project_owner
+  //       )[0],
+  //     };
+
+  //     setInitialValues(newMap);
+  //     setFormEditing(true);
+  //     setOpenForm(true);
+  //   } catch (error) {
+  //     toast.error(error?.response?.data?.message);
+  //   } finally {
+  //     setLoadingProjectData(false);
+  //   }
+  // }
+  //   if (project_data) {
+  //     console.log("project box click");
+  //     getOneProject(project_data);
+  //   }
+  // }, [ownerDropdown, project_data]);
   useEffect(() => {
-    getOwnerDropdown();
-  }, []);
+    async function getOneProject(project, ownerDropdown) {
+      try {
+        // Find the index of the matched element in the tableData array
+        setLoadingProjectData(true);
+
+        const result = await ApiService(
+          { id: project?.id },
+          "project/getone-project"
+        );
+
+        const resp = result?.data[0];
+
+        const newMap = {
+          ...resp,
+          project_owner: ownerDropdown?.filter(
+            (user) => user?.value === resp?.project_owner
+          )[0],
+        };
+
+        setInitialValues(newMap);
+        setFormEditing(true);
+        setOpenForm(true);
+      } catch (error) {
+        toast.error(error?.response?.data?.message);
+      } finally {
+        setLoadingProjectData(false);
+      }
+    }
+    async function fetchData() {
+      try {
+        // Get the owner dropdown and project list first
+        const ownerDropdown = await getOwnerDropdown();
+        await getProjects();
+
+        // After both async functions have completed, check for project data
+        if (project_data) {
+          console.log("project box click");
+          await getOneProject(project_data, ownerDropdown); // Call getOneProject after both are done
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    fetchData();
+  }, [project_data]); // Use project_data as dependency
+  // useEffect(() => {
+  //   // Clear the state after initial render (like after refresh)
+  //   if (project_data) {
+  //     navigate(location.pathname, { replace: true, state: {} });
+  //   }
+  // }, [project_data, navigate, location.pathname]);
   useEffect(() => {
-    getProjects();
-  }, []);
+    const handleUnload = () => {
+      // Clear the state before the page unloads or refreshes
+      navigate(location.pathname, { replace: true, state: {} });
+    };
+
+    window.addEventListener("beforeunload", handleUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleUnload);
+    };
+  }, [navigate, location.pathname]);
 
   return (
     <>
@@ -380,6 +511,26 @@ function Project() {
         <Grid item xs={12}>
           {!openForm ? (
             <>
+              {loadingProjectData ? (
+                <Backdrop
+                  sx={(theme) => ({
+                    backgroundColor: "rgba(0,0,0,0.15)",
+                    color: "#fff",
+                    zIndex: 1,
+                  })}
+                  open={true}
+                >
+                  <Stack gap={2} alignItems="center">
+                    <CircularProgress
+                      className="table_loader"
+                      color="inherit"
+                    />
+                    <Typography>Loading project...</Typography>
+                  </Stack>
+                </Backdrop>
+              ) : (
+                <></>
+              )}
               <Dialog
                 open={openDeleteModal}
                 aria-labelledby="responsive-dialog-title"
