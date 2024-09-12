@@ -726,7 +726,7 @@ function DynamicLink() {
                                       sx={{
                                         position: "absolute",
                                         backgroundColor: "primary.main",
-                                        width: "20%",
+                                        width: "25%",
                                         right: 0,
                                         height: "37px",
                                         borderTopLeftRadius: 0,

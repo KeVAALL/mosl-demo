@@ -50,9 +50,13 @@ import { ApiService } from "../../utils/api/apiCall";
 import { useSelector } from "react-redux";
 import { LoadingButton } from "@mui/lab";
 import { HtmlLightTooltip } from "../../utils/components/Tooltip";
+import { useLocation } from "react-router-dom";
 
 function Project() {
   const { userProfile } = useSelector((state) => state.user);
+  const location = useLocation();
+  const { id } = location.state || {}; // Access 'id' from the state
+  console.log(id);
   const [openForm, setOpenForm] = useState(false);
   const [checkUniqueID, setCheckUniqueID] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -620,25 +624,25 @@ function Project() {
                                     } else {
                                       return;
                                     }
+
                                     if (value?.length > 15) {
                                       const response = await checkProjectUnique(
                                         value
                                       );
-                                      if (!response?.data?.result_flag) {
-                                        setSuccessMessage(
-                                          "Project ID is valid"
-                                        );
-                                        setFieldTouched(
-                                          "project_id",
-                                          true,
-                                          false
-                                        );
-                                      } else {
+                                      if (response?.data?.result_flag === 0) {
+                                        console.log("error");
                                         setFieldError(
                                           "project_id",
                                           "Invalid Project ID"
                                         );
+                                        setSuccessMessage("");
+                                      } else {
+                                        setSuccessMessage(
+                                          "Project ID is valid"
+                                        );
+                                        setFieldError("project_id", ""); // Clear any previous error
                                       }
+                                      setFieldTouched("project_id", true);
                                     }
                                   }}
                                   endAdornment={

@@ -73,6 +73,10 @@ export default function ResetPassword() {
         /[!@#$%^&*(),.?":{}|<>]/,
         "Password must contain at least 1 special character"
       )
+      .matches(
+        /[a-zA-Z]/,
+        "Password must contain at least 1 alphabet character"
+      )
       .required("New Password is required"),
     confirmPassword: Yup.string()
       .required("Confirm Password is required")

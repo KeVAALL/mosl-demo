@@ -84,6 +84,10 @@ function User() {
         /[!@#$%^&*(),.?":{}|<>]/,
         "Password must contain at least 1 special character"
       )
+      .matches(
+        /[a-zA-Z]/,
+        "Password must contain at least 1 alphabet character"
+      )
       .required("Password is required"),
     phone_number: Yup.string()
       .min(10, "Invalid Phone number")

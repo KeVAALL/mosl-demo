@@ -384,11 +384,10 @@ export const Layout = () => {
             paddingLeft: 4,
             paddingTop: 4,
             paddingBottom: 4,
-            // paddingRight: { lg: 0, sm: 4, xs: 0 },
             flexGrow: 1,
             width: {
-              md: "calc(100% - 20px)",
-              sm: "calc(100% - 45px)",
+              md: "calc(100% - 32px)",
+              sm: "calc(100% - 48px)",
               xs: "100%",
             },
             overflowY: "auto",
