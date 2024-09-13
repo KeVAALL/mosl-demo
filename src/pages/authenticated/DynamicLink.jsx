@@ -109,18 +109,19 @@ function DynamicLink() {
     setOpenForm(true);
   };
   const handleClose = () => {
-    setOpenForm(false);
-    setFormEditing(false);
-    setInitialValues({
-      project_id: null,
-      dynamic_link_name: "",
-      link_param: "",
-      browser_url: "",
-      open_in_ios: "",
-      open_in_android: "",
-      open_in_app_ios_application_id: null,
-      open_in_app_android_application_id: null,
-    });
+    // setOpenForm(false);
+    // setFormEditing(false);
+    // setInitialValues({
+    //   project_id: null,
+    //   dynamic_link_name: "",
+    //   link_param: "",
+    //   browser_url: "",
+    //   open_in_ios: "",
+    //   open_in_android: "",
+    //   open_in_app_ios_application_id: null,
+    //   open_in_app_android_application_id: null,
+    // });
+    window.location.reload();
   };
   // Delete Modal
   const handleDeleteConfirmation = () => {

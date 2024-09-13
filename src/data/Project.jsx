@@ -1,5 +1,9 @@
 const tableColumns = [
   {
+    Header: "SR No.",
+    Cell: ({ row }) => row.index + 1, // Hardcoded serial number starting from 1
+  },
+  {
     Header: "Project name",
     accessor: "project_name",
   },

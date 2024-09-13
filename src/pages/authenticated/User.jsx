@@ -98,15 +98,16 @@ function User() {
     setOpenForm(true);
   };
   const handleClose = () => {
-    setOpenForm(false);
-    setFormEditing(false);
-    setInitialValues({
-      name: "",
-      email: "",
-      password: "",
-      phone_number: "",
-      role_id: null,
-    });
+    // setOpenForm(false);
+    // setFormEditing(false);
+    // setInitialValues({
+    //   name: "",
+    //   email: "",
+    //   password: "",
+    //   phone_number: "",
+    //   role_id: null,
+    // });
+    window.location.reload();
   };
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => {

@@ -79,8 +79,12 @@ function Application() {
     package_name: Yup.string().required("Package Name is required"),
     description: Yup.string().required("Description is required"),
     bundle_id: Yup.string().required("Bundle ID is required"),
-    store_url: Yup.string().required("Store URL is required"),
-    // dynamic_url: Yup.string().required("Dynamic URL is required"),
+    store_url: Yup.string()
+      .required("Store URL is required")
+      .matches(
+        /^(https:\/\/play\.google\.com\/store\/apps\/details\?id=[a-zA-Z0-9._-]+|https:\/\/apps\.apple\.com\/[a-z]{2}\/app\/[a-zA-Z0-9-]+\/id[0-9]+)$/,
+        "Store URL must be a valid Google Play Store or Apple App Store link"
+      ),
   });
   const [loadingData, setLoadingData] = useState(false);
   const [tableData, setTableData] = useState([]);
@@ -93,20 +97,21 @@ function Application() {
     setOpenForm(true);
   };
   const handleClose = () => {
-    setOpenForm(false);
-    setFormEditing(false);
-    setInitialValues({
-      p_id: null,
-      platform: {
-        label: "Android",
-        value: "android",
-      },
-      package_name: "",
-      description: "",
-      bundle_id: "",
-      store_url: "",
-      // dynamic_url: "",
-    });
+    // setOpenForm(false);
+    // setFormEditing(false);
+    // setInitialValues({
+    //   p_id: null,
+    //   platform: {
+    //     label: "Android",
+    //     value: "android",
+    //   },
+    //   package_name: "",
+    //   description: "",
+    //   bundle_id: "",
+    //   store_url: "",
+    //   // dynamic_url: "",
+    // });
+    window.location.reload();
   };
   const applicationArr = [
     {
@@ -126,6 +131,29 @@ function Application() {
   const handleDeleteConfirmation = () => {
     setOpenDeleteModal(!openDeleteModal);
   };
+  async function getAllApplication() {
+    try {
+      setLoadingData(true);
+      const result = await ApiService(
+        {
+          id: userProfile?.user_id,
+          name: userProfile?.user_name,
+          p_id: 0,
+        },
+        "application/getall-application"
+      );
+
+      const newMap = result?.data?.map((table) => {
+        return { ...table, isDeleting: false, isEditing: false };
+      });
+
+      setTableData(newMap);
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setLoadingData(false);
+    }
+  }
   async function getApplication(project) {
     try {
       setLoadingData(true);
@@ -359,6 +387,10 @@ function Application() {
   useEffect(() => {
     getProjectDropdown();
   }, []);
+  useEffect(() => {
+    getAllApplication();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -437,11 +469,16 @@ function Application() {
                       options={projectDropdown}
                       value={selectedProject}
                       onChange={(e) => {
+                        console.log(e);
+                        if (!e) {
+                          getAllApplication();
+                        } else {
+                          getApplication(e);
+                        }
                         setSelectedProject(e);
-                        getApplication(e);
                       }}
                       id="project"
-                      isClearable={false}
+                      isClearable
                     />
                   </Grid>
                 </Grid>

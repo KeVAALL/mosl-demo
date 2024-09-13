@@ -81,13 +81,13 @@ function Role() {
     setOpenForm(true);
   };
   const handleClose = () => {
-    setOpenForm(false);
-    setFormEditing(false);
-    setInitialValues({
-      role_name: "",
-      selectedMenus: [],
-    });
-    // setSelectedItems([]);
+    // setOpenForm(false);
+    // setFormEditing(false);
+    // setInitialValues({
+    //   role_name: "",
+    //   selectedMenus: [],
+    // });
+    window.location.reload();
   };
   async function getRoles() {
     try {

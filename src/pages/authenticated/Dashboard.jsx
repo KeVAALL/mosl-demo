@@ -86,11 +86,12 @@ function Dashboard() {
                 }}
                 sx={{
                   minHeight: 200,
+                  backgroundColor: "#eb6400",
+                  color: "#fff",
                   boxShadow:
                     "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px !important",
                   cursor: "pointer",
                   "&:hover": {
-                    backgroundColor: "#f4f0ea",
                     transition: "background-color 0.3s ease-in-out", // Add smooth transition
                   },
                   display: "flex",

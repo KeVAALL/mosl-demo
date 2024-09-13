@@ -248,15 +248,16 @@ function Project() {
     setOpenForm(true);
   };
   const handleClose = () => {
-    setSuccessMessage("");
-    setOpenForm(false);
-    setFormEditing(false);
-    setInitialValues({
-      project_name: "",
-      project_id: "",
-      project_owner: null,
-      project_description: "",
-    });
+    // setSuccessMessage("");
+    // setOpenForm(false);
+    // setFormEditing(false);
+    // setInitialValues({
+    //   project_name: "",
+    //   project_id: "",
+    //   project_owner: null,
+    //   project_description: "",
+    // });
+    window.location.reload();
   };
   // Table
   const dataColumns = useMemo(
