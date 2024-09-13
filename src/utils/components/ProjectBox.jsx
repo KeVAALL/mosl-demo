@@ -48,7 +48,7 @@ export default function ProjectBox({ title, description, project }) {
               {description}
             </Typography>
           </Stack>
-          <CodeOffOutlinedIcon />
+          {/* <CodeOffOutlinedIcon /> */}
         </CardContent>
       </Card>
     </Grid>
