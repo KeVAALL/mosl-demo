@@ -754,7 +754,7 @@ function DynamicLink() {
                                             "project_id",
                                             "Project is required."
                                           );
-                                          toast.error("Project is required.");
+                                          // toast.error("Project is required.");
                                           hasError = true; // Set flag that there is an error
                                         }
 
@@ -766,9 +766,9 @@ function DynamicLink() {
                                             "dynamic_link_name",
                                             "Dynamic Link Name is required."
                                           );
-                                          toast.error(
-                                            "Dynamic Link Name is required."
-                                          );
+                                          // toast.error(
+                                          //   "Dynamic Link Name is required."
+                                          // );
                                           hasError = true; // Set flag that there is an error
                                         }
 
