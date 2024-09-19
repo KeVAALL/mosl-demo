@@ -52,6 +52,7 @@ import { useSelector } from "react-redux";
 import { LoadingButton } from "@mui/lab";
 import { HtmlLightTooltip } from "../../utils/components/Tooltip";
 import { useLocation, useNavigate } from "react-router-dom";
+import { debounce } from "lodash";
 
 function Project() {
   const { userProfile } = useSelector((state) => state.user);
@@ -62,6 +63,7 @@ function Project() {
   const [openForm, setOpenForm] = useState(false);
   const [checkUniqueID, setCheckUniqueID] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [errMessage, setErrMessage] = useState(false);
   const [submitForm, setSubmitForm] = useState(false);
   const [initialValues, setInitialValues] = useState({
     project_name: "",
@@ -110,34 +112,7 @@ function Project() {
       setLoadingData(false);
     }
   }
-  // async function getOneProject(project) {
-  //   try {
-  //     // Find the index of the matched element in the tableData array
-  //     setLoadingProjectData(true);
 
-  //     const result = await ApiService(
-  //       { id: project?.id },
-  //       "project/getone-project"
-  //     );
-
-  //     const resp = result?.data[0];
-
-  //     const newMap = {
-  //       ...resp,
-  //       project_owner: ownerDropdown?.filter(
-  //         (user) => user?.value === resp?.project_owner
-  //       )[0],
-  //     };
-
-  //     setInitialValues(newMap);
-  //     setFormEditing(true);
-  //     setOpenForm(true);
-  //   } catch (error) {
-  //     toast.error(error?.response?.data?.message);
-  //   } finally {
-  //     setLoadingProjectData(false);
-  //   }
-  // }
   async function getOwnerDropdown() {
     try {
       const result = await ApiService({ method: "getusers" }, "masters/get");
@@ -153,7 +128,36 @@ function Project() {
       toast.error(error?.response?.data?.message);
     }
   }
-  const checkProjectUnique = async (value) => {
+  const debouncedCheckProjectUnique = debounce(
+    async (value, setErrors, setFieldError, setSuccessMessage) => {
+      try {
+        setCheckUniqueID(true);
+        const result = await ApiService(
+          { project_id: value },
+          "project/validate-id"
+        );
+
+        if (result?.data?.result_flag) {
+          // Set error if Project ID is invalid
+          setErrMessage(true);
+          setFieldError("project_id", "Invalid Project ID");
+          // setErrors({ project_id: "Invalid Project ID" });
+          setSuccessMessage("");
+        } else {
+          // Clear error and set success message if Project ID is valid
+          setErrMessage(false);
+          setSuccessMessage("Project ID is valid");
+          setFieldError("project_id", ""); // Clear previous error
+        }
+      } catch (error) {
+        toast.error(error?.response?.data?.message);
+      } finally {
+        setCheckUniqueID(false);
+      }
+    },
+    500
+  ); // 500ms debounce delay
+  const checkProjectUnique = debounce(async (value) => {
     try {
       setCheckUniqueID(true);
 
@@ -169,7 +173,7 @@ function Project() {
     } finally {
       setCheckUniqueID(false);
     }
-  };
+  }, 500); // 500ms debounce delay
   const onSubmit = async (values) => {
     console.log(values);
     const reqdata = {
@@ -693,6 +697,8 @@ function Project() {
                 setFieldTouched,
                 setFieldError,
                 handleSubmit,
+                setErrors,
+                setTouched,
               }) => (
                 <Form onSubmit={handleSubmit}>
                   <Paper elevation={3}>
@@ -771,30 +777,45 @@ function Project() {
                                       (regex.test(value.toString()) &&
                                         value.length <= 50)
                                     ) {
-                                      setFieldValue("project_id", value);
+                                      setFieldValue("project_id", value, false);
                                       setSuccessMessage("");
+                                      setErrMessage(false);
+
+                                      if (value?.length > 15) {
+                                        debouncedCheckProjectUnique(
+                                          value,
+                                          setErrors,
+                                          setFieldError,
+                                          setSuccessMessage
+                                        );
+                                        // Use the debounced version of checkProjectUnique
+                                        // const response =
+                                        //   await checkProjectUnique(value);
+                                        // if (response?.data?.result_flag) {
+                                        //   setFieldError(
+                                        //     "project_id",
+                                        //     "Invalid Project ID"
+                                        //   );
+                                        //   setSuccessMessage("");
+                                        // } else {
+                                        //   setSuccessMessage(
+                                        //     "Project ID is valid"
+                                        //   );
+                                        //   setFieldError("project_id", ""); // Clear previous error
+                                        // }
+                                      }
                                     } else {
                                       return;
                                     }
-
-                                    if (value?.length > 15) {
-                                      const response = await checkProjectUnique(
-                                        value
+                                    setFieldTouched("project_id", true, false);
+                                  }}
+                                  onBlur={() => {
+                                    setFieldTouched("project_id", true, false);
+                                    if (errMessage) {
+                                      setFieldError(
+                                        "project_id",
+                                        "Invalid Project ID"
                                       );
-                                      if (response?.data?.result_flag === 0) {
-                                        console.log("error");
-                                        setFieldError(
-                                          "project_id",
-                                          "Invalid Project ID"
-                                        );
-                                        setSuccessMessage("");
-                                      } else {
-                                        setSuccessMessage(
-                                          "Project ID is valid"
-                                        );
-                                        setFieldError("project_id", ""); // Clear any previous error
-                                      }
-                                      setFieldTouched("project_id", true);
                                     }
                                   }}
                                   endAdornment={
@@ -945,6 +966,70 @@ function Project() {
 
 export default Project;
 
+// async function getOneProject(project) {
+//   try {
+//     // Find the index of the matched element in the tableData array
+//     setLoadingProjectData(true);
+
+//     const result = await ApiService(
+//       { id: project?.id },
+//       "project/getone-project"
+//     );
+
+//     const resp = result?.data[0];
+
+//     const newMap = {
+//       ...resp,
+//       project_owner: ownerDropdown?.filter(
+//         (user) => user?.value === resp?.project_owner
+//       )[0],
+//     };
+
+//     setInitialValues(newMap);
+//     setFormEditing(true);
+//     setOpenForm(true);
+//   } catch (error) {
+//     toast.error(error?.response?.data?.message);
+//   } finally {
+//     setLoadingProjectData(false);
+//   }
+// }
+// if (value?.length > 15) {
+//   try {
+//     setFieldTouched(
+//       "project_id",
+//       true
+//       // true
+//     );
+//     const response =
+//       await checkProjectUnique(value);
+//     if (response?.data?.result_flag) {
+//       console.log("error");
+//       setFieldError(
+//         "project_id",
+//         "Invalid Project ID"
+//       );
+//       // setTouched(
+//       //   { project_id: true },
+//       //   true
+//       // );
+//       // setErrors({
+//       //   project_id: "Invalid Project ID",
+//       // });
+//       setSuccessMessage("");
+//     } else {
+//       setSuccessMessage(
+//         "Project ID is valid"
+//       );
+//       setFieldError("project_id", ""); // Clear previous error
+//     }
+//   } catch (error) {
+//     console.error(
+//       "Error checking project ID:",
+//       error
+//     );
+//   }
+// }
 // const modalStyle = {
 //   position: "absolute",
 //   top: "50%",

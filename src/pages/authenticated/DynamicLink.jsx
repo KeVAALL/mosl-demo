@@ -721,7 +721,7 @@ function DynamicLink() {
                                   endAdornment={
                                     <LoadingButton
                                       loading={fetchingLink}
-                                      disabled={fetchingLink}
+                                      disabled={formEditing || fetchingLink}
                                       variant="contained"
                                       fullWidth
                                       sx={{

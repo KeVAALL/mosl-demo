@@ -159,6 +159,7 @@ function User() {
     console.log(values);
     const reqdata = {
       ...values,
+      id: formEditing ? values?.user_id : 0,
       role_id: values?.role_id?.value,
       created_by: userProfile?.user_role_id,
       created_by_name: userProfile?.user_name,
