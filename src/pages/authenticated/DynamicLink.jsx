@@ -279,7 +279,7 @@ function DynamicLink() {
         isDeleting: true,
       });
 
-      const result = await ApiService(reqdata, "dynamiclinks/get-link");
+      const result = await ApiService(reqdata, "dynamiclinks/link");
 
       if (result?.status === 201) {
         toast.error("Dynamic Link Deleted");

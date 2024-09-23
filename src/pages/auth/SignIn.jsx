@@ -64,16 +64,16 @@ export default function SignIn() {
           toast.success("Login successful!");
           const firstURL = result?.data?.data?.menu[0]?.menu_url;
           navigate(`/home/${firstURL ? firstURL : ""}`);
+
+          const apiResponse = {
+            userProfile: result?.data?.data,
+            token: result?.data?.data?.token?.access_token,
+          };
+          dispatch(setProfile(apiResponse));
+
+          const apiMenu = { menu: result?.data?.data?.menu };
+          dispatch(setMenu(apiMenu));
         }
-
-        const apiResponse = {
-          userProfile: result?.data?.data,
-          token: result?.data?.data?.token?.access_token,
-        };
-        dispatch(setProfile(apiResponse));
-
-        const apiMenu = { menu: result?.data?.data?.menu };
-        dispatch(setMenu(apiMenu));
 
         return result;
       }

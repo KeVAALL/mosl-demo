@@ -82,7 +82,8 @@ function Application() {
     store_url: Yup.string()
       .required("Store URL is required")
       .matches(
-        /^(https:\/\/play\.google\.com\/store\/apps\/details\?id=[a-zA-Z0-9._-]+|https:\/\/apps\.apple\.com\/[a-z]{2}\/app\/[a-zA-Z0-9-]+\/id[0-9]+)$/,
+        // /^(https:\/\/play\.google\.com\/store\/apps\/details\?id=[a-zA-Z0-9._-]+|https:\/\/apps\.apple\.com\/[a-z]{2}\/app\/[a-zA-Z0-9-]+\/id[0-9]+)$/,
+        /^(https:\/\/play\.google\.com\/store\/apps\/details\?id=[a-zA-Z0-9._-]+(&.*)?|https:\/\/apps\.apple\.com\/[a-z]{2}\/app\/[a-zA-Z0-9-]+\/id[0-9]+)$/,
         "Store URL must be a valid Google Play Store or Apple App Store link"
       ),
   });
@@ -688,7 +689,8 @@ function Application() {
                                           e.preventDefault();
                                           const { value } = e.target;
 
-                                          const regex = /^[a-zA-Z][a-zA-Z\s]*$/;
+                                          // const regex = /^[a-zA-Z][a-zA-Z\s]*$/;
+                                          const regex = /^\S+$/;
 
                                           if (
                                             !value ||

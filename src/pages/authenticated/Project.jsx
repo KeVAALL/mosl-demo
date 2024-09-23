@@ -63,7 +63,7 @@ function Project() {
   const [openForm, setOpenForm] = useState(false);
   const [checkUniqueID, setCheckUniqueID] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [errMessage, setErrMessage] = useState(false);
+  const [errMessage, setErrMessage] = useState("");
   const [submitForm, setSubmitForm] = useState(false);
   const [initialValues, setInitialValues] = useState({
     project_name: "",
@@ -139,13 +139,14 @@ function Project() {
 
         if (result?.data?.result_flag) {
           // Set error if Project ID is invalid
-          setErrMessage(true);
-          setFieldError("project_id", "Invalid Project ID");
+          setErrMessage("Invalid Project ID");
+          setFieldError("project_id", "");
+          // setFieldError("project_id", "Invalid Project ID");
           // setErrors({ project_id: "Invalid Project ID" });
           setSuccessMessage("");
         } else {
           // Clear error and set success message if Project ID is valid
-          setErrMessage(false);
+          setErrMessage("");
           setSuccessMessage("Project ID is valid");
           setFieldError("project_id", ""); // Clear previous error
         }
@@ -176,6 +177,12 @@ function Project() {
   }, 500); // 500ms debounce delay
   const onSubmit = async (values) => {
     console.log(values);
+    if (errMessage) {
+      // Optionally, you can display a toast or some notification here
+      console.log("Form cannot be submitted due to errors:", errMessage);
+      setSubmitForm(false); // Stop the form submission
+      return; // Prevent form submission
+    }
     const reqdata = {
       ...values,
       project_owner: values?.project_owner?.value,
@@ -777,9 +784,10 @@ function Project() {
                                       (regex.test(value.toString()) &&
                                         value.length <= 50)
                                     ) {
-                                      setFieldValue("project_id", value, false);
+                                      // setFieldValue("project_id", value, false);
+                                      setFieldValue("project_id", value);
                                       setSuccessMessage("");
-                                      setErrMessage(false);
+                                      setErrMessage("");
 
                                       if (value?.length > 15) {
                                         debouncedCheckProjectUnique(
@@ -807,17 +815,18 @@ function Project() {
                                     } else {
                                       return;
                                     }
-                                    setFieldTouched("project_id", true, false);
+                                    // setFieldTouched("project_id", true, false);
+                                    setFieldTouched("project_id", true);
                                   }}
-                                  onBlur={() => {
-                                    setFieldTouched("project_id", true, false);
-                                    if (errMessage) {
-                                      setFieldError(
-                                        "project_id",
-                                        "Invalid Project ID"
-                                      );
-                                    }
-                                  }}
+                                  // onBlur={() => {
+                                  //   setFieldTouched("project_id", true, false);
+                                  //   if (errMessage) {
+                                  //     // setFieldError(
+                                  //     //   "project_id",
+                                  //     //   "Invalid Project ID"
+                                  //     // );
+                                  //   }
+                                  // }}
                                   endAdornment={
                                     <InputAdornment position="end">
                                       {checkUniqueID ? (
@@ -839,6 +848,11 @@ function Project() {
                               component="div"
                               className="text-error text-12 mt-5"
                             />
+                            {errMessage && (
+                              <div className="text-error text-12 mt-5">
+                                {errMessage}
+                              </div>
+                            )}
                             {successMessage && (
                               <div className="text-success text-12 mt-5">
                                 {successMessage}
