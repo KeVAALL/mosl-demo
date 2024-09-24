@@ -382,11 +382,12 @@ export const Layout = () => {
         <Box
           sx={{
             paddingLeft: 4,
+            paddingRight: 2,
             paddingTop: 4,
             paddingBottom: 4,
             flexGrow: 1,
             width: {
-              md: "calc(100% - 32px)",
+              md: "calc(100% - 16px)",
               sm: "calc(100% - 48px)",
               xs: "100%",
             },
