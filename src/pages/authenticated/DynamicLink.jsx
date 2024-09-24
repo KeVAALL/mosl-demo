@@ -957,7 +957,7 @@ function DynamicLink() {
                                     !values.link_param
                                   }
                                   placeholder="Select Application"
-                                  options={appDropdown.filter(
+                                  options={appDropdown?.filter(
                                     (item) => item.platform === "ios"
                                   )}
                                   id="open_in_app_ios_application_id"
@@ -1048,7 +1048,7 @@ function DynamicLink() {
                                     !values.link_param
                                   }
                                   placeholder="Select Application"
-                                  options={appDropdown.filter(
+                                  options={appDropdown?.filter(
                                     (item) => item.platform === "android"
                                   )}
                                   id="open_in_app_android_application_id"
