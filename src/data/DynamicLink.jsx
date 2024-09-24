@@ -11,10 +11,10 @@ const tableColumns = [
     Header: "Project Name",
     accessor: "project_name",
   },
-  {
-    Header: "Dynamic Link",
-    accessor: "link_param",
-  },
+  // {
+  //   Header: "Dynamic Link",
+  //   accessor: "link_param",
+  // },
   {
     Header: "Browser URL",
     accessor: "browser_url",
