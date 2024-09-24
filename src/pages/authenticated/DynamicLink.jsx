@@ -720,6 +720,7 @@ function DynamicLink() {
                                   }}
                                   endAdornment={
                                     <LoadingButton
+                                      className="disable-button"
                                       loading={fetchingLink}
                                       disabled={formEditing || fetchingLink}
                                       variant="contained"

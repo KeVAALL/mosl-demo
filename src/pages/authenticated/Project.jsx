@@ -832,7 +832,7 @@ function Project() {
                                       {checkUniqueID ? (
                                         <CircularProgress
                                           sx={{
-                                            color: "#757575",
+                                            color: "#eb6400 !important",
                                           }}
                                         />
                                       ) : (
@@ -955,8 +955,9 @@ function Project() {
                         </Grid>
                         <Grid item md={1} xs={5}>
                           <LoadingButton
+                            // className="disable-button"
                             loading={submitForm}
-                            disabled={submitForm}
+                            disabled={submitForm || errMessage}
                             type="submit"
                             fullWidth
                             variant="contained"
