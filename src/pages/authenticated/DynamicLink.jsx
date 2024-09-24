@@ -214,9 +214,13 @@ function DynamicLink() {
       console.log(result);
 
       const newMap = result?.data?.map((app) => {
-        return { label: app?.package_name, value: app?.id };
+        return {
+          label: app?.package_name,
+          value: app?.id,
+          platform: app?.platform,
+        };
       });
-
+      console.log(newMap);
       setAppDropdown(newMap);
       return newMap;
     } catch (error) {
@@ -953,7 +957,9 @@ function DynamicLink() {
                                     !values.link_param
                                   }
                                   placeholder="Select Application"
-                                  options={appDropdown}
+                                  options={appDropdown.filter(
+                                    (item) => item.platform === "ios"
+                                  )}
                                   id="open_in_app_ios_application_id"
                                   onChange={(option) =>
                                     setFieldValue(
@@ -1042,7 +1048,9 @@ function DynamicLink() {
                                     !values.link_param
                                   }
                                   placeholder="Select Application"
-                                  options={appDropdown}
+                                  options={appDropdown.filter(
+                                    (item) => item.platform === "android"
+                                  )}
                                   id="open_in_app_android_application_id"
                                   menuPlacement="auto"
                                   onChange={(option) =>
