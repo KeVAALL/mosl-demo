@@ -11,10 +11,10 @@ const tableColumns = [
     Header: "Platform",
     accessor: "platform",
   },
-  {
-    Header: "Dynamic URL",
-    accessor: "dynamic_url",
-  },
+  // {
+  //   Header: "Dynamic URL",
+  //   accessor: "dynamic_url",
+  // },
   {
     Header: "Store URL",
     accessor: "store_url",
