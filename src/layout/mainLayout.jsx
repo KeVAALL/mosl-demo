@@ -387,7 +387,8 @@ export const Layout = () => {
             paddingBottom: 4,
             flexGrow: 1,
             width: {
-              md: "calc(100% - 16px)",
+              // md: "calc(100% - 32px)",
+              md: "100%",
               sm: "calc(100% - 48px)",
               xs: "100%",
             },

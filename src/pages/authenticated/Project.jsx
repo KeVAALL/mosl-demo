@@ -789,7 +789,7 @@ function Project() {
                                       setSuccessMessage("");
                                       setErrMessage("");
 
-                                      if (value?.length > 15) {
+                                      if (value?.length >= 15) {
                                         debouncedCheckProjectUnique(
                                           value,
                                           setErrors,
