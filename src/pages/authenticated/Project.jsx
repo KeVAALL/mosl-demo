@@ -140,15 +140,15 @@ function Project() {
         if (result?.data?.result_flag) {
           // Set error if Project ID is invalid
           setErrMessage("Invalid Project ID");
-          setFieldError("project_id", "");
+          setSuccessMessage("");
+          // setFieldError("project_id", "");
           // setFieldError("project_id", "Invalid Project ID");
           // setErrors({ project_id: "Invalid Project ID" });
-          setSuccessMessage("");
         } else {
           // Clear error and set success message if Project ID is valid
           setErrMessage("");
           setSuccessMessage("Project ID is valid");
-          setFieldError("project_id", ""); // Clear previous error
+          // setFieldError("project_id", ""); // Clear previous error
         }
       } catch (error) {
         toast.error(error?.response?.data?.message);
@@ -816,7 +816,7 @@ function Project() {
                                       return;
                                     }
                                     // setFieldTouched("project_id", true, false);
-                                    setFieldTouched("project_id", true);
+                                    // setFieldTouched("project_id", true);
                                   }}
                                   // onBlur={() => {
                                   //   setFieldTouched("project_id", true, false);

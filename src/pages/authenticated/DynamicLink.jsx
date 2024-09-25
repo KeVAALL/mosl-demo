@@ -78,7 +78,9 @@ function DynamicLink() {
     project_id: Yup.object().required("Project is required"),
     dynamic_link_name: Yup.string().required("Dynamic Link Name is required"),
     link_param: Yup.string().required("Link Access URL is required"),
-    browser_url: Yup.string().required("Browser URL is required"),
+    browser_url: Yup.string()
+      .url("Please enter a valid URL")
+      .required("Browser URL is required"),
     open_in_ios: Yup.string().required("Link behavior for IOS is required"),
     open_in_android: Yup.string().required(
       "Link behavior for Android is required"
