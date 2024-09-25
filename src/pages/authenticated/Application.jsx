@@ -69,7 +69,7 @@ function Application() {
     },
     package_name: "",
     description: "",
-    bundle_id: "",
+    // bundle_id: "",
     store_url: "",
     // dynamic_url: "",
   });
@@ -78,7 +78,6 @@ function Application() {
     platform: Yup.object().required("Platform is required"),
     package_name: Yup.string().required("Package Name is required"),
     description: Yup.string().required("Description is required"),
-    bundle_id: Yup.string().required("Bundle ID is required"),
     store_url: Yup.string()
       .required("Store URL is required")
       .matches(
@@ -760,7 +759,7 @@ function Application() {
                                 </FormControl>
                               </Grid>
 
-                              <Grid item md={4} className="pt-24 pr-24 w-full">
+                              {/* <Grid item md={4} className="pt-24 pr-24 w-full">
                                 <FormControl variant="standard" fullWidth>
                                   <Typography className="label d-flex items-center">
                                     Bundle ID
@@ -798,7 +797,7 @@ function Application() {
                                     className="text-error text-12 mt-5"
                                   />
                                 </FormControl>
-                              </Grid>
+                              </Grid> */}
 
                               <Grid item md={4} className="pt-24 pr-24 w-full">
                                 <FormControl variant="standard" fullWidth>

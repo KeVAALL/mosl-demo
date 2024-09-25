@@ -3,6 +3,7 @@ import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { clearProfile } from "../../redux/slices/userSlice";
+import { clearSelectedProject } from "../../redux/slices/projectSlice";
 
 const verifyToken = (authToken) => {
   if (!authToken) {
@@ -25,6 +26,7 @@ function AuthGuard({ children }) {
   useEffect(() => {
     if (!verifyToken(token)) {
       dispatch(clearProfile());
+      dispatch(clearSelectedProject());
 
       navigate("/", { replace: true });
     }

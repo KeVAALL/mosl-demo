@@ -17,6 +17,7 @@ import {
   Drawer,
   Tooltip,
   tooltipClasses,
+  Stack,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { styled, useTheme } from "@mui/material/styles";
@@ -25,6 +26,7 @@ import { Menu, MenuItem, Sidebar } from "react-pro-sidebar";
 import { Outlet, Link } from "react-router-dom";
 
 import BarChartRoundedIcon from "@mui/icons-material/BarChartRounded";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HomeIcon from "@mui/icons-material/Home";
 import SettingsApplicationsRoundedIcon from "@mui/icons-material/SettingsApplicationsRounded";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
@@ -39,6 +41,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import "./mainLayout.css";
 import { clearProfile } from "../redux/slices/userSlice";
+import { clearSelectedProject } from "../redux/slices/projectSlice";
 
 const iconMapping = {
   Dashboard: <HomeIcon />,
@@ -49,7 +52,7 @@ const iconMapping = {
   Role: <SettingsApplicationsRoundedIcon />,
 };
 
-const Header = ({ open, handleDrawerToggle, userProfile }) => {
+const Header = ({ open, handleDrawerToggle, userProfile, selectedProject }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -66,15 +69,27 @@ const Header = ({ open, handleDrawerToggle, userProfile }) => {
           }}
           className={`${open ? "drawer-open" : ""}`}
         >
-          <IconButton
-            className="toggle-drawer-btn"
-            edge="start"
-            color="black"
-            aria-label="menu"
-            onClick={handleDrawerToggle}
-          >
-            <MenuIcon sx={{ color: "#000" }} />
-          </IconButton>
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <IconButton
+              className="toggle-drawer-btn"
+              edge="start"
+              color="black"
+              aria-label="menu"
+              onClick={handleDrawerToggle}
+            >
+              <MenuIcon sx={{ color: "#000" }} />
+            </IconButton>
+            {selectedProject && (
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <CheckCircleOutlineIcon
+                  sx={{ color: "#eb6400", fontSize: "35px" }}
+                />
+                <Typography sx={{ color: "#eb6400", fontSize: "14px" }}>
+                  {selectedProject?.project_name}
+                </Typography>
+              </Stack>
+            )}
+          </Stack>
           <Tooltip
             // open={true}
             arrow
@@ -85,6 +100,7 @@ const Header = ({ open, handleDrawerToggle, userProfile }) => {
                 <Link
                   onClick={() => {
                     dispatch(clearProfile());
+                    dispatch(clearSelectedProject());
                     navigate("/sign-in");
                   }}
                   style={{
@@ -322,9 +338,8 @@ export const Layout = () => {
   const theme = useTheme();
   const { menu } = useSelector((state) => state.menu);
   const { userProfile } = useSelector((state) => state.user);
-  console.log(menu);
+  const { SELECTED_PROJECT } = useSelector((state) => state.project);
   const isDesktop = useMediaQuery(theme.breakpoints.up("sm"));
-
   const handleDesktopDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
   };
@@ -364,6 +379,7 @@ export const Layout = () => {
             isDesktop ? handleDesktopDrawerToggle : handleMobileDrawerToggle
           }
           userProfile={userProfile}
+          selectedProject={SELECTED_PROJECT}
         />
         <Toolbar
           style={{

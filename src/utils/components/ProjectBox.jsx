@@ -6,8 +6,11 @@ import Typography from "@mui/material/Typography";
 import CodeOffOutlinedIcon from "@mui/icons-material/CodeOffOutlined";
 import { Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setSelectedProject } from "../../redux/slices/projectSlice";
 
 export default function ProjectBox({ title, description, project }) {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   return (
@@ -25,6 +28,10 @@ export default function ProjectBox({ title, description, project }) {
         }}
         onClick={() => {
           navigate("/home/project", { state: { project_data: project } });
+          const resp = {
+            selectedProject: project,
+          };
+          dispatch(setSelectedProject(resp));
         }}
       >
         <CardContent
