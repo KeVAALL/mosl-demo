@@ -1,12 +1,15 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useMemo, useState } from "react";
-import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { useTheme } from "@mui/material/styles";
 import {
   Box,
   Button,
+  Card,
+  Checkbox,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -27,9 +30,7 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { RichTreeView } from "@mui/x-tree-view/RichTreeView";
-import { useTreeViewApiRef } from "@mui/x-tree-view/hooks";
+
 import { BootstrapInput } from "../../utils/Input/textfield";
 // third-party
 import * as Yup from "yup";
@@ -39,7 +40,6 @@ import { useTable, usePagination, useGlobalFilter } from "react-table";
 import {
   GlobalFilter,
   TablePagination,
-  HidingSelect,
   HeaderSort,
   StyledTableCell,
 } from "../../utils/ReactTable/index";
@@ -54,18 +54,10 @@ import { HtmlLightTooltip } from "../../utils/components/Tooltip";
 
 function Role() {
   const { userProfile } = useSelector((state) => state.user);
+  const { menu } = useSelector((state) => state.menu);
   const [openForm, setOpenForm] = useState(false);
-  const [submitForm, setSubmitForm] = useState(false);
-  const [initialValues, setInitialValues] = useState({
-    role_name: "",
-    selectedMenus: [],
-  });
-  const validationSchema = Yup.object().shape({
-    role_name: Yup.string().required("Role Name is required"),
-    selectedMenus: Yup.array()
-      .min(1, "At least one menu must be selected")
-      .required("Please select at least one menu"),
-  });
+  const [submitRoleForm, setSubmitRoleForm] = useState(false);
+
   const [tableData, setTableData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -111,13 +103,13 @@ function Role() {
     const reqdata = {
       role_id: formEditing ? values?.role_id : 0,
       role_name: values?.role_name,
-      menuIds: values?.selectedMenus,
+      menuIds: values?.menuIds,
       created_by: userProfile?.user_role_id,
       created_by_name: userProfile?.user_name,
     };
     // Handle form submission
     try {
-      setSubmitForm(true);
+      setSubmitRoleForm(true);
 
       const result = await ApiService(reqdata, "role/create");
 
@@ -140,7 +132,7 @@ function Role() {
     } catch (error) {
       toast.error(error?.response?.data?.message);
     } finally {
-      setSubmitForm(false);
+      setSubmitRoleForm(false);
     }
   };
   const deleteRoles = async () => {
@@ -177,38 +169,106 @@ function Role() {
     }
   };
 
-  // Multi Checkbox
-  const toggledItemRef = React.useRef({});
-  const apiRef = useTreeViewApiRef();
   const menus = [
-    { id: 1, label: "Dashboard" },
     {
-      id: 2,
+      value: 1, // Previously id
+      label: "Dashboard",
+      display_flag: 0,
+      add_flag: 0,
+      edit_flag: 0,
+      delete_flag: 0,
+    },
+    {
+      value: 2, // Previously id
       label: "Project",
+      display_flag: 0,
+      add_flag: 0,
+      edit_flag: 0,
+      delete_flag: 0,
     },
     {
-      id: 3,
+      value: 3, // Previously id
       label: "Application",
+      display_flag: 0,
+      add_flag: 0,
+      edit_flag: 0,
+      delete_flag: 0,
     },
     {
-      id: 4,
+      value: 4, // Previously id
       label: "Dynamic Links",
+      display_flag: 0,
+      add_flag: 0,
+      edit_flag: 0,
+      delete_flag: 0,
     },
-    { id: 5, label: "Users" },
-    { id: 6, label: "Role" },
+    {
+      value: 5,
+      label: "Users",
+      display_flag: 0,
+      add_flag: 0,
+      edit_flag: 0,
+      delete_flag: 0,
+    },
+    {
+      value: 6,
+      label: "Role",
+      display_flag: 0,
+      add_flag: 0,
+      edit_flag: 0,
+      delete_flag: 0,
+    },
   ];
-  function getItemDescendantsIds(item) {
-    const ids = [];
-    item.children?.forEach((child) => {
-      ids.push(child.id);
-      ids.push(...getItemDescendantsIds(child));
-    });
+  const getInitialValues = () => ({
+    role_name: "", // Role name field
+    menuIds: menus.map((menu) => {
+      return {
+        menu_id: menu.value,
+        display_flag: menu.display_flag,
+        add_flag: menu.add_flag,
+        edit_flag: menu.edit_flag,
+        delete_flag: menu.delete_flag,
+      };
+    }),
+    // ...menus.reduce((acc, menu) => {
+    //   acc[menu.value] = {
+    //     menuId: menu.value,
+    //     display_flag: menu.display_flag,
+    //     add_flag: menu.add_flag,
+    //     edit_flag: menu.edit_flag,
+    //     delete_flag: menu.delete_flag,
+    //   };
+    //   return acc;
+    // }, {}),
+  });
+  const [initialValues, setInitialValues] = useState(getInitialValues());
+  const validationSchema = Yup.object().shape({
+    role_name: Yup.string().required("Role name is required"),
+    menuIds: Yup.array().of(
+      Yup.object().shape({
+        menu_id: Yup.number().required(),
+        display_flag: Yup.boolean(),
+        add_flag: Yup.boolean(),
+        edit_flag: Yup.boolean(),
+        delete_flag: Yup.boolean(),
+      })
+    ),
+  });
+  // ...menus.reduce((acc, menu) => {
+  //   acc[menu.value] = Yup.object().shape({
+  //     menuId: Yup.number(),
+  //     display_flag: Yup.boolean(),
+  //     add_flag: Yup.boolean(),
+  //     edit_flag: Yup.boolean(),
+  //     delete_flag: Yup.boolean(),
+  //   });
 
-    return ids;
-  }
-  const handleItemSelectionToggle = (event, itemId, isSelected) => {
-    toggledItemRef.current[itemId] = isSelected;
-  };
+  //   // .test(
+  //   //   "at-least-one-checked",
+  //   //   "At least one permission (Display, Add, Edit, Delete) must be selected.",
+  //   //   (values) =>
+  //   //     values.display || values.add || values.edit || values.delete
+  //   // );
 
   const dataColumns = useMemo(
     () => [
@@ -222,23 +282,26 @@ function Role() {
 
           return (
             <Stack direction="row" justifyContent="flex-end" spacing={2}>
-              {/* <Tooltip title="View" placement="top" arrow>
-                <Button
-                  className="mui-icon-button"
-                  variant="outlined"
-                  startIcon={<VisibilityOutlined />}
-                />
-              </Tooltip> */}
-              <HtmlLightTooltip title="Edit" placement="top" arrow>
+              <HtmlLightTooltip
+                title={menu[4]?.edit_flag !== 1 ? "View" : "Edit"}
+                placement="top"
+                arrow
+              >
                 <LoadingButton
                   loading={isEditing}
                   disabled={isEditing}
                   className="mui-icon-button"
                   variant="outlined"
                   startIcon={
-                    <BorderColorOutlinedIcon
-                      sx={{ color: isEditing ? "transparent" : "#fff" }}
-                    />
+                    menu[4]?.edit_flag !== 1 ? (
+                      <VisibilityOutlinedIcon
+                        sx={{ color: isEditing ? "transparent" : "#fff" }}
+                      />
+                    ) : (
+                      <BorderColorOutlinedIcon
+                        sx={{ color: isEditing ? "transparent" : "#fff" }}
+                      />
+                    )
                   }
                   onClick={async () => {
                     console.log(row);
@@ -256,7 +319,7 @@ function Role() {
 
                       const newMap = {
                         ...resp,
-                        selectedMenus: resp?.menus,
+                        menuIds: resp?.menus,
                       };
 
                       setInitialValues(newMap);
@@ -271,18 +334,22 @@ function Role() {
                 />
               </HtmlLightTooltip>
 
-              <HtmlLightTooltip title="Delete" placement="top" arrow>
-                <LoadingButton
-                  className="mui-icon-button"
-                  variant="outlined"
-                  startIcon={<DeleteForeverOutlinedIcon />}
-                  onClick={() => {
-                    console.log(row?.original);
-                    setDeleteItem(row?.original);
-                    handleDeleteConfirmation();
-                  }}
-                />
-              </HtmlLightTooltip>
+              {menu[4]?.delete_flag ? (
+                <HtmlLightTooltip title="Delete" placement="top" arrow>
+                  <LoadingButton
+                    className="mui-icon-button"
+                    variant="outlined"
+                    startIcon={<DeleteForeverOutlinedIcon />}
+                    onClick={() => {
+                      console.log(row?.original);
+                      setDeleteItem(row?.original);
+                      handleDeleteConfirmation();
+                    }}
+                  />
+                </HtmlLightTooltip>
+              ) : (
+                <></>
+              )}
             </Stack>
           );
         },
@@ -330,17 +397,6 @@ function Role() {
     return item;
   });
 
-  // useEffect(() => {
-  //   console.log(selectedItems);
-  //   if (menuError) {
-  //     if (selectedItems?.length < 1) {
-  //       setMenuError("Please select menus");
-  //     } else {
-  //       setMenuError("");
-  //     }
-  //   }
-  // }, [menuError, selectedItems]);
-
   useEffect(() => {
     getRoles();
   }, []);
@@ -359,10 +415,14 @@ function Role() {
               </Typography>
             </Grid>
             <Grid item xs={6} display="flex" justifyContent="flex-end">
-              {!openForm && (
-                <Button variant="contained" onClick={handleOpen}>
-                  Add Role
-                </Button>
+              {menu[4]?.add_flag ? (
+                !openForm && (
+                  <Button variant="contained" onClick={handleOpen}>
+                    Add Role
+                  </Button>
+                )
+              ) : (
+                <></>
               )}
             </Grid>
           </Grid>
@@ -532,6 +592,8 @@ function Role() {
                 setFieldTouched,
                 setFieldError,
                 handleSubmit,
+                submitForm,
+                validateForm,
                 values,
               }) => (
                 <Form onSubmit={handleSubmit}>
@@ -553,6 +615,11 @@ function Role() {
                               {({ field }) => (
                                 <BootstrapInput
                                   {...field}
+                                  disabled={
+                                    formEditing
+                                      ? menu[4]?.edit_flag !== 1
+                                      : menu[4]?.add_flag !== 1
+                                  }
                                   fullWidth
                                   id="role_name"
                                   size="small"
@@ -593,69 +660,127 @@ function Role() {
                             <Grid item xs={4}></Grid>
                           </>
                         )}
-                        <Grid item md={4} className="w-full">
+                        <Grid item md={12} className="w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
                               Menu
                               <sup className="asc">*</sup>
                             </Typography>
-                            <RichTreeView
-                              multiSelect
-                              checkboxSelection
-                              apiRef={apiRef}
-                              items={menus}
-                              selectedItems={values.selectedMenus}
-                              onSelectedItemsChange={(
-                                event,
-                                newSelectedItems
-                              ) => {
-                                setFieldValue(
-                                  "selectedMenus",
-                                  newSelectedItems
-                                );
+                            <Table>
+                              {/* Table Header */}
+                              <TableHead>
+                                <TableRow>
+                                  <StyledTableCell>Role Name</StyledTableCell>
+                                  <StyledTableCell
+                                    align="center"
+                                    style={{ width: "8%" }}
+                                  >
+                                    Display
+                                  </StyledTableCell>
+                                  <StyledTableCell
+                                    align="center"
+                                    style={{ width: "8%" }}
+                                  >
+                                    Add
+                                  </StyledTableCell>
+                                  <StyledTableCell
+                                    align="center"
+                                    style={{ width: "8%" }}
+                                  >
+                                    Edit
+                                  </StyledTableCell>
+                                  <StyledTableCell
+                                    align="center"
+                                    style={{ width: "8%" }}
+                                  >
+                                    Delete
+                                  </StyledTableCell>
+                                </TableRow>
+                              </TableHead>
 
-                                // Select / unselect the children of the toggled item
-                                const itemsToSelect = [];
-                                const itemsToUnSelect = {};
-                                Object.entries(toggledItemRef.current).forEach(
-                                  ([itemId, isSelected]) => {
-                                    const item = apiRef.current.getItem(itemId);
-                                    if (isSelected) {
-                                      itemsToSelect.push(
-                                        ...getItemDescendantsIds(item)
-                                      );
-                                    } else {
-                                      getItemDescendantsIds(item).forEach(
-                                        (descendantId) => {
-                                          itemsToUnSelect[descendantId] = true;
-                                        }
-                                      );
-                                    }
-                                  }
-                                );
+                              {/* Table Body */}
+                              <TableBody className="table_body_main">
+                                {menus.map((menu, index) => (
+                                  <TableRow key={menu.value}>
+                                    <TableCell>{menus[index].label}</TableCell>
 
-                                const newSelectedItemsWithChildren = Array.from(
-                                  new Set(
-                                    [
-                                      ...newSelectedItems,
-                                      ...itemsToSelect,
-                                    ].filter(
-                                      (itemId) => !itemsToUnSelect[itemId]
-                                    )
-                                  )
-                                );
+                                    <TableCell align="center">
+                                      <Field
+                                        name={`menuIds[${index}].display_flag`}
+                                      >
+                                        {({ field }) => (
+                                          <Checkbox
+                                            checked={field.value === 1}
+                                            onChange={(e) =>
+                                              setFieldValue(
+                                                `menuIds[${index}].display_flag`,
+                                                e.target.checked ? 1 : 0
+                                              )
+                                            }
+                                          />
+                                        )}
+                                      </Field>
+                                    </TableCell>
 
-                                setFieldValue(
-                                  "selectedMenus",
-                                  newSelectedItemsWithChildren
-                                );
+                                    <TableCell align="center">
+                                      <Field
+                                        name={`menuIds[${index}].add_flag`}
+                                      >
+                                        {({ field }) => (
+                                          <Checkbox
+                                            checked={field.value === 1}
+                                            onChange={(e) =>
+                                              setFieldValue(
+                                                `menuIds[${index}].add_flag`,
+                                                e.target.checked ? 1 : 0
+                                              )
+                                            }
+                                          />
+                                        )}
+                                      </Field>
+                                    </TableCell>
 
-                                toggledItemRef.current = {};
-                              }}
-                              onItemSelectionToggle={handleItemSelectionToggle}
-                            />
+                                    <TableCell align="center">
+                                      <Field
+                                        name={`menuIds[${index}].edit_flag`}
+                                      >
+                                        {({ field }) => (
+                                          <Checkbox
+                                            checked={field.value === 1}
+                                            onChange={(e) =>
+                                              setFieldValue(
+                                                `menuIds[${index}].edit_flag`,
+                                                e.target.checked ? 1 : 0
+                                              )
+                                            }
+                                          />
+                                        )}
+                                      </Field>
+                                    </TableCell>
+
+                                    <TableCell align="center">
+                                      <Field
+                                        name={`menuIds[${index}].delete_flag`}
+                                      >
+                                        {({ field }) => (
+                                          <Checkbox
+                                            checked={field.value === 1}
+                                            onChange={(e) =>
+                                              setFieldValue(
+                                                `menuIds[${index}].delete_flag`,
+                                                e.target.checked ? 1 : 0
+                                              )
+                                            }
+                                          />
+                                        )}
+                                      </Field>
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
                             <ErrorMessage
-                              name="selectedMenus"
+                              name="menuIds"
                               component="div"
                               className="text-error text-12 mt-5"
                             />
@@ -665,29 +790,182 @@ function Role() {
                     </Box>
                     <Box className="p-20 bg-highlight">
                       <Grid container spacing={2}>
-                        <Grid item md={10} xs={2}></Grid>
-                        <Grid item md={1} xs={5}>
-                          <Button
-                            fullWidth
-                            variant="outlined"
-                            sx={{ backgroundColor: "primary.main" }}
-                            onClick={handleClose}
-                          >
-                            Cancel
-                          </Button>
-                        </Grid>
-                        <Grid item md={1} xs={5}>
-                          <LoadingButton
-                            loading={submitForm}
-                            disabled={submitForm}
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ backgroundColor: "primary.main" }}
-                          >
-                            Save
-                          </LoadingButton>
-                        </Grid>
+                        {formEditing ? (
+                          <>
+                            <Grid
+                              item
+                              md={menu[4]?.edit_flag ? 10 : 11}
+                              xs={2}
+                            ></Grid>
+                            {menu[4]?.edit_flag !== 1 ? (
+                              <Grid item md={1} xs={5}>
+                                <Button
+                                  fullWidth
+                                  variant="outlined"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                  onClick={handleClose}
+                                >
+                                  Back
+                                </Button>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                            {menu[4]?.edit_flag ? (
+                              <Grid item md={1} xs={5}>
+                                <Button
+                                  fullWidth
+                                  variant="outlined"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                  onClick={handleClose}
+                                >
+                                  Cancel
+                                </Button>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                            {menu[4]?.edit_flag ? (
+                              <Grid item md={1} xs={5}>
+                                <LoadingButton
+                                  loading={submitRoleForm}
+                                  disabled={submitRoleForm}
+                                  fullWidth
+                                  type="submit"
+                                  variant="contained"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                  onClick={async (e) => {
+                                    e.preventDefault();
+
+                                    // Manually trigger form validation
+                                    const errors = await validateForm();
+                                    console.log(errors);
+                                    // Check if there are validation errors
+                                    if (Object.keys(errors).length > 0) {
+                                      if (errors.role_name) {
+                                        toast.error(errors.role_name);
+                                      }
+                                      // Check for selected permissions
+
+                                      // Check if there are any permission errors
+                                      // menus.forEach((menu) => {
+                                      //   if (errors[menu.value]) {
+                                      //     toast.error(errors[menu.value].message);
+                                      //   }
+                                      // });
+                                      // return;
+                                      return;
+                                    }
+                                    const hasPermissions = values.menuIds.some(
+                                      (menu) =>
+                                        menu.display_flag ||
+                                        menu.add_flag ||
+                                        menu.edit_flag ||
+                                        menu.delete_flag
+                                    );
+
+                                    if (!hasPermissions) {
+                                      toast.error(
+                                        "At least one permission must be selected!"
+                                      );
+                                      return;
+                                    }
+
+                                    // If validation passes, submit the form
+                                    await submitForm();
+                                  }}
+                                >
+                                  Save
+                                </LoadingButton>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <Grid
+                              item
+                              md={menu[4]?.add_flag ? 10 : 11}
+                              xs={2}
+                            ></Grid>
+                            {menu[4]?.add_flag !== 1 ? (
+                              <Grid item md={1} xs={5}>
+                                <Button
+                                  fullWidth
+                                  variant="outlined"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                  onClick={handleClose}
+                                >
+                                  Back
+                                </Button>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                            {menu[4]?.add_flag ? (
+                              <Grid item md={1} xs={5}>
+                                <Button
+                                  fullWidth
+                                  variant="outlined"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                  onClick={handleClose}
+                                >
+                                  Cancel
+                                </Button>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                            {menu[4]?.add_flag ? (
+                              <Grid item md={1} xs={5}>
+                                <LoadingButton
+                                  loading={submitRoleForm}
+                                  disabled={submitRoleForm}
+                                  fullWidth
+                                  type="submit"
+                                  variant="contained"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                  onClick={async (e) => {
+                                    e.preventDefault();
+
+                                    // Manually trigger form validation
+                                    const errors = await validateForm();
+                                    console.log(errors);
+                                    // Check if there are validation errors
+                                    if (Object.keys(errors).length > 0) {
+                                      if (errors.role_name) {
+                                        toast.error(errors.role_name);
+                                      }
+
+                                      return;
+                                    }
+                                    const hasPermissions = values.menuIds.some(
+                                      (menu) =>
+                                        menu.display_flag ||
+                                        menu.add_flag ||
+                                        menu.edit_flag ||
+                                        menu.delete_flag
+                                    );
+
+                                    if (!hasPermissions) {
+                                      toast.error(
+                                        "At least one permission must be selected!"
+                                      );
+                                      return;
+                                    }
+
+                                    await submitForm();
+                                  }}
+                                >
+                                  Save
+                                </LoadingButton>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                          </>
+                        )}
                       </Grid>
                     </Box>
                   </Paper>
@@ -804,3 +1082,63 @@ export default Role;
               </TableBody>
             </Table> */
 // }
+{
+  /* <RichTreeView
+                                multiSelect
+                                checkboxSelection
+                                apiRef={apiRef}
+                                items={menus}
+                                selectedItems={values.selectedMenus}
+                                onSelectedItemsChange={(
+                                  event,
+                                  newSelectedItems
+                                ) => {
+                                  setFieldValue(
+                                    "selectedMenus",
+                                    newSelectedItems
+                                  );
+
+                                  // Select / unselect the children of the toggled item
+                                  const itemsToSelect = [];
+                                  const itemsToUnSelect = {};
+                                  Object.entries(
+                                    toggledItemRef.current
+                                  ).forEach(([itemId, isSelected]) => {
+                                    const item = apiRef.current.getItem(itemId);
+                                    if (isSelected) {
+                                      itemsToSelect.push(
+                                        ...getItemDescendantsIds(item)
+                                      );
+                                    } else {
+                                      getItemDescendantsIds(item).forEach(
+                                        (descendantId) => {
+                                          itemsToUnSelect[descendantId] = true;
+                                        }
+                                      );
+                                    }
+                                  });
+
+                                  const newSelectedItemsWithChildren =
+                                    Array.from(
+                                      new Set(
+                                        [
+                                          ...newSelectedItems,
+                                          ...itemsToSelect,
+                                        ].filter(
+                                          (itemId) => !itemsToUnSelect[itemId]
+                                        )
+                                      )
+                                    );
+
+                                  setFieldValue(
+                                    "selectedMenus",
+                                    newSelectedItemsWithChildren
+                                  );
+
+                                  toggledItemRef.current = {};
+                                }}
+                                onItemSelectionToggle={
+                                  handleItemSelectionToggle
+                                }
+                              /> */
+}

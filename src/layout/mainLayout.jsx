@@ -202,25 +202,27 @@ const MobileDrawer = ({ open, handleDrawerToggle, menu }) => {
             </Typography>
           </Box>
 
-          {menu.map((item) => (
-            <Link
-              to={`/home/${item.menu_url}`}
-              key={item.menu_id}
-              onClick={handleDrawerToggle}
-              className="menu-item"
-            >
-              <MenuItem
-                icon={iconMapping[item.menu_name]}
-                className={
-                  location.pathname.includes(item.menu_url)
-                    ? "active-menu-item"
-                    : ""
-                }
+          {menu
+            ?.filter((m) => m?.display_flag === 1)
+            ?.map((item) => (
+              <Link
+                to={`/home/${item.menu_url}`}
+                key={item.menu_id}
+                onClick={handleDrawerToggle}
+                className="menu-item"
               >
-                <Typography variant="subtitle1">{item.menu_name}</Typography>
-              </MenuItem>
-            </Link>
-          ))}
+                <MenuItem
+                  icon={iconMapping[item.menu_name]}
+                  className={
+                    location.pathname.includes(item.menu_url)
+                      ? "active-menu-item"
+                      : ""
+                  }
+                >
+                  <Typography variant="subtitle1">{item.menu_name}</Typography>
+                </MenuItem>
+              </Link>
+            ))}
         </Menu>
       </Box>
     </Drawer>
@@ -281,31 +283,15 @@ const ReactSidebar = ({ open, menu }) => {
             </Box>
           )}
 
-          {menu.map((item, index) => (
-            <Link
-              to={`/home/${item.menu_url}`}
-              key={item.menu_id}
-              className={`menu-item${index === 0 ? " pt-20" : ""}`}
-            >
-              {open ? (
-                <MenuItem
-                  icon={iconMapping[item.menu_name]}
-                  className={
-                    location.pathname.includes(item.menu_url)
-                      ? "active-menu-item"
-                      : ""
-                  }
-                >
-                  <Typography sx={{ fontSize: "13px" }}>
-                    {item.menu_name}
-                  </Typography>
-                </MenuItem>
-              ) : (
-                <HtmlLightTooltip
-                  arrow
-                  title={item.menu_name}
-                  placement="right"
-                >
+          {menu
+            ?.filter((m) => m?.display_flag === 1)
+            ?.map((item, index) => (
+              <Link
+                to={`/home/${item.menu_url}`}
+                key={item.menu_id}
+                className={`menu-item${index === 0 ? " pt-20" : ""}`}
+              >
+                {open ? (
                   <MenuItem
                     icon={iconMapping[item.menu_name]}
                     className={
@@ -314,18 +300,32 @@ const ReactSidebar = ({ open, menu }) => {
                         : ""
                     }
                   >
-                    <Typography variant="subtitle1">
+                    <Typography sx={{ fontSize: "13px" }}>
                       {item.menu_name}
                     </Typography>
                   </MenuItem>
-                </HtmlLightTooltip>
-              )}
-            </Link>
-          ))}
-
-          {/* <Link to="/home/role" className="menu-item">
-            <MenuItem icon={<TimelineRoundedIcon />}>Logs</MenuItem>
-          </Link> */}
+                ) : (
+                  <HtmlLightTooltip
+                    arrow
+                    title={item.menu_name}
+                    placement="right"
+                  >
+                    <MenuItem
+                      icon={iconMapping[item.menu_name]}
+                      className={
+                        location.pathname.includes(item.menu_url)
+                          ? "active-menu-item"
+                          : ""
+                      }
+                    >
+                      <Typography variant="subtitle1">
+                        {item.menu_name}
+                      </Typography>
+                    </MenuItem>
+                  </HtmlLightTooltip>
+                )}
+              </Link>
+            ))}
         </Menu>
       </Sidebar>
     </>

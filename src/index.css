@@ -769,3 +769,18 @@ input:disabled {
   white-space: normal;
   word-wrap: break-word;
 }
+/* .MuiRichTreeView-root {
+  border: 1px solid #bdbdbd;
+}
+.MuiTreeItem-root {
+  border-bottom: 1px solid #bdbdbd;
+}
+.MuiTreeItem-content {
+  padding: 8px;
+} */
+.Mui-expanded .MuiCheckbox-root {
+  display: none;
+}
+.rct-node-icon {
+  color: #eb6400 !important;
+}

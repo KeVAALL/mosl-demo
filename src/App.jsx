@@ -104,10 +104,14 @@ function App() {
               <Layout />
             </AuthGuard>
           ),
-          children: menu?.map((item) => ({
-            path: item.menu_url,
-            element: componentMapping[item.menu_url] || <>No Component Found</>,
-          })),
+          children: menu
+            ?.filter((m) => m?.display_flag === 1)
+            ?.map((item) => ({
+              path: item.menu_url,
+              element: componentMapping[item.menu_url] || (
+                <>No Component Found</>
+              ),
+            })),
         },
       ],
     },

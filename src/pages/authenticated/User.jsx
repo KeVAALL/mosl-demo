@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useMemo, useState } from "react";
-import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import {
@@ -55,6 +55,7 @@ import { HtmlLightTooltip } from "../../utils/components/Tooltip";
 
 function User() {
   const { userProfile } = useSelector((state) => state.user);
+  const { menu } = useSelector((state) => state.menu);
   const [openForm, setOpenForm] = useState(false);
   const [submitForm, setSubmitForm] = useState(false);
   const [initialValues, setInitialValues] = useState({
@@ -242,23 +243,26 @@ function User() {
 
           return (
             <Stack direction="row" justifyContent="flex-end" spacing={2}>
-              {/* <Tooltip title="View" placement="top" arrow>
-                <Button
-                  className="mui-icon-button"
-                  variant="outlined"
-                  startIcon={<VisibilityOutlined />}
-                />
-              </Tooltip> */}
-              <HtmlLightTooltip title="Edit" placement="top" arrow>
+              <HtmlLightTooltip
+                title={menu[5]?.edit_flag !== 1 ? "View" : "Edit"}
+                placement="top"
+                arrow
+              >
                 <LoadingButton
                   loading={isEditing}
                   disabled={isEditing}
                   className="mui-icon-button"
                   variant="outlined"
                   startIcon={
-                    <BorderColorOutlinedIcon
-                      sx={{ color: isEditing ? "transparent" : "#fff" }}
-                    />
+                    menu[5]?.edit_flag !== 1 ? (
+                      <VisibilityOutlinedIcon
+                        sx={{ color: isEditing ? "transparent" : "#fff" }}
+                      />
+                    ) : (
+                      <BorderColorOutlinedIcon
+                        sx={{ color: isEditing ? "transparent" : "#fff" }}
+                      />
+                    )
                   }
                   onClick={async () => {
                     console.log(row);
@@ -299,17 +303,21 @@ function User() {
                 />
               </HtmlLightTooltip>
 
-              <HtmlLightTooltip title="Delete" placement="top" arrow>
-                <LoadingButton
-                  className="mui-icon-button"
-                  variant="outlined"
-                  startIcon={<DeleteForeverOutlinedIcon />}
-                  onClick={() => {
-                    setDeleteItem(row?.original);
-                    handleDeleteConfirmation();
-                  }}
-                />
-              </HtmlLightTooltip>
+              {menu[5]?.delete_flag ? (
+                <HtmlLightTooltip title="Delete" placement="top" arrow>
+                  <LoadingButton
+                    className="mui-icon-button"
+                    variant="outlined"
+                    startIcon={<DeleteForeverOutlinedIcon />}
+                    onClick={() => {
+                      setDeleteItem(row?.original);
+                      handleDeleteConfirmation();
+                    }}
+                  />
+                </HtmlLightTooltip>
+              ) : (
+                <></>
+              )}
             </Stack>
           );
         },
@@ -378,10 +386,14 @@ function User() {
               </Typography>
             </Grid>
             <Grid item xs={6} display="flex" justifyContent="flex-end">
-              {!openForm && (
-                <Button variant="contained" onClick={handleOpen}>
-                  Add User
-                </Button>
+              {menu[5]?.add_flag ? (
+                !openForm && (
+                  <Button variant="contained" onClick={handleOpen}>
+                    Add User
+                  </Button>
+                )
+              ) : (
+                <></>
               )}
             </Grid>
           </Grid>
@@ -579,6 +591,11 @@ function User() {
                               {({ field }) => (
                                 <BootstrapInput
                                   {...field}
+                                  disabled={
+                                    formEditing
+                                      ? menu[5]?.edit_flag !== 1
+                                      : menu[5]?.add_flag !== 1
+                                  }
                                   fullWidth
                                   id="name"
                                   size="small"
@@ -622,6 +639,11 @@ function User() {
                               {({ field }) => (
                                 <BootstrapInput
                                   {...field}
+                                  disabled={
+                                    formEditing
+                                      ? menu[5]?.edit_flag !== 1
+                                      : menu[5]?.add_flag !== 1
+                                  }
                                   fullWidth
                                   id="email"
                                   size="small"
@@ -665,6 +687,11 @@ function User() {
                               {({ field }) => (
                                 <BootstrapInput
                                   {...field}
+                                  disabled={
+                                    formEditing
+                                      ? menu[5]?.edit_flag !== 1
+                                      : menu[5]?.add_flag !== 1
+                                  }
                                   fullWidth
                                   id="password"
                                   type={showPassword ? "text" : "password"}
@@ -721,6 +748,55 @@ function User() {
                         <Grid item md={4} className="w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
+                              Enter PIN
+                              <sup className="asc">*</sup>
+                            </Typography>
+                            <Field name="pin">
+                              {({ field }) => (
+                                <BootstrapInput
+                                  {...field}
+                                  disabled={
+                                    formEditing
+                                      ? menu[5]?.edit_flag !== 1
+                                      : menu[5]?.add_flag !== 1
+                                  }
+                                  fullWidth
+                                  id="pin"
+                                  size="small"
+                                  placeholder="PIN"
+                                  InputLabelProps={{
+                                    shrink: true,
+                                  }}
+                                  onChange={(e) => {
+                                    e.preventDefault();
+                                    const { value } = e.target;
+
+                                    // Regular expression to allow only numbers
+                                    const regex = /^[0-9]+$/;
+
+                                    if (
+                                      !value ||
+                                      (regex.test(value.toString()) &&
+                                        value.length <= 4)
+                                    ) {
+                                      setFieldValue("pin", value);
+                                    } else {
+                                      return;
+                                    }
+                                  }}
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="pin"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                          </FormControl>
+                        </Grid>
+                        <Grid item md={4} className="w-full">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
                               Phone Number
                               <sup className="asc">*</sup>
                             </Typography>
@@ -728,6 +804,11 @@ function User() {
                               {({ field }) => (
                                 <BootstrapInput
                                   {...field}
+                                  disabled={
+                                    formEditing
+                                      ? menu[5]?.edit_flag !== 1
+                                      : menu[5]?.add_flag !== 1
+                                  }
                                   fullWidth
                                   id="phone_number"
                                   size="small"
@@ -772,6 +853,11 @@ function User() {
                               {({ field }) => (
                                 <CustomSelect
                                   {...field}
+                                  isDisabled={
+                                    formEditing
+                                      ? menu[5]?.edit_flag !== 1
+                                      : menu[5]?.add_flag !== 1
+                                  }
                                   options={roleDropdown}
                                   placeholder="Select Role"
                                   id="role_id"
@@ -793,29 +879,113 @@ function User() {
                     </Box>
                     <Box className="p-20 bg-highlight">
                       <Grid container spacing={2}>
-                        <Grid item md={10} xs={2}></Grid>
-                        <Grid item md={1} xs={5}>
-                          <Button
-                            fullWidth
-                            variant="outlined"
-                            sx={{ backgroundColor: "primary.main" }}
-                            onClick={handleClose}
-                          >
-                            Cancel
-                          </Button>
-                        </Grid>
-                        <Grid item md={1} xs={5}>
-                          <LoadingButton
-                            loading={submitForm}
-                            disabled={submitForm}
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ backgroundColor: "primary.main" }}
-                          >
-                            Save
-                          </LoadingButton>
-                        </Grid>
+                        {formEditing ? (
+                          <>
+                            <Grid
+                              item
+                              md={menu[5]?.edit_flag ? 10 : 11}
+                              xs={2}
+                            ></Grid>
+                            {menu[5]?.edit_flag !== 1 ? (
+                              <Grid item md={1} xs={5}>
+                                <Button
+                                  fullWidth
+                                  variant="outlined"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                  onClick={handleClose}
+                                >
+                                  Back
+                                </Button>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                            {menu[5]?.edit_flag ? (
+                              <Grid item md={1} xs={5}>
+                                <Button
+                                  fullWidth
+                                  variant="outlined"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                  onClick={handleClose}
+                                >
+                                  Cancel
+                                </Button>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                            {menu[5]?.edit_flag ? (
+                              <Grid item md={1} xs={5}>
+                                <LoadingButton
+                                  // className="disable-button"
+                                  loading={submitForm}
+                                  disabled={submitForm}
+                                  type="submit"
+                                  fullWidth
+                                  variant="contained"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                >
+                                  Save
+                                </LoadingButton>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <Grid
+                              item
+                              md={menu[5]?.add_flag ? 10 : 11}
+                              xs={2}
+                            ></Grid>
+                            {menu[5]?.add_flag !== 1 ? (
+                              <Grid item md={1} xs={5}>
+                                <Button
+                                  fullWidth
+                                  variant="outlined"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                  onClick={handleClose}
+                                >
+                                  Back
+                                </Button>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                            {menu[5]?.add_flag ? (
+                              <Grid item md={1} xs={5}>
+                                <Button
+                                  fullWidth
+                                  variant="outlined"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                  onClick={handleClose}
+                                >
+                                  Cancel
+                                </Button>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                            {menu[5]?.add_flag ? (
+                              <Grid item md={1} xs={5}>
+                                <LoadingButton
+                                  // className="disable-button"
+                                  loading={submitForm}
+                                  disabled={submitForm}
+                                  type="submit"
+                                  fullWidth
+                                  variant="contained"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                >
+                                  Save
+                                </LoadingButton>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                          </>
+                        )}
                       </Grid>
                     </Box>
                   </Paper>

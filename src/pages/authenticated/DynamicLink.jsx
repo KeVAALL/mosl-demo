@@ -3,7 +3,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
-import ClearOutlinedIcon from "@mui/icons-material/ClearOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+
 import { styled } from "@mui/material/styles";
 import {
   Backdrop,
@@ -61,6 +62,7 @@ import { useSelector } from "react-redux";
 
 function DynamicLink() {
   const { userProfile } = useSelector((state) => state.user);
+  const { menu } = useSelector((state) => state.menu);
   const [open, setOpen] = useState(false);
   const [openForm, setOpenForm] = useState(false);
   const [submitForm, setSubmitForm] = useState(false);
@@ -245,7 +247,7 @@ function DynamicLink() {
       toast.error(error?.response?.data?.message);
     }
   }
-  async function getAccessLinkUrl(values, setFieldTouched) {
+  async function getAccessLinkUrl(values) {
     const reqdata = {
       ...values,
       created_by: userProfile?.user_role_id,
@@ -315,16 +317,26 @@ function DynamicLink() {
 
           return (
             <Stack direction="row" justifyContent="flex-end" spacing={2}>
-              <HtmlLightTooltip title="Edit" placement="top" arrow>
+              <HtmlLightTooltip
+                title={menu[3]?.edit_flag !== 1 ? "View" : "Edit"}
+                placement="top"
+                arrow
+              >
                 <LoadingButton
                   loading={isEditing}
                   disabled={isEditing}
                   className="mui-icon-button"
                   variant="outlined"
                   startIcon={
-                    <BorderColorOutlinedIcon
-                      sx={{ color: isEditing ? "transparent" : "#fff" }}
-                    />
+                    menu[3]?.edit_flag !== 1 ? (
+                      <VisibilityOutlinedIcon
+                        sx={{ color: isEditing ? "transparent" : "#fff" }}
+                      />
+                    ) : (
+                      <BorderColorOutlinedIcon
+                        sx={{ color: isEditing ? "transparent" : "#fff" }}
+                      />
+                    )
                   }
                   onClick={async () => {
                     console.log(row);
@@ -383,24 +395,28 @@ function DynamicLink() {
                 />
               </HtmlLightTooltip>
 
-              <HtmlLightTooltip title="Delete" placement="top" arrow>
-                <LoadingButton
-                  className="mui-icon-button"
-                  variant="outlined"
-                  startIcon={<DeleteForeverOutlinedIcon />}
-                  onClick={() => {
-                    console.log(row.original);
-                    setDeleteItem(row?.original);
-                    handleDeleteConfirmation();
-                  }}
-                />
-              </HtmlLightTooltip>
+              {menu[3]?.delete_flag ? (
+                <HtmlLightTooltip title="Delete" placement="top" arrow>
+                  <LoadingButton
+                    className="mui-icon-button"
+                    variant="outlined"
+                    startIcon={<DeleteForeverOutlinedIcon />}
+                    onClick={() => {
+                      console.log(row.original);
+                      setDeleteItem(row?.original);
+                      handleDeleteConfirmation();
+                    }}
+                  />
+                </HtmlLightTooltip>
+              ) : (
+                <></>
+              )}
             </Stack>
           );
         },
       },
     ],
-    [tableData]
+    [menu, projectDropdown]
   );
   const columns = useMemo(() => dataColumns, [dataColumns]);
   const data = useMemo(() => tableData, [tableData]);
@@ -462,10 +478,14 @@ function DynamicLink() {
               </Typography>
             </Grid>
             <Grid item xs={6} display="flex" justifyContent="flex-end">
-              {!openForm && (
-                <Button variant="contained" onClick={handleOpen}>
-                  Add Link
-                </Button>
+              {menu[3]?.add_flag ? (
+                !openForm && (
+                  <Button variant="contained" onClick={handleOpen}>
+                    Add Link
+                  </Button>
+                )
+              ) : (
+                <></>
               )}
             </Grid>
           </Grid>
@@ -679,6 +699,11 @@ function DynamicLink() {
                               {({ field }) => (
                                 <CustomSelect
                                   {...field}
+                                  isDisabled={
+                                    formEditing
+                                      ? menu[3]?.edit_flag !== 1
+                                      : menu[3]?.add_flag !== 1
+                                  }
                                   placeholder="Select Project"
                                   options={projectDropdown}
                                   id="project_id"
@@ -706,6 +731,11 @@ function DynamicLink() {
                               {({ field }) => (
                                 <BootstrapInput
                                   {...field}
+                                  disabled={
+                                    formEditing
+                                      ? menu[3]?.edit_flag !== 1
+                                      : menu[3]?.add_flag !== 1
+                                  }
                                   fullWidth
                                   id="dynamic_link_name"
                                   size="small"
@@ -864,7 +894,11 @@ function DynamicLink() {
                                   fullWidth
                                   id="browser_url"
                                   size="small"
-                                  disabled={!values.link_param}
+                                  disabled={
+                                    !values.link_param || formEditing
+                                      ? menu[3]?.edit_flag !== 1
+                                      : menu[3]?.add_flag !== 1
+                                  }
                                   InputLabelProps={{ shrink: true }}
                                   onChange={async (e) => {
                                     const value = e.target.value;
@@ -924,7 +958,11 @@ function DynamicLink() {
                                   </Typography>
                                 }
                                 sx={{ width: "55%" }}
-                                disabled={!values.link_param}
+                                disabled={
+                                  !values.link_param || formEditing
+                                    ? menu[3]?.edit_flag !== 1
+                                    : menu[3]?.add_flag !== 1
+                                }
                               />
                               <FormControlLabel
                                 value="App"
@@ -935,7 +973,11 @@ function DynamicLink() {
                                   </Typography>
                                 }
                                 sx={{ width: "55%" }}
-                                disabled={!values.link_param}
+                                disabled={
+                                  !values.link_param || formEditing
+                                    ? menu[3]?.edit_flag !== 1
+                                    : menu[3]?.add_flag !== 1
+                                }
                               />
                               <ErrorMessage
                                 name="open_in_ios"
@@ -1015,7 +1057,11 @@ function DynamicLink() {
                                   </Typography>
                                 }
                                 sx={{ width: "55%" }}
-                                disabled={!values.link_param}
+                                disabled={
+                                  !values.link_param || formEditing
+                                    ? menu[3]?.edit_flag !== 1
+                                    : menu[3]?.add_flag !== 1
+                                }
                               />
                               <FormControlLabel
                                 value="App"
@@ -1026,7 +1072,11 @@ function DynamicLink() {
                                   </Typography>
                                 }
                                 sx={{ width: "55%" }}
-                                disabled={!values.link_param}
+                                disabled={
+                                  !values.link_param || formEditing
+                                    ? menu[3]?.edit_flag !== 1
+                                    : menu[3]?.add_flag !== 1
+                                }
                               />
                               <ErrorMessage
                                 name="open_in_android"
@@ -1075,29 +1125,113 @@ function DynamicLink() {
                     </Box>
                     <Box className="p-20 bg-highlight">
                       <Grid container spacing={2}>
-                        <Grid item md={10} xs={2}></Grid>
-                        <Grid item md={1} xs={5}>
-                          <Button
-                            fullWidth
-                            variant="outlined"
-                            sx={{ backgroundColor: "primary.main" }}
-                            onClick={handleClose}
-                          >
-                            Cancel
-                          </Button>
-                        </Grid>
-                        <Grid item md={1} xs={5}>
-                          <LoadingButton
-                            loading={submitForm}
-                            disabled={submitForm}
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ backgroundColor: "primary.main" }}
-                          >
-                            Save
-                          </LoadingButton>
-                        </Grid>
+                        {formEditing ? (
+                          <>
+                            <Grid
+                              item
+                              md={menu[3]?.edit_flag ? 10 : 11}
+                              xs={2}
+                            ></Grid>
+                            {menu[3]?.edit_flag !== 1 ? (
+                              <Grid item md={1} xs={5}>
+                                <Button
+                                  fullWidth
+                                  variant="outlined"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                  onClick={handleClose}
+                                >
+                                  Back
+                                </Button>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                            {menu[3]?.edit_flag ? (
+                              <Grid item md={1} xs={5}>
+                                <Button
+                                  fullWidth
+                                  variant="outlined"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                  onClick={handleClose}
+                                >
+                                  Cancel
+                                </Button>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                            {menu[3]?.edit_flag ? (
+                              <Grid item md={1} xs={5}>
+                                <LoadingButton
+                                  // className="disable-button"
+                                  loading={submitForm}
+                                  disabled={submitForm}
+                                  type="submit"
+                                  fullWidth
+                                  variant="contained"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                >
+                                  Save
+                                </LoadingButton>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <Grid
+                              item
+                              md={menu[3]?.add_flag ? 10 : 11}
+                              xs={2}
+                            ></Grid>
+                            {menu[3]?.add_flag !== 1 ? (
+                              <Grid item md={1} xs={5}>
+                                <Button
+                                  fullWidth
+                                  variant="outlined"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                  onClick={handleClose}
+                                >
+                                  Back
+                                </Button>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                            {menu[3]?.add_flag ? (
+                              <Grid item md={1} xs={5}>
+                                <Button
+                                  fullWidth
+                                  variant="outlined"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                  onClick={handleClose}
+                                >
+                                  Cancel
+                                </Button>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                            {menu[3]?.add_flag ? (
+                              <Grid item md={1} xs={5}>
+                                <LoadingButton
+                                  // className="disable-button"
+                                  loading={submitForm}
+                                  disabled={submitForm}
+                                  type="submit"
+                                  fullWidth
+                                  variant="contained"
+                                  sx={{ backgroundColor: "primary.main" }}
+                                >
+                                  Save
+                                </LoadingButton>
+                              </Grid>
+                            ) : (
+                              <></>
+                            )}
+                          </>
+                        )}
                       </Grid>
                     </Box>
                   </Paper>
