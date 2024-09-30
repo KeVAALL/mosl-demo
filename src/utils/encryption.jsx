@@ -1,19 +1,17 @@
-import * as CryptoJS from "crypto-js";
-import { Base64 } from "js-base64";
-
-const secretKey = "fitZen";
-
+// Encode data to Base64
 export function encryptData(data) {
-  const encrypted = CryptoJS.AES.encrypt(
-    JSON.stringify(data),
-    secretKey
-  ).toString();
-  const base64Encrypted = Base64.encode(encrypted); // Encode to Base64 using js-base64
-  return base64Encrypted;
+  return window.btoa(data);
 }
 
-export function decryptData(encryptedData) {
-  const encrypted = Base64.decode(encryptedData); // Decode from Base64 using js-base64
-  const bytes = CryptoJS.AES.decrypt(encrypted, secretKey);
-  return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+// Decode data from Base64
+export function decryptData(base64Data) {
+  return window.atob(base64Data);
 }
+
+const testString = "Hello World";
+
+const encrypted = encryptData(testString);
+console.log("Encrypted:", encrypted);
+
+const decrypted = decryptData(encrypted);
+console.log("Decrypted:", decrypted); // Should output "Hello World"

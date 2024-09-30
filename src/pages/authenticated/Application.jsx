@@ -62,10 +62,11 @@ import { HtmlLightTooltip } from "../../utils/components/Tooltip";
 function Application() {
   const { userProfile } = useSelector((state) => state.user);
   const { menu } = useSelector((state) => state.menu);
+  const { SELECTED_PROJECT } = useSelector((state) => state.project);
   const [openForm, setOpenForm] = useState(false);
   const [submitForm, setSubmitForm] = useState(false);
   const [initialValues, setInitialValues] = useState({
-    p_id: null,
+    // p_id: null,
     platform: {
       label: "Android",
       value: "android",
@@ -77,7 +78,7 @@ function Application() {
     // dynamic_url: "",
   });
   const validationSchema = Yup.object().shape({
-    p_id: Yup.object().required("Project is required"),
+    // p_id: Yup.object().required("Project is required"),
     platform: Yup.object().required("Platform is required"),
     package_name: Yup.string().required("Package Name is required"),
     description: Yup.string().required("Description is required"),
@@ -164,7 +165,7 @@ function Application() {
         {
           id: userProfile?.user_id,
           name: userProfile?.user_name,
-          p_id: project.value,
+          p_id: project.id,
         },
         "application/getall-application"
       );
@@ -199,7 +200,7 @@ function Application() {
     const reqdata = {
       ...values,
       platform: values?.platform?.value,
-      p_id: values?.p_id?.value,
+      p_id: SELECTED_PROJECT?.id,
       created_by: userProfile?.user_id,
       created_by_name: userProfile?.user_name,
     };
@@ -218,7 +219,7 @@ function Application() {
         setOpenForm(false);
         setFormEditing(false);
         setInitialValues({
-          p_id: null,
+          // p_id: null,
           platform: {
             label: "Android",
             value: "android",
@@ -229,8 +230,8 @@ function Application() {
           store_url: "",
           // dynamic_url: "",
         });
-        setSelectedProject(values?.p_id);
-        getApplication(values?.p_id);
+        // setSelectedProject(values?.p_id);
+        getApplication(SELECTED_PROJECT);
       }
 
       // return result;
@@ -259,7 +260,7 @@ function Application() {
       if (result?.status === 201) {
         toast.error("Application Deleted");
         handleDeleteConfirmation();
-        getApplication(selectedProject);
+        getApplication(SELECTED_PROJECT);
       }
 
       return result;
@@ -320,9 +321,9 @@ function Application() {
 
                       const newMap = {
                         ...resp,
-                        p_id: projectDropdown?.filter(
-                          (project) => project?.value === resp?.p_id
-                        )[0],
+                        // p_id: projectDropdown?.filter(
+                        //   (project) => project?.value === resp?.p_id
+                        // )[0],
                         platform: applicationArr?.filter(
                           (app) => app?.value === resp?.platform?.toLowerCase()
                         )[0],
@@ -401,13 +402,18 @@ function Application() {
     }
     return item;
   });
+  // useEffect(() => {
+  //   getProjectDropdown();
+  // }, []);
   useEffect(() => {
-    getProjectDropdown();
-  }, []);
-  useEffect(() => {
-    getAllApplication();
+    // getAllApplication();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!SELECTED_PROJECT) {
+      getAllApplication();
+    } else {
+      getApplication(SELECTED_PROJECT);
+    }
+  }, [SELECTED_PROJECT]);
 
   return (
     <>
@@ -485,7 +491,7 @@ function Application() {
                     />
                   </Grid>
                   <Grid item md={3} xs={6}>
-                    <CustomSelect
+                    {/* <CustomSelect
                       placeholder="Select Project"
                       options={projectDropdown}
                       value={selectedProject}
@@ -500,7 +506,7 @@ function Application() {
                       }}
                       id="project"
                       isClearable
-                    />
+                    /> */}
                   </Grid>
                 </Grid>
                 <Box
@@ -654,7 +660,7 @@ function Application() {
                             />
                           </FormControl>
                         </Grid>
-                        <Grid item md={4} sx={{ pb: 2.5 }} className="w-full">
+                        {/* <Grid item md={4} sx={{ pb: 2.5 }} className="w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
                               Project
@@ -684,7 +690,7 @@ function Application() {
                               className="text-error text-12 mt-5"
                             />
                           </FormControl>
-                        </Grid>
+                        </Grid> */}
                         <Grid item md={12} className="w-full">
                           <Divider textAlign="left">
                             {values?.platform?.value.toUpperCase()}

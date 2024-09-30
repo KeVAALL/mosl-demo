@@ -21,9 +21,13 @@ import { BootstrapInput } from "../../utils/Input/textfield";
 import { useNavigate } from "react-router-dom";
 import { ApiService } from "../../utils/api/apiCall";
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { setSelectedProject } from "../../redux/slices/projectSlice";
 
 function Dashboard() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { SELECTED_PROJECT } = useSelector((state) => state.project);
   const [loadingData, setLoadingData] = useState(false);
   const [projectData, setProjectData] = useState([]);
 
@@ -38,6 +42,15 @@ function Dashboard() {
       // });
 
       setProjectData(result?.data);
+
+      if (SELECTED_PROJECT) {
+        return;
+      } else {
+        const resp = {
+          selectedProject: result?.data[0],
+        };
+        dispatch(setSelectedProject(resp));
+      }
     } catch (error) {
       toast.error(error?.response?.data?.message);
     } finally {

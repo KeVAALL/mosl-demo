@@ -22,6 +22,7 @@ import ResetPassword from "./pages/auth/ResetPassword";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import { useSelector } from "react-redux";
 import ResetSignIn from "./pages/auth/ResetSignIn.";
+import LinkData from "./pages/authenticated/LinkData";
 
 const theme = createTheme({
   breakpoints: {
@@ -104,14 +105,20 @@ function App() {
               <Layout />
             </AuthGuard>
           ),
-          children: menu
-            ?.filter((m) => m?.display_flag === 1)
-            ?.map((item) => ({
-              path: item.menu_url,
-              element: componentMapping[item.menu_url] || (
-                <>No Component Found</>
-              ),
-            })),
+          children: [
+            ...menu
+              ?.filter((m) => m?.display_flag === 1)
+              ?.map((item) => ({
+                path: item.menu_url,
+                element: componentMapping[item.menu_url] || (
+                  <>No Component Found</>
+                ),
+              })),
+            {
+              path: ":link_id",
+              element: <LinkData />,
+            },
+          ],
         },
       ],
     },

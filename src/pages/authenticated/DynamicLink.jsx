@@ -39,6 +39,7 @@ import {
   Typography,
 } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import TimelineIcon from "@mui/icons-material/Timeline";
 // third-party
 import { useTable, usePagination, useGlobalFilter } from "react-table";
 
@@ -61,15 +62,19 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import { HtmlLightTooltip } from "../../utils/components/Tooltip";
 import { useSelector } from "react-redux";
 import { debounce } from "lodash";
+import { useNavigate } from "react-router-dom";
+import { encryptData } from "../../utils/encryption";
 
 function DynamicLink() {
   const { userProfile } = useSelector((state) => state.user);
   const { menu } = useSelector((state) => state.menu);
+  const { SELECTED_PROJECT } = useSelector((state) => state.project);
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [openForm, setOpenForm] = useState(false);
   const [submitForm, setSubmitForm] = useState(false);
   const [initialValues, setInitialValues] = useState({
-    project_id: null,
+    // project_id: null,
     dynamic_link_name: "",
     link_param: "",
     custom_dynamic_link: "",
@@ -80,7 +85,7 @@ function DynamicLink() {
     open_in_app_android_application_id: null,
   });
   const validationSchema = Yup.object().shape({
-    project_id: Yup.object().required("Project is required"),
+    // project_id: Yup.object().required("Project is required"),
     dynamic_link_name: Yup.string().required("Dynamic Link Name is required"),
     link_param: Yup.string().required("Link Access URL is required"),
     custom_dynamic_link: Yup.string()
@@ -144,13 +149,13 @@ function DynamicLink() {
   const handleDeleteConfirmation = () => {
     setOpenDeleteModal(!openDeleteModal);
   };
-  async function getLinks(link_id = 0, project_id = 0) {
+  async function getLinks(link_id = 0, project = 0) {
     try {
       setLoadingData(true);
       const result = await ApiService(
         {
           link_id: link_id,
-          project_id: project_id,
+          project_id: project?.id,
         },
         "get-link"
       );
@@ -177,7 +182,7 @@ function DynamicLink() {
     const { link_param, ...newObj } = values;
     const reqdata = {
       ...newObj,
-      project_id: values?.project_id?.value,
+      project_id: SELECTED_PROJECT?.id,
       open_in_app_android: values?.open_in_android === "App" ? 1 : 0,
       open_in_browser_android: values?.open_in_android === "Browser" ? 1 : 0,
       open_in_app_android_application_id:
@@ -203,7 +208,7 @@ function DynamicLink() {
         setOpenForm(false);
         setFormEditing(false);
         setInitialValues({
-          project_id: null,
+          // project_id: null,
           dynamic_link_name: "",
           link_param: "",
           browser_url: "",
@@ -212,7 +217,7 @@ function DynamicLink() {
           open_in_app_ios_application_id: null,
           open_in_app_android_application_id: null,
         });
-        getLinks(0, 0);
+        getLinks(0, SELECTED_PROJECT);
       }
 
       // return result;
@@ -224,14 +229,15 @@ function DynamicLink() {
       setSubmitForm(false);
     }
   };
-  async function getApplicationDropdown(project) {
+  async function getApplicationDropdown() {
     try {
       setFetchingApp(true);
       const result = await ApiService(
         {
           id: userProfile?.user_id,
           name: userProfile?.user_name,
-          p_id: project.value ? project.value : project,
+          // p_id: project.value ? project.value : project,
+          p_id: SELECTED_PROJECT?.id,
         },
         "application/getall-application"
       );
@@ -281,9 +287,9 @@ function DynamicLink() {
       console.log(res);
       setInitialValues({
         ...res,
-        project_id: projectDropdown?.filter(
-          (p) => p?.value === res?.project_id
-        )[0],
+        // project_id: projectDropdown?.filter(
+        //   (p) => p?.value === res?.project_id
+        // )[0],
         open_in_ios: "Browser",
         open_in_android: "Browser",
       });
@@ -340,7 +346,7 @@ function DynamicLink() {
       if (result?.status === 201) {
         toast.error("Dynamic Link Deleted");
         handleDeleteConfirmation();
-        getLinks(0, 0);
+        getLinks(0, SELECTED_PROJECT);
       }
 
       return result;
@@ -401,9 +407,10 @@ function DynamicLink() {
                       const resp = result?.data[0];
                       console.log(resp);
 
-                      const dropdownApp = await getApplicationDropdown(
-                        resp?.project_id
-                      );
+                      // const dropdownApp = await getApplicationDropdown(
+                      //   resp?.project_id
+                      // );
+                      const dropdownApp = await getApplicationDropdown();
                       console.log(dropdownApp);
 
                       const app1 = dropdownApp?.find(
@@ -418,9 +425,9 @@ function DynamicLink() {
 
                       const newMap = {
                         ...resp,
-                        project_id: projectDropdown?.filter(
-                          (pr) => pr?.value === resp?.project_id
-                        )[0],
+                        // project_id: projectDropdown?.filter(
+                        //   (pr) => pr?.value === resp?.project_id
+                        // )[0],
                         open_in_ios: resp?.open_in_browser_ios
                           ? "Browser"
                           : "App",
@@ -459,6 +466,20 @@ function DynamicLink() {
               ) : (
                 <></>
               )}
+
+              <HtmlLightTooltip title="Logs" placement="top" arrow>
+                <LoadingButton
+                  className="mui-icon-button"
+                  variant="outlined"
+                  startIcon={<TimelineIcon />}
+                  onClick={() => {
+                    // console.log(row.original);
+                    // setDeleteItem(row?.original);
+                    // handleDeleteConfirmation();
+                    navigate(`/home/${encryptData(row.original.link_id)}`);
+                  }}
+                />
+              </HtmlLightTooltip>
             </Stack>
           );
         },
@@ -505,12 +526,10 @@ function DynamicLink() {
     }
     return item;
   });
+
   useEffect(() => {
-    getProjectDropdown();
-  }, []);
-  useEffect(() => {
-    getLinks();
-  }, []);
+    getLinks(0, SELECTED_PROJECT);
+  }, [SELECTED_PROJECT]);
 
   return (
     <>
@@ -588,7 +607,7 @@ function DynamicLink() {
                       setGlobalFilter={setGlobalFilter}
                     />
                   </Grid>
-                  <Grid item md={3} xs={6}>
+                  {/* <Grid item md={3} xs={6}>
                     <CustomSelect
                       placeholder="Select Project"
                       options={projectDropdown}
@@ -600,7 +619,7 @@ function DynamicLink() {
                       }}
                       value={selectedProject}
                     />
-                  </Grid>
+                  </Grid> */}
                   {/* <Grid item md={3} xs={6}>
                   <CustomSelect
                     placeholder="Select Application"
@@ -737,7 +756,7 @@ function DynamicLink() {
                         mt={1}
                         className="pl-20 pr-20 pb-20"
                       >
-                        <Grid item md={6} className="w-full">
+                        {/* <Grid item md={6} className="w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
                               Project
@@ -768,7 +787,7 @@ function DynamicLink() {
                               className="text-error text-12 mt-5"
                             />
                           </FormControl>
-                        </Grid>
+                        </Grid> */}
                         <Grid item md={6} className="w-full">
                           <FormControl variant="standard" fullWidth>
                             <Typography className="label d-flex items-center">
@@ -821,7 +840,7 @@ function DynamicLink() {
                                       }}
                                       onClick={async () => {
                                         // Mark `project_id` and `dynamic_link_name` as touched
-                                        setFieldTouched("project_id", true);
+                                        // setFieldTouched("project_id", true);
                                         setFieldTouched(
                                           "dynamic_link_name",
                                           true
@@ -834,14 +853,14 @@ function DynamicLink() {
                                         let hasError = false;
 
                                         // Check for `project_id` error and display it if found
-                                        if (validationErrors.project_id) {
-                                          setFieldError(
-                                            "project_id",
-                                            "Project is required."
-                                          );
-                                          // toast.error("Project is required.");
-                                          hasError = true; // Set flag that there is an error
-                                        }
+                                        // if (validationErrors.project_id) {
+                                        //   setFieldError(
+                                        //     "project_id",
+                                        //     "Project is required."
+                                        //   );
+                                        //   // toast.error("Project is required.");
+                                        //   hasError = true; // Set flag that there is an error
+                                        // }
 
                                         // Check for `dynamic_link_name` error and display it if found
                                         if (
@@ -862,8 +881,7 @@ function DynamicLink() {
                                           if (formEditing) {
                                             const formValues = {
                                               ...values,
-                                              project_id:
-                                                values?.project_id?.value,
+                                              project_id: SELECTED_PROJECT?.id,
                                             };
                                             getAccessLinkUrl(
                                               formValues,
@@ -872,8 +890,7 @@ function DynamicLink() {
                                           } else {
                                             const formValues = {
                                               ...values,
-                                              project_id:
-                                                values?.project_id?.value,
+                                              project_id: SELECTED_PROJECT?.id,
                                               dynamic_link_name:
                                                 values?.dynamic_link_name,
                                               link_id: 0,
@@ -899,6 +916,8 @@ function DynamicLink() {
                             />
                           </FormControl>
                         </Grid>
+
+                        <Grid item md={6} className="w-full"></Grid>
 
                         <Grid item md={6} className="w-full">
                           <FormControl variant="standard" fullWidth>
