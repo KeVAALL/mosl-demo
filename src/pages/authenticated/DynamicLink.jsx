@@ -21,6 +21,7 @@ import {
   FormLabel,
   Grid,
   IconButton,
+  InputAdornment,
   InputLabel,
   Modal,
   Paper,
@@ -59,6 +60,7 @@ import { LoadingButton } from "@mui/lab";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { HtmlLightTooltip } from "../../utils/components/Tooltip";
 import { useSelector } from "react-redux";
+import { debounce } from "lodash";
 
 function DynamicLink() {
   const { userProfile } = useSelector((state) => state.user);
@@ -70,6 +72,7 @@ function DynamicLink() {
     project_id: null,
     dynamic_link_name: "",
     link_param: "",
+    custom_dynamic_link: "",
     browser_url: "",
     open_in_ios: "",
     open_in_android: "",
@@ -80,6 +83,13 @@ function DynamicLink() {
     project_id: Yup.object().required("Project is required"),
     dynamic_link_name: Yup.string().required("Dynamic Link Name is required"),
     link_param: Yup.string().required("Link Access URL is required"),
+    custom_dynamic_link: Yup.string()
+      .nullable()
+      .test(
+        "is-valid-length",
+        "Custom Dynamic Link must be at least 20 characters",
+        (value) => !value || value.length >= 20
+      ),
     browser_url: Yup.string()
       .url("Please enter a valid URL")
       .required("Browser URL is required"),
@@ -103,6 +113,9 @@ function DynamicLink() {
   const [projectDropdown, setProjectDropdown] = useState([]);
   const [appDropdown, setAppDropdown] = useState([]);
   const [fetchingLink, setFetchingLink] = useState(false);
+  const [checkingLink, setCheckingLink] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errMessage, setErrMessage] = useState("");
   const [fetchingApps, setFetchingApp] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -139,7 +152,7 @@ function DynamicLink() {
           link_id: link_id,
           project_id: project_id,
         },
-        "dynamiclinks/get-link"
+        "get-link"
       );
 
       const newMap = result?.data?.map((table) => {
@@ -155,7 +168,12 @@ function DynamicLink() {
   }
   const onSubmit = async (values) => {
     console.log(values);
-
+    if (errMessage) {
+      // Optionally, you can display a toast or some notification here
+      console.log("Form cannot be submitted due to errors:", errMessage);
+      toast.error("Invalid Custom Link");
+      return; // Prevent form submission
+    }
     const { link_param, ...newObj } = values;
     const reqdata = {
       ...newObj,
@@ -174,7 +192,7 @@ function DynamicLink() {
     try {
       setSubmitForm(true);
 
-      const result = await ApiService(reqdata, "dynamiclinks/link");
+      const result = await ApiService(reqdata, "link");
 
       console.log(result);
 
@@ -201,6 +219,8 @@ function DynamicLink() {
     } catch (error) {
       toast.error(error?.response?.data?.message);
     } finally {
+      setErrMessage("");
+      setSuccessMessage("");
       setSubmitForm(false);
     }
   };
@@ -247,7 +267,7 @@ function DynamicLink() {
       toast.error(error?.response?.data?.message);
     }
   }
-  async function getAccessLinkUrl(values) {
+  async function getAccessLinkUrl(values, setFieldTouched) {
     const reqdata = {
       ...values,
       created_by: userProfile?.user_role_id,
@@ -255,7 +275,7 @@ function DynamicLink() {
     };
     try {
       setFetchingLink(true);
-      const result = await ApiService(reqdata, "dynamiclinks/link");
+      const result = await ApiService(reqdata, "link");
 
       const res = result?.data;
       console.log(res);
@@ -267,12 +287,40 @@ function DynamicLink() {
         open_in_ios: "Browser",
         open_in_android: "Browser",
       });
+      Object.keys(values).forEach((field) => {
+        setFieldTouched(field, true);
+      });
     } catch (error) {
       toast.error(error?.response?.data?.message);
     } finally {
       setFetchingLink(false);
     }
   }
+  const debouncedCheckLink = debounce(
+    async (value, setErrMessage, setSuccessMessage) => {
+      try {
+        setCheckingLink(true);
+        const result = await ApiService(
+          { custom_dynamic_link: value },
+          "validate-link"
+        );
+
+        if (result?.data?.result_flag) {
+          setErrMessage("Invalid Custom Link");
+          setSuccessMessage("");
+        } else {
+          // Clear error and set success message if Project ID is valid
+          setErrMessage("");
+          setSuccessMessage("Custom Link is valid");
+        }
+      } catch (error) {
+        toast.error(error?.response?.data?.message);
+      } finally {
+        setCheckingLink(false);
+      }
+    },
+    500
+  ); // 500ms debounce delay
   const deleteDynamicLinks = async () => {
     console.log(deleteItem);
     const reqdata = {
@@ -287,7 +335,7 @@ function DynamicLink() {
         isDeleting: true,
       });
 
-      const result = await ApiService(reqdata, "dynamiclinks/link");
+      const result = await ApiService(reqdata, "link");
 
       if (result?.status === 201) {
         toast.error("Dynamic Link Deleted");
@@ -347,7 +395,7 @@ function DynamicLink() {
 
                       const result = await ApiService(
                         { link_id: row?.original?.link_id },
-                        "dynamiclinks/get-link"
+                        "get-link"
                       );
 
                       const resp = result?.data[0];
@@ -823,6 +871,7 @@ function DynamicLink() {
                                             );
                                           } else {
                                             const formValues = {
+                                              ...values,
                                               project_id:
                                                 values?.project_id?.value,
                                               dynamic_link_name:
@@ -878,7 +927,87 @@ function DynamicLink() {
                           </FormControl>
                         </Grid>
 
-                        <Grid item md={6} className="w-full"></Grid>
+                        <Grid item md={6} className="w-full">
+                          <FormControl variant="standard" fullWidth>
+                            <Typography className="label d-flex items-center">
+                              Custom Dynamic Link
+                              <sup className="asc">*</sup>
+                            </Typography>
+
+                            <Field name="custom_dynamic_link">
+                              {({ field }) => (
+                                <BootstrapInput
+                                  {...field}
+                                  disabled={
+                                    formEditing
+                                      ? menu[3]?.edit_flag !== 1
+                                      : menu[3]?.add_flag !== 1
+                                  }
+                                  fullWidth
+                                  id="custom_dynamic_link"
+                                  size="small"
+                                  InputLabelProps={{ shrink: true }}
+                                  endAdornment={
+                                    <InputAdornment position="end">
+                                      {checkingLink ? (
+                                        <CircularProgress
+                                          sx={{
+                                            color: "#eb6400 !important",
+                                          }}
+                                        />
+                                      ) : (
+                                        <></>
+                                      )}
+                                    </InputAdornment>
+                                  }
+                                  onChange={async (e) => {
+                                    const value = e.target.value;
+                                    const regex = /^\S+$/;
+
+                                    if (
+                                      !value ||
+                                      (regex.test(value.toString()) &&
+                                        value.length <= 100)
+                                    ) {
+                                      // setFieldValue("project_id", value, false);
+                                      setFieldValue(
+                                        "custom_dynamic_link",
+                                        value
+                                      );
+                                      setSuccessMessage("");
+                                      setErrMessage("");
+
+                                      if (value?.length >= 20) {
+                                        debouncedCheckLink(
+                                          value,
+                                          setErrMessage,
+                                          setSuccessMessage
+                                        );
+                                      }
+                                    } else {
+                                      return;
+                                    }
+                                  }}
+                                />
+                              )}
+                            </Field>
+                            <ErrorMessage
+                              name="custom_dynamic_link"
+                              component="div"
+                              className="text-error text-12 mt-5"
+                            />
+                            {errMessage && (
+                              <div className="text-error text-12 mt-5">
+                                {errMessage}
+                              </div>
+                            )}
+                            {successMessage && (
+                              <div className="text-success text-12 mt-5">
+                                {successMessage}
+                              </div>
+                            )}
+                          </FormControl>
+                        </Grid>
 
                         <Grid item md={6} className="w-full">
                           <FormControl variant="standard" fullWidth>
@@ -959,9 +1088,10 @@ function DynamicLink() {
                                 }
                                 sx={{ width: "55%" }}
                                 disabled={
-                                  !values.link_param || formEditing
-                                    ? menu[3]?.edit_flag !== 1
-                                    : menu[3]?.add_flag !== 1
+                                  !values.link_param
+                                  // || formEditing
+                                  // ? menu[3]?.edit_flag !== 1
+                                  // : menu[3]?.add_flag !== 1
                                 }
                               />
                               <FormControlLabel
@@ -974,9 +1104,10 @@ function DynamicLink() {
                                 }
                                 sx={{ width: "55%" }}
                                 disabled={
-                                  !values.link_param || formEditing
-                                    ? menu[3]?.edit_flag !== 1
-                                    : menu[3]?.add_flag !== 1
+                                  !values.link_param
+                                  // || formEditing
+                                  // ? menu[3]?.edit_flag !== 1
+                                  // : menu[3]?.add_flag !== 1
                                 }
                               />
                               <ErrorMessage
@@ -1058,9 +1189,10 @@ function DynamicLink() {
                                 }
                                 sx={{ width: "55%" }}
                                 disabled={
-                                  !values.link_param || formEditing
-                                    ? menu[3]?.edit_flag !== 1
-                                    : menu[3]?.add_flag !== 1
+                                  !values.link_param
+                                  // || formEditing
+                                  // ? menu[3]?.edit_flag !== 1
+                                  // : menu[3]?.add_flag !== 1
                                 }
                               />
                               <FormControlLabel
@@ -1073,9 +1205,10 @@ function DynamicLink() {
                                 }
                                 sx={{ width: "55%" }}
                                 disabled={
-                                  !values.link_param || formEditing
-                                    ? menu[3]?.edit_flag !== 1
-                                    : menu[3]?.add_flag !== 1
+                                  !values.link_param
+                                  // || formEditing
+                                  // ? menu[3]?.edit_flag !== 1
+                                  // : menu[3]?.add_flag !== 1
                                 }
                               />
                               <ErrorMessage
@@ -1165,7 +1298,7 @@ function DynamicLink() {
                                 <LoadingButton
                                   // className="disable-button"
                                   loading={submitForm}
-                                  disabled={submitForm}
+                                  disabled={submitForm || errMessage}
                                   type="submit"
                                   fullWidth
                                   variant="contained"

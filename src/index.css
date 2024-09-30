@@ -524,6 +524,9 @@ h1 {
 .mt-10 {
   margin-top: 10px !important;
 }
+.w-50 {
+  width: 50px;
+}
 :root {
   --primary: #eb6400;
   --secondary: #fdaf17;
@@ -783,4 +786,36 @@ input:disabled {
 }
 .rct-node-icon {
   color: #eb6400 !important;
+}
+.single-field input {
+  border-radius: 8px;
+  padding: 13px 20px;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  font-size: var(--text-13);
+  font-weight: 500;
+  color: #111111;
+}
+.form-control {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #475f7b;
+  background-color: #fff;
+  border: 1px solid #dfe3e7;
+  border-radius: 10px;
+  -webkit-transition: border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.form-control:focus {
+  /*    color: #475F7B;*/
+  /*    background-color: #FFF;*/
+  border-color: #5a8dee;
+  outline: 0;
+  box-shadow: 0 3px 8px 0 rgb(0 0 0 / 10%);
 }

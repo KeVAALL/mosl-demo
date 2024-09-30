@@ -63,6 +63,7 @@ function User() {
     email: "",
     password: "",
     phone_number: "",
+    user_pin: "",
     role_id: null,
   });
   const [tableData, setTableData] = useState([]);
@@ -90,6 +91,9 @@ function User() {
         "Password must contain at least 1 alphabet character"
       )
       .required("Password is required"),
+    user_pin: Yup.string()
+      .min(4, "PIN should be 4 characters long")
+      .required("PIN is required"),
     phone_number: Yup.string()
       .min(10, "Invalid Phone number")
       .required("Phone Number is required"),
@@ -285,6 +289,7 @@ function User() {
                         name: resp?.user_name,
                         email: resp?.user_email,
                         password: resp?.user_password,
+                        user_pin: resp?.user_pin,
                         phone_number: resp?.user_phone_number,
                         role_id: roleDropdown?.find(
                           (user) => user?.value === resp?.user_role_id
@@ -751,7 +756,7 @@ function User() {
                               Enter PIN
                               <sup className="asc">*</sup>
                             </Typography>
-                            <Field name="pin">
+                            <Field name="user_pin">
                               {({ field }) => (
                                 <BootstrapInput
                                   {...field}
@@ -761,7 +766,7 @@ function User() {
                                       : menu[5]?.add_flag !== 1
                                   }
                                   fullWidth
-                                  id="pin"
+                                  id="user_pin"
                                   size="small"
                                   placeholder="PIN"
                                   InputLabelProps={{
@@ -779,7 +784,7 @@ function User() {
                                       (regex.test(value.toString()) &&
                                         value.length <= 4)
                                     ) {
-                                      setFieldValue("pin", value);
+                                      setFieldValue("user_pin", value);
                                     } else {
                                       return;
                                     }
@@ -788,7 +793,7 @@ function User() {
                               )}
                             </Field>
                             <ErrorMessage
-                              name="pin"
+                              name="user_pin"
                               component="div"
                               className="text-error text-12 mt-5"
                             />
