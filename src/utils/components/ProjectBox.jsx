@@ -19,7 +19,8 @@ export default function ProjectBox({ key, title, description, project }) {
       <Card
         sx={{
           backgroundColor:
-            SELECTED_PROJECT?.project_name === title ? "#f5ecd7" : "#fff",
+            // SELECTED_PROJECT?.project_name === title ? "#f5ecd7" : "#fff",
+            SELECTED_PROJECT?.id === project.id ? "#f5ecd7" : "#fff",
           minHeight: 200,
           boxShadow:
             "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px !important",
@@ -47,7 +48,8 @@ export default function ProjectBox({ key, title, description, project }) {
           }}
         >
           <Stack>
-            {SELECTED_PROJECT?.project_name === title ? (
+            {/* {SELECTED_PROJECT?.project_name === title ? ( */}
+            {SELECTED_PROJECT?.id === project.id ? (
               <Stack direction="row" alignItems="center" spacing={1}>
                 <Typography variant="h5" fontWeight={500} component="div">
                   {title}

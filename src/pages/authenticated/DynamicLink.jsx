@@ -5,11 +5,11 @@ import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
-import { styled } from "@mui/material/styles";
 import {
   Backdrop,
   Box,
   Button,
+  Card,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -18,6 +18,7 @@ import {
   DialogTitle,
   FormControl,
   FormControlLabel,
+  FormHelperText,
   FormLabel,
   Grid,
   IconButton,
@@ -40,6 +41,8 @@ import {
 } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import TimelineIcon from "@mui/icons-material/Timeline";
+import CloudDownloadOutlinedIcon from "@mui/icons-material/CloudDownloadOutlined";
+import CloseIcon from "@mui/icons-material/Close";
 // third-party
 import { useTable, usePagination, useGlobalFilter } from "react-table";
 
@@ -49,6 +52,7 @@ import {
   HeaderSort,
   GlobalFilter,
   StyledTableCell,
+  CSVExport,
 } from "../../utils/ReactTable/index";
 import { BootstrapInput } from "../../utils/Input/textfield";
 import { useSortBy } from "react-table";
@@ -64,6 +68,8 @@ import { useSelector } from "react-redux";
 import { debounce } from "lodash";
 import { useNavigate } from "react-router-dom";
 import { encryptData } from "../../utils/encryption";
+import MultiFileUpload from "../../utils/third-party/MultiFile";
+import { CSVLink } from "react-csv";
 
 function DynamicLink() {
   const { userProfile } = useSelector((state) => state.user);
@@ -126,6 +132,8 @@ function DynamicLink() {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteItem, setDeleteItem] = useState({});
   const [formEditing, setFormEditing] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [list, setList] = useState(false);
   const handleOpen = () => {
     // setOpen(true);
     setOpenForm(true);
@@ -489,6 +497,7 @@ function DynamicLink() {
   );
   const columns = useMemo(() => dataColumns, [dataColumns]);
   const data = useMemo(() => tableData, [tableData]);
+  console.log(data);
   const {
     getTableProps,
     getTableBodyProps,
@@ -533,6 +542,75 @@ function DynamicLink() {
 
   return (
     <>
+      <Modal
+        open={showUploadModal}
+        onClose={() => {
+          // setShowUploadModal(false);
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 700,
+            bgcolor: "background.paper",
+            border: "none",
+            borderRadius: 2,
+            boxShadow: 24,
+          }}
+        >
+          <Card
+            style={{ boxShadow: "none" }}
+            // title="Upload Multiple File"
+          >
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              sx={{ p: 3, borderBottom: "1px solid #9e9e9e" }}
+            >
+              <Typography variant="body1">Upload Multiple Files</Typography>
+              <CloseIcon
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setShowUploadModal(false);
+                }}
+              />
+            </Stack>
+            <Formik
+              initialValues={{ files: null }}
+              onSubmit={({ values }) => {
+                // submit form
+                console.log(values);
+              }}
+              validationSchema={Yup.object().shape({
+                files: Yup.mixed().required("Avatar is required."),
+              })}
+            >
+              {({ values, handleSubmit, setFieldValue, touched, errors }) => (
+                <form onSubmit={handleSubmit}>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <Stack sx={{ p: 3 }} spacing={1.5} alignItems="center">
+                        <MultiFileUpload
+                          showList={list}
+                          setFieldValue={setFieldValue}
+                          files={values.files}
+                          error={touched.files && !!errors.files}
+                        />
+                        {touched.files && errors.files && (
+                          <FormHelperText error>{errors.files}</FormHelperText>
+                        )}
+                      </Stack>
+                    </Grid>
+                  </Grid>
+                </form>
+              )}
+            </Formik>
+          </Card>
+        </Box>
+      </Modal>
       <Grid container spacing={4} sx={{ width: "100%" }}>
         <Grid item xs={12}>
           <Grid container display="flex" alignItems="center">
@@ -544,7 +622,46 @@ function DynamicLink() {
                 Manage Links
               </Typography>
             </Grid>
-            <Grid item xs={6} display="flex" justifyContent="flex-end">
+            <Grid item xs={2}></Grid>
+            <Grid item xs={2} display="flex" justifyContent="flex-end">
+              {/* <CSVExport data={data} filename={"link.csv"} /> */}
+              <CSVLink
+                data={data?.map((el) => {
+                  return {
+                    Dynamic_Name: el?.dynamic_link_name,
+                    Project_Name: el?.project_name,
+                    Custom_Dynamic_Link: el?.link_param,
+                    Browser_Url: el?.browser_url,
+                    Open_Deeplink_Browser_IOS: el?.open_in_browser_ios
+                      ? "1"
+                      : "0",
+                    Open_Deeplink_Browser_Android: el?.open_in_browser_android
+                      ? "1"
+                      : "0",
+                  };
+                })}
+                filename={"link.csv"}
+              >
+                <HtmlLightTooltip title="Download Sample" placement="top" arrow>
+                  <LoadingButton
+                    className="mui-icon-button"
+                    variant="outlined"
+                    startIcon={<CloudDownloadOutlinedIcon />}
+                  />
+                </HtmlLightTooltip>
+              </CSVLink>
+            </Grid>
+            <Grid item xs={1} display="flex" justifyContent="flex-end">
+              <Button
+                variant="contained"
+                onClick={() => {
+                  setShowUploadModal(true);
+                }}
+              >
+                Upload
+              </Button>
+            </Grid>
+            <Grid item xs={1} display="flex" justifyContent="flex-end">
               {menu[3]?.add_flag ? (
                 !openForm && (
                   <Button variant="contained" onClick={handleOpen}>

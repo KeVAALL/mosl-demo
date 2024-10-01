@@ -316,7 +316,7 @@ export const CSVExport = ({ data, filename, headers }) => {
   return (
     <Box>
       <CSVLink data={data} filename={filename} headers={headers}>
-        <Tooltip title="CSV Export">
+        <Tooltip title="Download">
           <CloudDownloadOutlinedIcon
             size={38}
             style={{

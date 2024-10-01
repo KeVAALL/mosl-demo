@@ -273,7 +273,7 @@ export default function SignIn() {
                     <Typography variant="body1">
                       Authenticate Yourself
                     </Typography>
-                    <Typography variant="caption">Enter OTP</Typography>
+                    <Typography variant="caption">Enter PIN</Typography>
                     <Stack direction="row" spacing={4} sx={{ mt: 2 }}>
                       {otp.map((value, index) => (
                         <input

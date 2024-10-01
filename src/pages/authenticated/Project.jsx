@@ -49,17 +49,20 @@ import { CustomSelect } from "../../utils/Input/reactSelect";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { toast } from "react-toastify";
 import { ApiService } from "../../utils/api/apiCall";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { LoadingButton } from "@mui/lab";
 import { HtmlLightTooltip } from "../../utils/components/Tooltip";
 import { useLocation, useNavigate } from "react-router-dom";
 import { debounce } from "lodash";
+import { setSelectedProject } from "../../redux/slices/projectSlice";
 
 function Project() {
   const { userProfile } = useSelector((state) => state.user);
   const { menu } = useSelector((state) => state.menu);
+  const { SELECTED_PROJECT } = useSelector((state) => state.project);
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { project_data } = location.state || {}; // Access 'id' from the state
   console.log(project_data);
   const [openForm, setOpenForm] = useState(false);
@@ -184,6 +187,15 @@ function Project() {
       console.log(result);
 
       if (result?.status === 201) {
+        if (formEditing) {
+          if (SELECTED_PROJECT.id === values.id) {
+            dispatch(
+              setSelectedProject({
+                selectedProject: values,
+              })
+            );
+          }
+        }
         toast.success(
           `Project${formEditing ? " Updated Successfully" : " Added"}`
         );

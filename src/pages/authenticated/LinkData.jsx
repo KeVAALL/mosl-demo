@@ -30,7 +30,6 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import dayjs from "dayjs";
@@ -53,8 +52,6 @@ function LinkData() {
   const [tableData, setTableData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
   const [searchingData, setSearchingData] = useState(false);
-  //   const [value, setValue] = React.useState(dayjs("2022-04-17"));
-  const [value, setValue] = React.useState(dayjs());
 
   // Table
   const dataColumns = useMemo(() => [...tableColumns], []);
@@ -294,9 +291,11 @@ function LinkData() {
                       {headerGroup.headers.map((column) => (
                         <StyledTableCell
                           key={column.id}
-                          {...column.getHeaderProps({
-                            style: { minWidth: column.minWidth },
-                          })}
+                          {...column.getHeaderProps()}
+                          style={{
+                            minWidth: column.minWidth,
+                            textAlign: column.align || "left",
+                          }}
                           sx={{
                             border: "1px solid #dbe0e5a6",
                           }}
@@ -335,9 +334,11 @@ function LinkData() {
                             {row.cells.map((cell) => (
                               <StyledTableCell
                                 key={cell.column.id}
-                                {...cell.getCellProps({
-                                  style: { minWidth: cell.column.minWidth },
-                                })}
+                                {...cell.getCellProps({})}
+                                style={{
+                                  minWidth: cell.column.minWidth,
+                                  textAlign: cell.column.align || "left",
+                                }}
                                 sx={{
                                   border: "1px solid #dbe0e5a6",
                                 }}

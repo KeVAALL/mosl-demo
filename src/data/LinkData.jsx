@@ -19,7 +19,9 @@ const tableColumns = [
   {
     Header: "Count",
     accessor: "count",
-    minWidth: 250,
+    minWidth: 50,
+    width: 50,
+    align: "right", // Add alignment property to this column
   },
 ];
 

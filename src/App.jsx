@@ -9,9 +9,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { Layout } from "./layout/mainLayout";
-import CommonLayout from "./layout/CommonLayout/commonLayout";
 import SignIn from "./pages/auth/SignIn";
-import SignUp from "./pages/auth/SignUp";
 import User from "./pages/authenticated/User";
 import Role from "./pages/authenticated/Role";
 import Dashboard from "./pages/authenticated/Dashboard";
