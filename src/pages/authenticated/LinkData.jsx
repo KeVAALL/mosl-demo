@@ -37,22 +37,22 @@ import dayjs from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { BootstrapInput } from "../../utils/Input/textfield";
 import { LoadingButton } from "@mui/lab";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
+import { ApiService } from "../../utils/api/apiCall";
+import { decryptData } from "../../utils/encryption";
 
 function LinkData() {
   const { link_id } = useParams();
   const { userProfile } = useSelector((state) => state.user);
-  const { menu } = useSelector((state) => state.menu);
   const location = useLocation();
   const navigate = useNavigate();
-  const { project_data } = location.state || {}; // Access 'id' from the state
 
   const [tableData, setTableData] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
+  const [searchingData, setSearchingData] = useState(false);
   //   const [value, setValue] = React.useState(dayjs("2022-04-17"));
   const [value, setValue] = React.useState(dayjs());
 
@@ -105,17 +105,42 @@ function LinkData() {
       submitForm();
     }
   };
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        // Get the owner dropdown and project list first
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    }
+  const onSubmit = async (values) => {
+    console.log(values);
 
-    fetchData();
-  }, [project_data]); // Use project_data as dependency
+    const reqdata = {
+      startDate: dayjs(values.startDate).format("YYYY-MM-DD"),
+      endDate: dayjs(values.endDate).format("YYYY-MM-DD"),
+      link_id: decryptData(link_id),
+    };
+    // Handle form submission
+    try {
+      setSearchingData(true);
+
+      const result = await ApiService(reqdata, "get-log");
+
+      console.log(result);
+
+      setTableData(result?.data);
+
+      // return result;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setSearchingData(false);
+    }
+  };
+  //   useEffect(() => {
+  //     async function fetchData() {
+  //       try {
+  //         // Get the owner dropdown and project list first
+  //       } catch (error) {
+  //         console.error("Error fetching data:", error);
+  //       }
+  //     }
+
+  //     fetchData();
+  //   }, [project_data]); // Use project_data as dependency
 
   return (
     <div>
@@ -154,10 +179,7 @@ function LinkData() {
                 startDate: Yup.date().required("Start Date is required"),
                 endDate: Yup.date().required("End Date is required"),
               })}
-              onSubmit={(values) => {
-                // Handle form submission here
-                console.log(values);
-              }}
+              onSubmit={onSubmit}
             >
               {({ values, setFieldValue, validateForm, submitForm }) => (
                 <Form>
@@ -177,10 +199,8 @@ function LinkData() {
                               className="date-field"
                               value={values.startDate}
                               onChange={(newValue) => {
-                                if (newValue && newValue.isValid()) {
-                                  const formattedDate =
-                                    newValue.format("YYYY-MM-DD"); // Format the date
-                                  setFieldValue("startDate", formattedDate); // Set the formatted date in Formik
+                                if (newValue) {
+                                  setFieldValue("startDate", dayjs(newValue)); // Set the formatted date in Formik
                                 } else {
                                   // Handle invalid date case if needed
                                   setFieldValue("startDate", ""); // Reset or set to empty if invalid
@@ -213,12 +233,14 @@ function LinkData() {
                             <DatePicker
                               label="End Date"
                               className="date-field"
-                              value={values.endDate ? values.endDate : null}
+                              value={values.endDate}
                               onChange={(newValue) => {
-                                if (newValue && newValue.isValid()) {
-                                  const formattedDate =
-                                    newValue.format("YYYY-MM-DD"); // Format the date
-                                  setFieldValue("endDate", formattedDate); // Set the formatted date in Formik
+                                console.log(newValue);
+                                if (newValue) {
+                                  //   const formattedDate =
+                                  //     newValue.format("YYYY-MM-DD"); // Format the date
+                                  //   console.log(formattedDate);
+                                  setFieldValue("endDate", dayjs(newValue)); // Set the formatted date in Formik
                                 } else {
                                   // Handle invalid date case if needed
                                   setFieldValue("endDate", ""); // Reset or set to empty if invalid
@@ -243,9 +265,8 @@ function LinkData() {
                     </Grid>
                     <Grid item md={1} xs={5}>
                       <LoadingButton
-                        // className="disable-button"
-                        //   loading={submitForm}
-                        //   disabled={submitForm}
+                        loading={searchingData}
+                        disabled={searchingData}
                         type="button"
                         fullWidth
                         variant="contained"
