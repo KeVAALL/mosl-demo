@@ -661,6 +661,10 @@ function DynamicLink() {
                     Open_Deeplink_Browser_Android: el?.open_in_browser_android
                       ? "1"
                       : "0",
+                    Application_Name_IOS: "MyAppIOS",
+                    Application_Name_Android: "MyAppAndroid",
+                    Open_In_App_IOS: el?.open_in_app_ios,
+                    Open_In_App_Android: el?.open_in_app_android,
                   };
                 })}
                 filename={"link.csv"}
