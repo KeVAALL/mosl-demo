@@ -13,6 +13,10 @@ import { useDropzone } from "react-dropzone";
 import RejectionFiles from "./RejectionFiles";
 import PlaceholderContent from "./PlaceholderContent";
 import FilesPreview from "./FilePreview";
+import { toast } from "react-toastify";
+import { ApiService } from "../api/apiCall";
+import { LoadingButton } from "@mui/lab";
+import { useState } from "react";
 
 const DropzoneWrapper = styled("div")(({ theme }) => ({
   outline: "none",
@@ -35,11 +39,14 @@ const MultiFileUpload = ({
   setFieldValue,
   sx,
   onUpload,
+  validateForm,
+  userProfile,
 }) => {
   const DropzopType = {
     default: "DEFAULT",
     standard: "STANDARD",
   };
+  const [uploading, setUploading] = useState(false);
   const {
     getRootProps,
     getInputProps,
@@ -149,17 +156,57 @@ const MultiFileUpload = ({
           <Button color="inherit" size="small" onClick={onRemoveAll}>
             Remove
           </Button>
-          <Button
+          <LoadingButton
+            loading={uploading}
+            disabled={uploading}
             type="button"
             size="small"
             variant="contained"
-            onClick={() => {
-              console.log(files);
+            onClick={async () => {
+              // Trigger form validation manually
+              const errors = await validateForm();
+
+              if (!errors.files) {
+                // If there are no validation errors for the files field, proceed with the upload
+                console.log("No errors, proceed with upload", files);
+
+                // Create a new FormData instance
+                const formData = new FormData();
+
+                // Append file to FormData
+                if (files) {
+                  formData.append("file", files); // Directly append the file object
+                }
+
+                // Append other request body data
+                formData.append("created_by", userProfile?.user_role_id);
+                try {
+                  setUploading(true);
+                  // Upload using the utility function
+                  const result = await ApiService(formData, "upload");
+
+                  console.log(result);
+
+                  if (result?.status === 201) {
+                    toast.success(`Link added`);
+                  }
+                } catch (error) {
+                  toast.error("Failed to upload file");
+                  console.error("Upload error:", error);
+                } finally {
+                  setUploading(false);
+                }
+                // You can add your upload logic here
+              } else {
+                console.error("Validation failed:", errors.files);
+
+                toast.error(errors.files);
+              }
             }}
             //   onClick={onUpload}
           >
             Upload files
-          </Button>
+          </LoadingButton>
         </Stack>
       )}
     </>

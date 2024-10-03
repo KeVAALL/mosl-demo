@@ -585,10 +585,31 @@ function DynamicLink() {
                 console.log(values);
               }}
               validationSchema={Yup.object().shape({
-                files: Yup.mixed().required("Avatar is required."),
+                files: Yup.mixed()
+                  .required("File is required.")
+                  .test("fileType", "Unsupported file type", (value) => {
+                    // Check if the file exists and is of a supported type
+                    return value
+                      ? [
+                          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                          "application/vnd.ms-excel",
+                        ].includes(value.type)
+                      : false;
+                  })
+                  .test("fileSize", "File is too large", (value) => {
+                    // Check if the file size is within the limit (e.g., 2MB)
+                    return value ? value.size <= 2 * 1024 * 1024 : false;
+                  }),
               })}
             >
-              {({ values, handleSubmit, setFieldValue, touched, errors }) => (
+              {({
+                values,
+                handleSubmit,
+                setFieldValue,
+                validateForm,
+                touched,
+                errors,
+              }) => (
                 <form onSubmit={handleSubmit}>
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
@@ -598,6 +619,8 @@ function DynamicLink() {
                           setFieldValue={setFieldValue}
                           files={values.files}
                           error={touched.files && !!errors.files}
+                          validateForm={validateForm}
+                          userProfile={userProfile}
                         />
                         {touched.files && errors.files && (
                           <FormHelperText error>{errors.files}</FormHelperText>
