@@ -72,6 +72,7 @@ function Application() {
       value: "android",
     },
     package_name: "",
+    app_id: "",
     description: "",
     // bundle_id: "",
     store_url: "",
@@ -81,6 +82,7 @@ function Application() {
     // p_id: Yup.object().required("Project is required"),
     platform: Yup.object().required("Platform is required"),
     package_name: Yup.string().required("Package Name is required"),
+    app_id: Yup.string().required("App ID is required"),
     description: Yup.string().required("Description is required"),
     store_url: Yup.string()
       .required("Store URL is required")
@@ -709,7 +711,7 @@ function Application() {
                               <Grid item md={4} className="pr-24 w-full">
                                 <FormControl variant="standard" fullWidth>
                                   <Typography className="label d-flex items-center">
-                                    Package Name
+                                    App Name
                                     <sup className="asc">*</sup>
                                   </Typography>
                                   <Field name="package_name">
@@ -724,7 +726,7 @@ function Application() {
                                         fullWidth
                                         id="package_name"
                                         size="small"
-                                        placeholder="Package Name"
+                                        placeholder="App Name"
                                         InputLabelProps={{ shrink: true }}
                                         onChange={(e) => {
                                           e.preventDefault();
@@ -742,6 +744,53 @@ function Application() {
                                               "package_name",
                                               value
                                             );
+                                          } else {
+                                            return;
+                                          }
+                                        }}
+                                      />
+                                    )}
+                                  </Field>
+                                  <ErrorMessage
+                                    name="package_name"
+                                    component="div"
+                                    className="text-error text-12 mt-5"
+                                  />
+                                </FormControl>
+                              </Grid>
+                              <Grid item md={4} className="pr-24 w-full">
+                                <FormControl variant="standard" fullWidth>
+                                  <Typography className="label d-flex items-center">
+                                    App ID
+                                    <sup className="asc">*</sup>
+                                  </Typography>
+                                  <Field name="app_id">
+                                    {({ field }) => (
+                                      <BootstrapInput
+                                        {...field}
+                                        disabled={
+                                          formEditing
+                                            ? menu[2]?.edit_flag !== 1
+                                            : menu[2]?.add_flag !== 1
+                                        }
+                                        fullWidth
+                                        id="app_id"
+                                        size="small"
+                                        placeholder="App ID"
+                                        InputLabelProps={{ shrink: true }}
+                                        onChange={(e) => {
+                                          e.preventDefault();
+                                          const { value } = e.target;
+
+                                          // const regex = /^[a-zA-Z][a-zA-Z\s]*$/;
+                                          const regex = /^\S+$/;
+
+                                          if (
+                                            !value ||
+                                            (regex.test(value.toString()) &&
+                                              value.length <= 50)
+                                          ) {
+                                            setFieldValue("app_id", value);
                                           } else {
                                             return;
                                           }

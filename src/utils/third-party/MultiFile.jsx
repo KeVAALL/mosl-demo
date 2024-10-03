@@ -41,6 +41,7 @@ const MultiFileUpload = ({
   onUpload,
   validateForm,
   userProfile,
+  setShowUploadModal,
 }) => {
   const DropzopType = {
     default: "DEFAULT",
@@ -117,7 +118,15 @@ const MultiFileUpload = ({
               }),
             }}
           >
-            <input {...getInputProps()} />
+            <input
+              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+              // {...getInputProps({ accept: "image/*" })}
+              {...getInputProps({ accept: ".xlsx, .xls" })}
+              // {...getInputProps({
+              //   accept:
+              //     ".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
+              // })}
+            />
             {/* { accept: ".xlsx, .xls" } */}
             <PlaceholderContent type={type} />
           </DropzoneWrapper>
@@ -183,12 +192,14 @@ const MultiFileUpload = ({
                 try {
                   setUploading(true);
                   // Upload using the utility function
-                  const result = await ApiService(formData, "upload");
+                  const result = await ApiService(formData, "upload-file");
 
                   console.log(result);
 
                   if (result?.status === 201) {
                     toast.success(`Link added`);
+                    setShowUploadModal(false);
+                    window.location.reload();
                   }
                 } catch (error) {
                   toast.error("Failed to upload file");
