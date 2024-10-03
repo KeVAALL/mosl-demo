@@ -805,7 +805,53 @@ function Application() {
                                   />
                                 </FormControl>
                               </Grid>
-                              <Grid item md={8} className="w-full">
+
+                              <Grid item md={4} className="w-full">
+                                <FormControl variant="standard" fullWidth>
+                                  <Typography className="label d-flex items-center">
+                                    Store URL
+                                    <sup className="asc">*</sup>
+                                  </Typography>
+                                  <Field name="store_url">
+                                    {({ field }) => (
+                                      <BootstrapInput
+                                        {...field}
+                                        disabled={
+                                          formEditing
+                                            ? menu[2]?.edit_flag !== 1
+                                            : menu[2]?.add_flag !== 1
+                                        }
+                                        fullWidth
+                                        id="store-url"
+                                        size="small"
+                                        placeholder="Store URL"
+                                        InputLabelProps={{ shrink: true }}
+                                        onChange={async (e) => {
+                                          const value = e.target.value;
+                                          const regex = /^\S+$/;
+
+                                          if (
+                                            !value ||
+                                            (regex.test(value.toString()) &&
+                                              value.length <= 200)
+                                          ) {
+                                            setFieldValue("store_url", value);
+                                          } else {
+                                            return;
+                                          }
+                                        }}
+                                      />
+                                    )}
+                                  </Field>
+                                  <ErrorMessage
+                                    name="store_url"
+                                    component="div"
+                                    className="text-error text-12 mt-5"
+                                  />
+                                </FormControl>
+                              </Grid>
+
+                              <Grid item md={8} className="pt-24 w-full">
                                 <FormControl variant="standard" fullWidth>
                                   <Typography className="label d-flex items-center">
                                     Description
@@ -894,51 +940,6 @@ function Application() {
                                   />
                                 </FormControl>
                               </Grid> */}
-
-                              <Grid item md={4} className="pt-24 pr-24 w-full">
-                                <FormControl variant="standard" fullWidth>
-                                  <Typography className="label d-flex items-center">
-                                    Store URL
-                                    <sup className="asc">*</sup>
-                                  </Typography>
-                                  <Field name="store_url">
-                                    {({ field }) => (
-                                      <BootstrapInput
-                                        {...field}
-                                        disabled={
-                                          formEditing
-                                            ? menu[2]?.edit_flag !== 1
-                                            : menu[2]?.add_flag !== 1
-                                        }
-                                        fullWidth
-                                        id="store-url"
-                                        size="small"
-                                        placeholder="Store URL"
-                                        InputLabelProps={{ shrink: true }}
-                                        onChange={async (e) => {
-                                          const value = e.target.value;
-                                          const regex = /^\S+$/;
-
-                                          if (
-                                            !value ||
-                                            (regex.test(value.toString()) &&
-                                              value.length <= 200)
-                                          ) {
-                                            setFieldValue("store_url", value);
-                                          } else {
-                                            return;
-                                          }
-                                        }}
-                                      />
-                                    )}
-                                  </Field>
-                                  <ErrorMessage
-                                    name="store_url"
-                                    component="div"
-                                    className="text-error text-12 mt-5"
-                                  />
-                                </FormControl>
-                              </Grid>
 
                               {/* <Grid item md={4} className="pt-24 w-full">
                                 <FormControl variant="standard" fullWidth>
