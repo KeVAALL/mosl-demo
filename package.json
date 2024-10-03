@@ -21,6 +21,7 @@
     "crypto-js": "^4.2.0",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.13",
+    "file-saver": "^2.0.5",
     "formik": "^2.4.6",
     "js-base64": "^3.7.7",
     "jwt-decode": "^4.0.0",
@@ -37,6 +38,7 @@
     "react-toastify": "^10.0.5",
     "redux-persist": "^6.0.0",
     "redux-persist-transform-encrypt": "^5.1.1",
+    "xlsx": "^0.18.5",
     "yup": "^1.4.0"
   },
   "devDependencies": {

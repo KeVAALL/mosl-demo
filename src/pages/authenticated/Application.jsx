@@ -799,7 +799,7 @@ function Application() {
                                     )}
                                   </Field>
                                   <ErrorMessage
-                                    name="package_name"
+                                    name="app_id"
                                     component="div"
                                     className="text-error text-12 mt-5"
                                   />
