@@ -99,6 +99,16 @@ function LinkData() {
     if (Object.keys(errors).length > 0) {
       toast.error("Please fill in all required fields");
     } else {
+      // Additional check for date validity using dayjs
+      if (dayjs(values.startDate).isAfter(dayjs(values.endDate))) {
+        toast.error("Start date must be before end date");
+        return;
+      }
+
+      if (dayjs(values.endDate).isBefore(dayjs(values.startDate))) {
+        toast.error("End date must be after start date");
+        return;
+      }
       submitForm();
     }
   };
@@ -117,6 +127,10 @@ function LinkData() {
       const result = await ApiService(reqdata, "get-log");
 
       console.log(result);
+
+      if (result?.data?.length < 1) {
+        toast.error("No data found");
+      }
 
       setTableData(result?.data);
 
@@ -195,6 +209,8 @@ function LinkData() {
                               label="Start Date"
                               className="date-field"
                               value={values.startDate}
+                              format="DD/MM/YYYY"
+                              inputFormat="DD/MM/YYYY"
                               onChange={(newValue) => {
                                 if (newValue) {
                                   setFieldValue("startDate", dayjs(newValue)); // Set the formatted date in Formik
@@ -232,6 +248,8 @@ function LinkData() {
                               label="End Date"
                               className="date-field"
                               value={values.endDate}
+                              format="DD/MM/YYYY"
+                              inputFormat="DD/MM/YYYY"
                               onChange={(newValue) => {
                                 console.log(newValue);
                                 if (newValue) {
