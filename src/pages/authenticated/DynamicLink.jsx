@@ -420,27 +420,28 @@ function DynamicLink() {
                       // const dropdownApp = await getApplicationDropdown(
                       //   resp?.project_id
                       // );
-                      // const dropdownApp = await getApplicationDropdown();
-                      // console.log(dropdownApp);
+                      const dropdownApp = await getApplicationDropdown();
+                      console.log(dropdownApp);
 
-                      // const app1 = dropdownApp?.find(
-                      //   (app) =>
-                      //     app?.value === resp?.open_in_app_ios_application_id
-                      // );
-                      // const app2 = dropdownApp?.find(
-                      //   (app) =>
-                      //     app?.value ===
-                      //     resp?.open_in_app_android_application_id
-                      // );
-                      const app1 = appDropdown?.find(
+                      const app1 = dropdownApp?.find(
                         (app) =>
                           app?.value === resp?.open_in_app_ios_application_id
                       );
-                      const app2 = appDropdown?.find(
+                      const app2 = dropdownApp?.find(
                         (app) =>
                           app?.value ===
                           resp?.open_in_app_android_application_id
                       );
+                      // console.log(appDropdown);
+                      // const app1 = appDropdown?.find(
+                      //   (app) =>
+                      //     app?.value === resp?.open_in_app_ios_application_id
+                      // );
+                      // const app2 = appDropdown?.find(
+                      //   (app) =>
+                      //     app?.value ===
+                      //     resp?.open_in_app_android_application_id
+                      // );
 
                       const newMap = {
                         ...resp,
