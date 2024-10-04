@@ -46,15 +46,17 @@ import {
 import { useSortBy } from "react-table";
 import { tableColumns, VisibleColumn } from "../../data/Role";
 import { ApiService } from "../../utils/api/apiCall";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { LoadingButton } from "@mui/lab";
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import { HtmlLightTooltip } from "../../utils/components/Tooltip";
+import { setMenu } from "../../redux/slices/menuSlice";
 
 function Role() {
   const { userProfile } = useSelector((state) => state.user);
   const { menu } = useSelector((state) => state.menu);
+  const dispatch = useDispatch();
   const [openForm, setOpenForm] = useState(false);
   const [submitRoleForm, setSubmitRoleForm] = useState(false);
 
@@ -125,6 +127,29 @@ function Role() {
           role_name: "",
           selectedMenus: [],
         });
+        if (formEditing) {
+          if (userProfile.user_role_id === values.role_id) {
+            console.log("Here");
+            console.log(menu);
+            const updatedArray = menu.map((item) => {
+              const matchingItem = values.menuIds.find(
+                (el) => el.menu_id === item.menu_id
+              );
+              if (matchingItem) {
+                return {
+                  ...item,
+                  add_flag: matchingItem.add_flag,
+                  delete_flag: matchingItem.delete_flag,
+                  edit_flag: matchingItem.edit_flag,
+                  display_flag: matchingItem.display_flag,
+                };
+              }
+              return item;
+            });
+            // console.log(updatedArray);
+            dispatch(setMenu({ menu: updatedArray }));
+          }
+        }
         getRoles();
       }
 
@@ -172,7 +197,7 @@ function Role() {
   const menus = [
     {
       value: 1, // Previously id
-      label: "Dashboard",
+      menu_name: "Dashboard",
       display_flag: 0,
       add_flag: 0,
       edit_flag: 0,
@@ -180,7 +205,7 @@ function Role() {
     },
     {
       value: 2, // Previously id
-      label: "Project",
+      menu_name: "Project",
       display_flag: 0,
       add_flag: 0,
       edit_flag: 0,
@@ -188,7 +213,7 @@ function Role() {
     },
     {
       value: 3, // Previously id
-      label: "Application",
+      menu_name: "Application",
       display_flag: 0,
       add_flag: 0,
       edit_flag: 0,
@@ -196,7 +221,7 @@ function Role() {
     },
     {
       value: 4, // Previously id
-      label: "Dynamic Links",
+      menu_name: "Dynamic Links",
       display_flag: 0,
       add_flag: 0,
       edit_flag: 0,
@@ -204,7 +229,7 @@ function Role() {
     },
     {
       value: 5,
-      label: "Users",
+      menu_name: "Users",
       display_flag: 0,
       add_flag: 0,
       edit_flag: 0,
@@ -212,7 +237,7 @@ function Role() {
     },
     {
       value: 6,
-      label: "Role",
+      menu_name: "Role",
       display_flag: 0,
       add_flag: 0,
       edit_flag: 0,
@@ -221,8 +246,9 @@ function Role() {
   ];
   const getInitialValues = () => ({
     role_name: "", // Role name field
-    menuIds: menus.map((menu) => {
+    menuIds: menus?.map((menu) => {
       return {
+        menu_name: menu.menu_name,
         menu_id: menu.value,
         display_flag: menu.display_flag,
         add_flag: menu.add_flag,
@@ -246,6 +272,7 @@ function Role() {
     role_name: Yup.string().required("Role name is required"),
     menuIds: Yup.array().of(
       Yup.object().shape({
+        menu_name: Yup.string(),
         menu_id: Yup.number().required(),
         display_flag: Yup.boolean(),
         add_flag: Yup.boolean(),
@@ -702,7 +729,9 @@ function Role() {
                               <TableBody className="table_body_main">
                                 {menus.map((menu, index) => (
                                   <TableRow key={menu.value}>
-                                    <TableCell>{menus[index].label}</TableCell>
+                                    <TableCell>
+                                      {menus[index].menu_name}
+                                    </TableCell>
 
                                     <TableCell align="center">
                                       <Field

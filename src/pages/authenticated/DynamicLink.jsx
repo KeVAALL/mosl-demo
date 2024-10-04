@@ -572,7 +572,7 @@ function DynamicLink() {
               justifyContent="space-between"
               sx={{ p: 3, borderBottom: "1px solid #9e9e9e" }}
             >
-              <Typography variant="body1">Upload Multiple Files</Typography>
+              <Typography variant="body1">Upload File</Typography>
               <CloseIcon
                 style={{ cursor: "pointer" }}
                 onClick={() => {
@@ -648,10 +648,14 @@ function DynamicLink() {
                 Manage Links
               </Typography>
             </Grid>
-            <Grid item xs={2}></Grid>
-            <Grid item xs={2} display="flex" justifyContent="flex-end">
-              {/* <CSVExport data={data} filename={"link.csv"} /> */}
-              {/* <CSVLink
+            <Grid
+              item
+              xs={formEditing || menu[3]?.add_flag !== 1 ? 3 : 2}
+            ></Grid>
+            {!openForm && (
+              <Grid item xs={2} display="flex" justifyContent="flex-end">
+                {/* <CSVExport data={data} filename={"link.csv"} /> */}
+                {/* <CSVLink
                 data={data?.map((el) => {
                   return {
                     Dynamic_Name: el?.dynamic_link_name,
@@ -672,69 +676,76 @@ function DynamicLink() {
                 })}
                 filename={"link.csv"}
               > */}
-              <HtmlLightTooltip title="Download Sample" placement="top" arrow>
-                <LoadingButton
+                <HtmlLightTooltip title="Download Sample" placement="top" arrow>
+                  <LoadingButton
+                    onClick={() => {
+                      const worksheet = XLSX.utils.json_to_sheet(
+                        data?.map((el) => {
+                          return {
+                            Dynamic_Name: el?.dynamic_link_name,
+                            Project_Name: el?.project_name,
+                            Custom_Dynamic_Link: el?.link_param,
+                            Browser_Url: el?.browser_url,
+                            Open_Deeplink_Browser_IOS: el?.open_in_browser_ios
+                              ? "1"
+                              : "0",
+                            Open_Deeplink_Browser_Android:
+                              el?.open_in_browser_android ? "1" : "0",
+                            Application_Name_IOS: "MyAppIOS",
+                            Application_Name_Android: "MyAppAndroid",
+                            Open_In_App_IOS: el?.open_in_app_ios ? "1" : "0",
+                            Open_In_App_Android: el?.open_in_app_android
+                              ? "1"
+                              : "0",
+                          };
+                        })
+                      );
+                      const workbook = XLSX.utils.book_new();
+                      XLSX.utils.book_append_sheet(
+                        workbook,
+                        worksheet,
+                        "Sheet1"
+                      );
+                      const excelBuffer = XLSX.write(workbook, {
+                        bookType: "xlsx",
+                        type: "array",
+                      });
+                      const blob = new Blob([excelBuffer], {
+                        type: "application/octet-stream",
+                      });
+                      saveAs(blob, `test.xlsx`);
+                    }}
+                    className="mui-icon-button"
+                    variant="outlined"
+                    startIcon={<CloudDownloadOutlinedIcon />}
+                  />
+                </HtmlLightTooltip>
+                {/* </CSVLink> */}
+              </Grid>
+            )}
+            {!openForm && (
+              <Grid item xs={1} display="flex" justifyContent="flex-end">
+                <Button
+                  variant="contained"
                   onClick={() => {
-                    const worksheet = XLSX.utils.json_to_sheet(
-                      data?.map((el) => {
-                        return {
-                          Dynamic_Name: el?.dynamic_link_name,
-                          Project_Name: el?.project_name,
-                          Custom_Dynamic_Link: el?.link_param,
-                          Browser_Url: el?.browser_url,
-                          Open_Deeplink_Browser_IOS: el?.open_in_browser_ios
-                            ? "1"
-                            : "0",
-                          Open_Deeplink_Browser_Android:
-                            el?.open_in_browser_android ? "1" : "0",
-                          Application_Name_IOS: "MyAppIOS",
-                          Application_Name_Android: "MyAppAndroid",
-                          Open_In_App_IOS: el?.open_in_app_ios ? "1" : "0",
-                          Open_In_App_Android: el?.open_in_app_android
-                            ? "1"
-                            : "0",
-                        };
-                      })
-                    );
-                    const workbook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-                    const excelBuffer = XLSX.write(workbook, {
-                      bookType: "xlsx",
-                      type: "array",
-                    });
-                    const blob = new Blob([excelBuffer], {
-                      type: "application/octet-stream",
-                    });
-                    saveAs(blob, `test.xlsx`);
+                    setShowUploadModal(true);
                   }}
-                  className="mui-icon-button"
-                  variant="outlined"
-                  startIcon={<CloudDownloadOutlinedIcon />}
-                />
-              </HtmlLightTooltip>
-              {/* </CSVLink> */}
-            </Grid>
-            <Grid item xs={1} display="flex" justifyContent="flex-end">
-              <Button
-                variant="contained"
-                onClick={() => {
-                  setShowUploadModal(true);
-                }}
-              >
-                Upload
-              </Button>
-            </Grid>
-            <Grid item xs={1} display="flex" justifyContent="flex-end">
-              {menu[3]?.add_flag ? (
-                !openForm && (
+                >
+                  Upload
+                </Button>
+              </Grid>
+            )}
+            {menu[3]?.add_flag ? (
+              <Grid item xs={1} display="flex" justifyContent="flex-end">
+                {!openForm && (
                   <Button variant="contained" onClick={handleOpen}>
                     Add Link
                   </Button>
-                )
-              ) : (
-                <></>
-              )}
-            </Grid>
+                )}
+              </Grid>
+            ) : (
+              <></>
+            )}
           </Grid>
         </Grid>
         <Grid item xs={12}>
