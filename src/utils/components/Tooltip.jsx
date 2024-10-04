@@ -1,13 +1,13 @@
 import { Tooltip, tooltipClasses } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
 
-export const HtmlLightTooltip = styled(({ className, ...props }) => (
+export const HtmlLightTooltip = styled(({ className, maxWidth, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
+))(({ theme, maxWidth }) => ({
   [`& .${tooltipClasses.tooltip}`]: {
     backgroundColor: "#f5ecd7",
     color: "rgba(0, 0, 0, 0.87)",
-    maxWidth: 220,
+    maxWidth: maxWidth || 220,
     height: 30,
     fontSize: theme.typography.pxToRem(12),
     border: "1px solid #000",

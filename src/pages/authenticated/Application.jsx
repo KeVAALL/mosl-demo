@@ -4,6 +4,7 @@ import VisibilityOutlined from "@mui/icons-material/VisibilityOutlined";
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 import {
   Box,
@@ -82,7 +83,13 @@ function Application() {
     // p_id: Yup.object().required("Project is required"),
     platform: Yup.object().required("Platform is required"),
     package_name: Yup.string().required("Package Name is required"),
-    app_id: Yup.string().required("App ID is required"),
+    app_id: Yup.string().when("platform", (platform, schema) => {
+      console.log(platform);
+      if (platform[0]?.value === "ios") {
+        return schema.required("App ID is required for iOS platform");
+      }
+      return schema.notRequired();
+    }),
     description: Yup.string().required("Description is required"),
     store_url: Yup.string()
       .required("Store URL is required")
@@ -275,7 +282,6 @@ function Application() {
       });
     }
   };
-
   const dataColumns = useMemo(
     () => [
       ...tableColumns,
@@ -647,9 +653,10 @@ function Application() {
                                   }
                                   options={applicationArr}
                                   placeholder="Select Application"
-                                  onChange={(option) =>
-                                    setFieldValue("platform", option)
-                                  }
+                                  onChange={(option) => {
+                                    console.log(option);
+                                    setFieldValue("platform", option);
+                                  }}
                                   id="application"
                                   isSearchable={false}
                                 />
@@ -711,7 +718,30 @@ function Application() {
                               <Grid item md={4} className="pr-24 w-full">
                                 <FormControl variant="standard" fullWidth>
                                   <Typography className="label d-flex items-center">
-                                    App Name
+                                    {values.platform.value === "android" ? (
+                                      <Stack
+                                        direction="row"
+                                        alignItems="center"
+                                      >
+                                        <span>Package Name</span>
+                                        <HtmlLightTooltip
+                                          // open={true}
+                                          maxWidth="460px"
+                                          arrow
+                                          title="intent://send/#Intent;package=com.whatsapp;scheme=whatsapp;end"
+                                          placement="right"
+                                        >
+                                          <InfoOutlinedIcon
+                                            style={{
+                                              fontSize: "14px",
+                                              marginLeft: "4px",
+                                            }}
+                                          />
+                                        </HtmlLightTooltip>
+                                      </Stack>
+                                    ) : (
+                                      "App Name"
+                                    )}
                                     <sup className="asc">*</sup>
                                   </Typography>
                                   <Field name="package_name">
@@ -726,7 +756,11 @@ function Application() {
                                         fullWidth
                                         id="package_name"
                                         size="small"
-                                        placeholder="App Name"
+                                        placeholder={
+                                          values.platform.value === "android"
+                                            ? "Package Name"
+                                            : "App Name"
+                                        }
                                         InputLabelProps={{ shrink: true }}
                                         onChange={(e) => {
                                           e.preventDefault();
@@ -758,53 +792,55 @@ function Application() {
                                   />
                                 </FormControl>
                               </Grid>
-                              <Grid item md={4} className="pr-24 w-full">
-                                <FormControl variant="standard" fullWidth>
-                                  <Typography className="label d-flex items-center">
-                                    App ID
-                                    <sup className="asc">*</sup>
-                                  </Typography>
-                                  <Field name="app_id">
-                                    {({ field }) => (
-                                      <BootstrapInput
-                                        {...field}
-                                        disabled={
-                                          formEditing
-                                            ? menu[2]?.edit_flag !== 1
-                                            : menu[2]?.add_flag !== 1
-                                        }
-                                        fullWidth
-                                        id="app_id"
-                                        size="small"
-                                        placeholder="App ID"
-                                        InputLabelProps={{ shrink: true }}
-                                        onChange={(e) => {
-                                          e.preventDefault();
-                                          const { value } = e.target;
-
-                                          // const regex = /^[a-zA-Z][a-zA-Z\s]*$/;
-                                          const regex = /^\S+$/;
-
-                                          if (
-                                            !value ||
-                                            (regex.test(value.toString()) &&
-                                              value.length <= 50)
-                                          ) {
-                                            setFieldValue("app_id", value);
-                                          } else {
-                                            return;
+                              {values?.platform?.value === "ios" && (
+                                <Grid item md={4} className="pr-24 w-full">
+                                  <FormControl variant="standard" fullWidth>
+                                    <Typography className="label d-flex items-center">
+                                      App ID
+                                      <sup className="asc">*</sup>
+                                    </Typography>
+                                    <Field name="app_id">
+                                      {({ field }) => (
+                                        <BootstrapInput
+                                          {...field}
+                                          disabled={
+                                            formEditing
+                                              ? menu[2]?.edit_flag !== 1
+                                              : menu[2]?.add_flag !== 1
                                           }
-                                        }}
-                                      />
-                                    )}
-                                  </Field>
-                                  <ErrorMessage
-                                    name="app_id"
-                                    component="div"
-                                    className="text-error text-12 mt-5"
-                                  />
-                                </FormControl>
-                              </Grid>
+                                          fullWidth
+                                          id="app_id"
+                                          size="small"
+                                          placeholder="App ID"
+                                          InputLabelProps={{ shrink: true }}
+                                          onChange={(e) => {
+                                            e.preventDefault();
+                                            const { value } = e.target;
+
+                                            // const regex = /^[a-zA-Z][a-zA-Z\s]*$/;
+                                            const regex = /^\S+$/;
+
+                                            if (
+                                              !value ||
+                                              (regex.test(value.toString()) &&
+                                                value.length <= 50)
+                                            ) {
+                                              setFieldValue("app_id", value);
+                                            } else {
+                                              return;
+                                            }
+                                          }}
+                                        />
+                                      )}
+                                    </Field>
+                                    <ErrorMessage
+                                      name="app_id"
+                                      component="div"
+                                      className="text-error text-12 mt-5"
+                                    />
+                                  </FormControl>
+                                </Grid>
+                              )}
 
                               <Grid item md={4} className="w-full">
                                 <FormControl variant="standard" fullWidth>
