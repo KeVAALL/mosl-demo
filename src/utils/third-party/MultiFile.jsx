@@ -202,7 +202,7 @@ const MultiFileUpload = ({
                     window.location.reload();
                   }
                 } catch (error) {
-                  toast.error("Failed to upload file");
+                  toast.error(error?.response?.data?.message);
                   console.error("Upload error:", error);
                 } finally {
                   setUploading(false);
