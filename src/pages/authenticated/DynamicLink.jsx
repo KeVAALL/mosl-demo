@@ -189,7 +189,7 @@ function DynamicLink() {
       toast.error("Invalid Custom Link");
       return; // Prevent form submission
     }
-    const { link_param, ...newObj } = values;
+    const { link_param, dynamic_link, ...newObj } = values;
     const reqdata = {
       ...newObj,
       project_id: SELECTED_PROJECT?.id,
@@ -283,7 +283,7 @@ function DynamicLink() {
       toast.error(error?.response?.data?.message);
     }
   }
-  async function getAccessLinkUrl(values, setFieldTouched) {
+  async function getAccessLinkUrl(values, setFieldTouched, setFieldValue) {
     const reqdata = {
       ...values,
       created_by: userProfile?.user_role_id,
@@ -1088,7 +1088,8 @@ function DynamicLink() {
                                             };
                                             getAccessLinkUrl(
                                               formValues,
-                                              setFieldTouched
+                                              setFieldTouched,
+                                              setFieldValue
                                             );
                                           } else {
                                             const formValues = {
@@ -1100,7 +1101,8 @@ function DynamicLink() {
                                             };
                                             getAccessLinkUrl(
                                               formValues,
-                                              setFieldTouched
+                                              setFieldTouched,
+                                              setFieldValue
                                             );
                                           }
                                         }
