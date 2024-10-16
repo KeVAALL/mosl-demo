@@ -295,7 +295,6 @@ function Role() {
   //   //   "At least one permission (Display, Add, Edit, Delete) must be selected.",
   //   //   (values) =>
   //   //     values.display || values.add || values.edit || values.delete
-  //   // );
 
   const dataColumns = useMemo(
     () => [
