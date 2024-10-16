@@ -332,7 +332,6 @@ function Role() {
                   onClick={async () => {
                     console.log(row);
                     try {
-                      // Find the index of the matched element in the tableData array
                       setIsEditing(true);
 
                       const result = await ApiService(
