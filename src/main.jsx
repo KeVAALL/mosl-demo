@@ -8,7 +8,7 @@ import "./index.css";
 
 alert("Printing...")
 console.log("import.meta.env.VITE_BASE_URL: ",import.meta.env.VITE_BASE_URL)
-console.log("process.env.NODE_ENV: ",process.env.NODE_ENV)
+console.log("process.env.NODE_ENV: ",process.env.VITE_BASE_URL)
 
 
 ReactDOM.createRoot(document.getElementById("root")).render(
