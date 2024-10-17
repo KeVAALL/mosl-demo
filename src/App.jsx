@@ -36,7 +36,6 @@ const theme = createTheme({
 
 function App() {
   const { menu } = useSelector((state) => state.menu);
-
   const componentMapping = {
     dashboard: <Dashboard />,
     project: <Project />,
