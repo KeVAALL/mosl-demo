@@ -117,7 +117,6 @@ function Project() {
       setLoadingData(false);
     }
   }
-
   async function getOwnerDropdown() {
     try {
       const result = await ApiService({ method: "getusers" }, "masters/get");

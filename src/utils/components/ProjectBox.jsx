@@ -31,7 +31,9 @@ export default function ProjectBox({ key, title, description, project }) {
           },
         }}
         onClick={() => {
-          navigate("/home/project", { state: { project_data: project } });
+          navigate("/deeplinkui/home/project", {
+            state: { project_data: project },
+          });
           const resp = {
             selectedProject: project,
           };

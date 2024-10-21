@@ -154,7 +154,7 @@ function SignUp() {
                   variant="contained"
                   sx={{ mt: 1, mb: 1, backgroundColor: "primary.main" }}
                   onClick={() => {
-                    navigate("/home/dashboard");
+                    navigate("/deeplinkui/home/dashboard");
                   }}
                 >
                   Register

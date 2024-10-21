@@ -26,7 +26,8 @@ const GuestGuard = ({ children }) => {
       console.log(location?.state?.from?.pathname);
       console.log(menu);
       const redirectPath =
-        location?.state?.from?.pathname || `/home/${menu[0]?.menu_url}`;
+        location?.state?.from?.pathname ||
+        `/deeplinkui/home/${menu[0]?.menu_url}`;
       navigate(redirectPath, { replace: true });
     }
   }, [isLoggedIn, token, navigate, location?.state?.from?.pathname, menu]);

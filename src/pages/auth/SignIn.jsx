@@ -76,7 +76,7 @@ export default function SignIn() {
         if (result?.data?.data?.is_password_reset) {
           toast.warn("Please reset your Password!");
           localStorage.setItem("resetEmail", encryptData(values?.email));
-          navigate("/reset-password");
+          navigate("/deeplinkui/reset-password");
         } else {
           // const firstURL = result?.data?.data?.menu[0]?.menu_url;
           setInitialValues(values);
@@ -258,7 +258,9 @@ export default function SignIn() {
                   if (otp.join("") === verifyPin) {
                     toast.success("Login successful!");
 
-                    navigate(`/home/${initialUrl ? initialUrl : ""}`);
+                    navigate(
+                      `/deeplinkui/home/${initialUrl ? initialUrl : ""}`
+                    );
 
                     dispatch(setProfile(user));
 
@@ -461,7 +463,10 @@ export default function SignIn() {
                         </FormControl>
                       </Grid>
                       <Grid item xs={6} alignItems="flex-end">
-                        <Link href="/forgot-password" className="custom-link">
+                        <Link
+                          href="/deeplinkui/forgot-password"
+                          className="custom-link"
+                        >
                           <Typography variant="caption">
                             Forgot password?
                           </Typography>

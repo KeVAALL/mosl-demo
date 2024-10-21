@@ -496,7 +496,9 @@ function DynamicLink() {
                     // console.log(row.original);
                     // setDeleteItem(row?.original);
                     // handleDeleteConfirmation();
-                    navigate(`/home/${encryptData(row.original.link_id)}`);
+                    navigate(
+                      `/deeplinkui/home/${encryptData(row.original.link_id)}`
+                    );
                   }}
                 />
               </HtmlLightTooltip>

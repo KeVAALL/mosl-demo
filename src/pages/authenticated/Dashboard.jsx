@@ -95,7 +95,7 @@ function Dashboard() {
             <Grid item xs={12} sm={6} md={4}>
               <Card
                 onClick={() => {
-                  navigate("/home/project");
+                  navigate("/deeplinkui/home/project");
                 }}
                 sx={{
                   minHeight: 200,

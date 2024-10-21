@@ -47,7 +47,7 @@ function App() {
 
   const appLayout = createBrowserRouter([
     {
-      path: `/`,
+      path: `/deeplinkui`,
       // element: (
       //   // <AuthGuard>
       //   // </AuthGuard>
@@ -55,8 +55,8 @@ function App() {
       // ),
       children: [
         {
-          path: "/",
-          element: <Navigate to="/sign-in" />,
+          path: "/deeplinkui",
+          element: <Navigate to="/deeplinkui/sign-in" />,
         },
         {
           path: "sign-in",
@@ -93,7 +93,7 @@ function App() {
       ],
     },
     {
-      path: "/",
+      path: "/deeplinkui",
       children: [
         {
           path: "home",
