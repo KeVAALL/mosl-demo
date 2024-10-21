@@ -1,6 +1,7 @@
 {
   "name": "mock-design",
   "private": true,
+  "homepage": "/deeplinkui",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
