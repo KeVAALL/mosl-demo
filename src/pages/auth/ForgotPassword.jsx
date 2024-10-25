@@ -197,7 +197,8 @@ export default function ForgotPassword() {
             <KeyboardBackspaceOutlinedIcon
               style={{ fontSize: "20px", paddingTop: "4px" }}
             />
-            <Link href="/deeplinkui/sign-in" className="custom-link">
+            {/* <Link href="/deeplinkui/sign-in" className="custom-link"> */}
+            <Link href="/sign-in" className="custom-link">
               <Typography variant="caption">Go back</Typography>
             </Link>
           </Stack>

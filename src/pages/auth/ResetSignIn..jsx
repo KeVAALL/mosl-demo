@@ -54,11 +54,13 @@ export default function ResetSignIn() {
         if (result?.data?.data?.is_password_reset) {
           toast.warn("Please reset your Password!");
           localStorage.setItem("resetEmail", encryptData(values?.email));
-          navigate("/deeplinkui/reset-password");
+          // navigate("/deeplinkui/reset-password");
+          navigate("/reset-password");
         } else {
           toast.success("Login successful!");
           const firstURL = result?.data?.data?.menu[0]?.menu_url;
-          navigate(`/deeplinkui/home/${firstURL ? firstURL : ""}`);
+          // navigate(`/deeplinkui/home/${firstURL ? firstURL : ""}`);
+          navigate(`/home/${firstURL ? firstURL : ""}`);
 
           const apiResponse = {
             userProfile: result?.data?.data,

@@ -497,7 +497,8 @@ function DynamicLink() {
                     // setDeleteItem(row?.original);
                     // handleDeleteConfirmation();
                     navigate(
-                      `/deeplinkui/home/${encryptData(row.original.link_id)}`
+                      // `/deeplinkui/home/${encryptData(row.original.link_id)}`
+                      `/home/${encryptData(row.original.link_id)}`
                     );
                   }}
                 />

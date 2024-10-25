@@ -76,7 +76,8 @@ export default function SignIn() {
         if (result?.data?.data?.is_password_reset) {
           toast.warn("Please reset your Password!");
           localStorage.setItem("resetEmail", encryptData(values?.email));
-          navigate("/deeplinkui/reset-password");
+          // navigate("/deeplinkui/reset-password");
+          navigate("/reset-password");
         } else {
           // const firstURL = result?.data?.data?.menu[0]?.menu_url;
           setInitialValues(values);
@@ -259,7 +260,8 @@ export default function SignIn() {
                     toast.success("Login successful!");
 
                     navigate(
-                      `/deeplinkui/home/${initialUrl ? initialUrl : ""}`
+                      // `/deeplinkui/home/${initialUrl ? initialUrl : ""}`
+                      `/home/${initialUrl ? initialUrl : ""}`
                     );
 
                     dispatch(setProfile(user));
@@ -464,7 +466,8 @@ export default function SignIn() {
                       </Grid>
                       <Grid item xs={6} alignItems="flex-end">
                         <Link
-                          href="/deeplinkui/forgot-password"
+                          // href="/deeplinkui/forgot-password"
+                          href="/forgot-password"
                           className="custom-link"
                         >
                           <Typography variant="caption">
